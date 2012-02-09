@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune " id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="0.10.0.0" version="1.0.2" markersize="24">
+	<card back="r1" front="r2" width="63" height="88" cornerRadius="0">
+		<property name="Type" type="String" hidden="false" ignoreText="False" />
+		<property name="Deployment Cost" type="String" hidden="false" ignoreText="False" />
+		<property name="Allegiance" type="String" hidden="false" ignoreText="False" />
+		<property name="Talent Requirement" type="String" hidden="false" ignoreText="False" />
+		<property name="Subtype" type="String" hidden="false" ignoreText="False" />
+		<property name="Operation" type="String" hidden="false" ignoreText="False" />
+		<property name="Command" type="String" hidden="false" ignoreText="False" />
+		<property name="Resistance" type="String" hidden="false" ignoreText="False" />
+		<property name="Dueling" type="String" hidden="false" ignoreText="False" />
+		<property name="Battle" type="String" hidden="false" ignoreText="False" />
+		<property name="Intrigue" type="String" hidden="false" ignoreText="False" />
+		<property name="Arbitration" type="String" hidden="false" ignoreText="False" />
+		<property name="Weirding" type="String" hidden="false" ignoreText="False" />
+		<property name="Prescience" type="String" hidden="false" ignoreText="False" />
+		<property name="Number" type="String" hidden="false" ignoreText="False" />
+		<property name="Imperial" type="String" hidden="false" ignoreText="False" />
+		<property name="House" type="String" hidden="false" ignoreText="False" />
+	</card>
+	<table name="Table" visibility="undefined" ordered="false" width="640" height="480" board="r3" boardPosition="0,0,0,0" background="r4" backgroundStyle="uniformToFill">
+		<groupaction menu="Flip a Coin" default="false" shortcut="Ctrl+F" execute="flipCoin" />
+		<cardaction menu="Engage/Disengage" default="true" shortcut="Ctrl+E" execute="engage" />
+		<groupaction menu="Disengage all Cards" default="false" shortcut="F5" execute="restoreAll" />
+		<cardaction menu="Subdue/Deploy/Petition" default="false" shortcut="Ctrl+Q" execute="subdue" />
+		<cardaction menu="Add Spice Token" default="false" shortcut="Alt+S" execute="addSpice" />
+		<cardaction menu="Remove Spice Token" default="false" shortcut="Alt+Shift+S" execute="subSpice" />
+		<cardaction menu="Add Deferment Token" default="false" shortcut="Alt+D" execute="addDeferment" />
+		<cardaction menu="Remove Deferment Token" default="false" shortcut="Alt+Shift+D" execute="subDeferment" />
+		<groupactions menu="Phases">
+			<groupaction menu="Next Phase" default="false" shortcut="Ctrl+Z" execute="nextPhase" />
+			<groupaction menu="Go to Opening Interval" default="false" shortcut="Ctrl+Shift+Z" execute="goToOpeningInterval" />
+		</groupactions>
+		<cardactions menu="Rites">
+			<cardaction menu="Dueling Rite" default="false" shortcut="F1" execute="dueling" />
+			<cardaction menu="Battle Rite" default="false" shortcut="F2" execute="battle" />
+			<cardaction menu="Arbitration Rite" default="false" shortcut="F3" execute="arbitration" />
+			<cardaction menu="Intrigue Rite" default="false" shortcut="F4" execute="intrigue" />
+		</cardactions>
+	</table>
+	<player summary="{#Solaris} / {#Spice} / {#Favor} / {#Hand}">
+		<hand name="Hand" visibility="me" ordered="false" width="63" height="88" icon="r10">
+			<cardaction menu="Play Card" default="true" shortcut="Ctrl+W" execute="play" />
+		</hand>
+		<group name="House Deck" visibility="none" ordered="false" width="63" height="88" icon="r11" collapsed="false">
+			<groupaction menu="Draw" default="true" shortcut="Ctrl+S" execute="draw" />
+			<groupaction menu="Draw Many" default="false" shortcut="Ctrl+Shift+S" execute="drawMany" />
+			<groupaction menu="Shuffle" default="false" shortcut="Ctrl+A" execute="shuffle" />
+		</group>
+		<group name="House Discard" visibility="all" ordered="false" width="63" height="88" icon="r12" collapsed="false" />
+		<group name="Imperial Deck" visibility="none" ordered="false" width="63" height="88" icon="r13" collapsed="false">
+			<groupaction menu="Imperial Draw" default="true" execute="imperialDraw" />
+			<groupaction menu="Shuffle" default="false" shortcut="Ctrl+Shift+A" execute="shuffle" />
+			<groupaction menu="Setup Imperial Assembly" default="false" execute="setupAssembly" />
+		</group>
+		<group name="Imperial Discard" visibility="all" ordered="false" width="63" height="88" icon="r14" collapsed="false" />
+		<counter name="Spice" default="0" reset="false" icon="r6" />
+		<counter name="Solaris" default="5" reset="false" icon="r7" />
+		<counter name="Favor" default="0" reset="false" icon="r8" />
+	</player>
+	<shared>
+		<counter name="Guild Hoard" default="8" reset="false" icon="r16" />
+		<counter name="CROE" default="3" reset="false" icon="r17" />
+	</shared>
+	<deck>
+		<section name="Imperial Deck" group="Imperial Deck" />
+		<section name="House Deck" group="House Deck" />
+		<section name="Hand" group="Hand" />
+	</deck>
+	<scripts>
+		<script src="r5" />
+	</scripts>
+</game>
