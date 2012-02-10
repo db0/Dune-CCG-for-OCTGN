@@ -16,6 +16,10 @@ Sample screenshot of 1.0.2
 Changelog
 ---------
 
+### 1.0.4
+
+* Added CHOAM Exchange functions for buying and selling Spice. This automatically stops players form doing 2 CHOAM Exchanges per turn, or buying/selling more than 3 spice per exchange, or from buying/selling when there is not  enough Solaris or Spice. These functions also automatically reset the CROE when the Guild Hoard is modified.
+
 ### 1.0.3
 
 * Added Global Phase counter and made the phases global. Reduced phases to 3. Phases now change with ENTER
@@ -40,3 +44,10 @@ Changelog
 * Petitioning a facedown card with the Assembly card marker, will inform everyone that the card is up for petition. If successful, the player should move the card to his play area. Petitioning a face up card with an Assembly marker, will turn it face down again and inform that the petition was unsuccessful.
 * Deploying a face down card (that doesn't have an "Assembly" marker) with less deferment tokens than its deployment cost will ask the player to pay the difference. It will also notify everyone is a player deploys something with 0 deferment tokens
 * The "refresh all" function will remove Assembly markers from face up cards. This way, you can see which cards have just been put in from the assembly this turn.
+
+
+Roadmap
+-------
+
+- Automatic Opening Interval functions (card disengage, adding deferal tokens, assign initiative)
+- Automatic Closing Interval functions (hand refresh)
