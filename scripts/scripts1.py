@@ -1,3 +1,19 @@
+    # Python Scripts for the Doomtown CCG definition for OCTGN
+    # Copyright (C) 2012  Konstantine Thoukydides
+
+    # This python script is free software: you can redistribute it and/or modify
+    # it under the terms of the GNU General Public License as published by
+    # the Free Software Foundation, either version 3 of the License, or
+    # (at your option) any later version.
+
+    # This program is distributed in the hope that it will be useful,
+    # but WITHOUT ANY WARRANTY; without even the implied warranty of
+    # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    # GNU General Public License for more details.
+
+    # You should have received a copy of the GNU General Public License
+    # along with this script.  If not, see <http://www.gnu.org/licenses/>.
+
 Solaris = ("Solaris", "b30701c1-d925-45fc-afe4-6c341a103f32")
 Spice = ("Spice", "491cf29f-224c-4d8b-8e2d-58467686be88")
 Favor = ("Favor", "6ed72fed-4a63-4f38-95bb-424cbbcdd427")
@@ -30,7 +46,7 @@ playerAllegiance = None # Variable to keep track of the player's outfit.
 playerside = None # Variable to keep track on which side each player is
 playeraxis = None # Variable to keep track on which axis the player is
 handsize = 7 # Used when automatically refilling your hand
-favourBought = 0
+favorBought = 0
 CHOAMDone = 0
 
 
@@ -243,37 +259,37 @@ def subDeferment(card, x = 0, y = 0):
     notify("{} removes a Deferment token on {}.".format(me, card))
     card.markers[Deferment_Token] -= 1
 
-def CHOAMbuy(group, x = 0, y = 0):
-    global CHOAMDone
+def CHOAMbuy(group, x = 0, y = 0): # This function allows the player to purchase spice through checks and balances to avoid mistakes.
+    global CHOAMDone # Import the variable which informs us if the player has done another CHOAM exchange this turn
     mute()
-    spiceNR = 0
-    if CHOAMDone == 1:
+    spiceNR = 0 # Variable we use to remember how much spice they want to buy
+    if CHOAMDone == 1: # If the player has already done a CHOAM exchange, remind them, but let them continue if they want, in case they have a card effect allowing them to do so.
        if not confirm("You've already done a CHOAM exchange this round. Are you sure you're allowed to do another?"): return
-       else: notify("{} is performing another CHOAM Exchange this round.".format(me))
-    if CHOAMDone == 0: notify("{} is performing a CHOAM Exchange.".format(me))
-    while spiceNR > 3 or spiceNR == 0:
+       else: notify("{} is performing another CHOAM Exchange this round.".format(me)) # However if they proceed, alter the message to point it out.
+    if CHOAMDone == 0: notify("{} is performing a CHOAM Exchange.".format(me)) # Inform everyone that the player is beggingin a CHOAM exchange.
+    while spiceNR > 3 or spiceNR == 0: # We start a loop, so that if the player can alter their number if they realize they don't have enough.
        spiceNR = askInteger("How much spice do you want to buy (Max 3)? Remember that you can only do one CHOAM Exchange per round!", 0)
-       if spiceNR == 0 or spiceNR == None : return
-       elif spiceNR > 0 and spiceNR < 4: 
-          fullcost = completeSpiceCost(spiceNR)
-          if spiceNR > shared.counters['Guild Hoard'].value: 
+       if spiceNR == 0 or spiceNR == None : return # If the player answered 0 or closed the window, cancel the exchange.
+       elif spiceNR > 0 and spiceNR < 4:  # If they are within the right value of 1-3...
+          fullcost = completeSpiceCost(spiceNR) # Calculate how much the spice they want to purchase would cost. 
+          if spiceNR > shared.counters['Guild Hoard'].value:  # Check if the hoard has enough spice left.
              whisper("The hoard does not have enough spice for you to buy.")
-             spiceNR = 5 # We do this so that the player stays in the loop and gets asked again
-          if me.Solaris < fullcost: 
+             spiceNR = 0 # We do this so that the player stays in the loop and gets asked again
+          elif me.Solaris < fullcost: # Check if the player can pay it.
              whisper("You do not have enough solaris in your treasury to buy {} Spice from the hoard. You need at least {}".format(spiceNR, fullcost))
-             spiceNR = 5 # We do this so that the player stays in the loop and gets asked again
+             spiceNR = 0 # We do this so that the player stays in the loop and gets asked again
           else: 
-             me.Solaris -=fullcost
-             me.Spice += spiceNR
-             shared.counters['Guild Hoard'].value -= spiceNR
-             shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
+             me.Solaris -=fullcost # Player pays here.
+             me.Spice += spiceNR # Then they get their spice.
+             shared.counters['Guild Hoard'].value -= spiceNR # Then the spice is taken away from the hoard.
+             shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value) # Then the CROE is reset.
              notify("{} has bought {} Spice for {}. The Guild Hoard now has {} Spice left and the CROE is set at {}".format(me, spiceNR, fullcost, shared.counters['Guild Hoard'].value, shared.CROE))
-             CHOAMDone = 1
+             CHOAMDone = 1 # Then mark that the player has done their CHOAM exchange for the turn.
        else:
           whisper("You cannot buy more than 3 spice per CHOAM Exchange.")
         
 
-def CHOAMsell(group, x = 0, y = 0):
+def CHOAMsell(group, x = 0, y = 0): # Very similar as CHOAMbuy, but player sells spice instead.
     global CHOAMDone
     mute()
     spiceNR = 0
@@ -287,7 +303,7 @@ def CHOAMsell(group, x = 0, y = 0):
        elif spiceNR > 0 and spiceNR < 4: 
           if me.Spice - spiceNR < 0: 
              whisper("You do not have this amount of spice to sell. You have only {} to sell.".format(me.Spice))
-             spiceNR = 5 # We do this so that the player stays in the loop and gets asked again
+             spiceNR = 0 # We do this so that the player stays in the loop and gets asked again
           else: 
              fullcost = completeSpiceCost(-spiceNR)
              me.Solaris +=fullcost
@@ -303,8 +319,8 @@ def CHOAMsell(group, x = 0, y = 0):
 def completeSpiceCost(count = 1): # This takes as input how many spice we want to buy or sell, and returns how much it's going to cost in total.
    i = 0
    cost = 0
-   simulatedHoard = shared.counters['Guild Hoard'].value
-   simulatedCROE = shared.CROE
+   simulatedHoard = shared.counters['Guild Hoard'].value #We use simulated numbers in order to avoid touching the counters.
+   simulatedCROE = shared.CROE 
    if count > 0:
       while i < count:
          cost += simulatedCROE
@@ -328,7 +344,32 @@ def CROEAdjust(hoard): # We need to pass the guild hoard number here. We cannot 
    elif hoard >6 and hoard < 10: return  3
    elif hoard >9 and hoard < 13: return 2
    elif hoard >12: return 1
-   else: notify("Why is the Guild Hoard at a {}?".format(hoard))
+   else: notify("Why is the Guild Hoard at a {}?".format(hoard)) # Notify the players, in case the counter is set below 0 by mistake.
+
+def buyFavor(group, x = 0, y = 0): # Very similar to CHOAMbuy, but player buys Favour instead, which is simpler.
+    global favorBought
+    mute()
+    favorNR = 0
+    if favorBought == 1:
+       if not confirm("You've already bought favor this round. Are you sure you're allowed to buy more?"): return
+       else: notify("{} is performing another favor purchase this round.".format(me))
+    if favorBought == 0: notify("{} is performing a favor purchase.".format(me))
+    while favorNR > 5 or favorNR == 0:
+       favorNR = askInteger("How much Imperial favor do you want to purchase (Max 5)? Remember that you can only purchase favor once per round!", 0)
+       if favorNR == 0 or favorNR == None : return
+       elif favorNR > 0 and favorNR < 6: 
+          fullcost = favorNR * 2
+          if me.Solaris < fullcost: 
+             whisper("You do not have enough solaris in your treasury to buy {} favor. You need at least {}".format(favorNR, fullcost))
+             favorNR = 0 # We do this so that the player stays in the loop and gets asked again
+          else: 
+             me.Solaris -=fullcost
+             me.Favor += favorNR
+             notify("{} has bought {} favor. They now have {} favor".format(me, favorNR, me.Favor))
+             favorBought = 1
+       else:
+          whisper("You cannot buy more than 5 favor per exchange.")
+
 
 #------------------------------------------------------------------------------
 # Hand Actions

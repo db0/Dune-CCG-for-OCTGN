@@ -31,7 +31,7 @@
 		<groupaction menu="Buy Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+C" execute="CHOAMbuy" />
 		<groupaction menu="Sell Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+Shift+C" execute="CHOAMsell" />
 		<cardaction menu="Produce Spice to the Guild Hoard" default="false" execute="produceSpice" />
-		<groupaction menu="Buy Favor" default="false" shortcut="Ctrl+F" execute="buyFavor" />
+		<groupaction menu="Purchase Favor" default="false" shortcut="Ctrl+F" execute="buyFavor" />
 		<groupactions menu="Phases">
 			<groupaction menu="Next Phase" default="false" shortcut="Enter" execute="nextPhase" />
 			<groupaction menu="Go to Pre-Game Setup Phase" default="false" execute="goToSetup" />
