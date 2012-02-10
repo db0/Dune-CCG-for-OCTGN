@@ -30,6 +30,8 @@ playerAllegiance = None # Variable to keep track of the player's outfit.
 playerside = None # Variable to keep track on which side each player is
 playeraxis = None # Variable to keep track on which axis the player is
 handsize = 7 # Used when automatically refilling your hand
+favourBought = 0
+CHOAMDone = 0
 
 
 #---------------------------------------------------------------------------
@@ -241,6 +243,93 @@ def subDeferment(card, x = 0, y = 0):
     notify("{} removes a Deferment token on {}.".format(me, card))
     card.markers[Deferment_Token] -= 1
 
+def CHOAMbuy(group, x = 0, y = 0):
+    global CHOAMDone
+    mute()
+    spiceNR = 0
+    if CHOAMDone == 1:
+       if not confirm("You've already done a CHOAM exchange this round. Are you sure you're allowed to do another?"): return
+       else: notify("{} is performing another CHOAM Exchange this round.".format(me))
+    if CHOAMDone == 0: notify("{} is performing a CHOAM Exchange.".format(me))
+    while spiceNR > 3 or spiceNR == 0:
+       spiceNR = askInteger("How much spice do you want to buy (Max 3)? Remember that you can only do one CHOAM Exchange per round!", 0)
+       if spiceNR == 0 or spiceNR == None : return
+       elif spiceNR > 0 and spiceNR < 4: 
+          fullcost = completeSpiceCost(spiceNR)
+          if spiceNR > shared.counters['Guild Hoard'].value: 
+             whisper("The hoard does not have enough spice for you to buy.")
+             spiceNR = 5 # We do this so that the player stays in the loop and gets asked again
+          if me.Solaris < fullcost: 
+             whisper("You do not have enough solaris in your treasury to buy {} Spice from the hoard. You need at least {}".format(spiceNR, fullcost))
+             spiceNR = 5 # We do this so that the player stays in the loop and gets asked again
+          else: 
+             me.Solaris -=fullcost
+             me.Spice += spiceNR
+             shared.counters['Guild Hoard'].value -= spiceNR
+             shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
+             notify("{} has bought {} Spice for {}. The Guild Hoard now has {} Spice left and the CROE is set at {}".format(me, spiceNR, fullcost, shared.counters['Guild Hoard'].value, shared.CROE))
+             CHOAMDone = 1
+       else:
+          whisper("You cannot buy more than 3 spice per CHOAM Exchange.")
+        
+
+def CHOAMsell(group, x = 0, y = 0):
+    global CHOAMDone
+    mute()
+    spiceNR = 0
+    if CHOAMDone == 1:
+       if not confirm("You've already done a CHOAM exchange this round. Are you sure you're allowed to do another?"): return
+       else: notify("{} is performing another CHOAM Exchange this round.".format(me))
+    if CHOAMDone == 0: notify("{} is performing a CHOAM Exchange.".format(me))
+    while spiceNR > 3 or spiceNR == 0:
+       spiceNR = askInteger("How much spice do you want to sell (Max 3)? Remember that you can only do one CHOAM Exchange per round!", 0)
+       if spiceNR == 0 or spiceNR == None : return
+       elif spiceNR > 0 and spiceNR < 4: 
+          if me.Spice - spiceNR < 0: 
+             whisper("You do not have this amount of spice to sell. You have only {} to sell.".format(me.Spice))
+             spiceNR = 5 # We do this so that the player stays in the loop and gets asked again
+          else: 
+             fullcost = completeSpiceCost(-spiceNR)
+             me.Solaris +=fullcost
+             me.Spice -= spiceNR
+             shared.counters['Guild Hoard'].value += spiceNR
+             shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
+             notify("{} has sold {} Spice for {}. The Guild Hoard now has {} Spice left and the CROE is set at {}".format(me, spiceNR, fullcost, shared.counters['Guild Hoard'].value, shared.CROE))
+             CHOAMDone = 1
+       else:
+          whisper("You cannot sell more than 3 spice per CHOAM Exchange.")
+
+
+def completeSpiceCost(count = 1): # This takes as input how many spice we want to buy or sell, and returns how much it's going to cost in total.
+   i = 0
+   cost = 0
+   simulatedHoard = shared.counters['Guild Hoard'].value
+   simulatedCROE = shared.CROE
+   if count > 0:
+      while i < count:
+         cost += simulatedCROE
+         simulatedHoard -= 1
+         simulatedCROE = CROEAdjust(simulatedHoard)
+         i += 1
+      return cost
+   elif count < 0:
+      while i > count:
+         cost += simulatedCROE
+         simulatedHoard += 1
+         simulatedCROE = CROEAdjust(simulatedHoard)
+         i -= 1
+      return cost
+ 
+
+def CROEAdjust(hoard): # We need to pass the guild hoard number here. We cannot set it as default when it's not provided. It bugs out.
+   if hoard == 0: return 6
+   elif hoard >0 and hoard < 4: return 5
+   elif hoard >3 and hoard < 7: return 4
+   elif hoard >6 and hoard < 10: return  3
+   elif hoard >9 and hoard < 13: return 2
+   elif hoard >12: return 1
+   else: notify("Why is the Guild Hoard at a {}?".format(hoard))
+
 #------------------------------------------------------------------------------
 # Hand Actions
 #------------------------------------------------------------------------------
@@ -380,7 +469,7 @@ def imperialDraw(group = me.piles['Imperial Deck'], times = 1):
 
 def setupAssembly(group = me.piles['Imperial Deck']):
     imperialDraw(times = 3)
-    notify("{} Setup his Assembly.".format(me))
+#    notify("{} Setup his Assembly.".format(me))
     
 
 def shuffle(group):
