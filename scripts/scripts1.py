@@ -36,6 +36,7 @@ loud = 'loud' # So that I don't have to use the quotes all the time in my functi
 silent = 'silent' # Same as above
 Xaxis = 'x'  # Same as above
 Yaxis = 'y'	 # Same as above
+DoesntDisengageColor = "#ffffff"
 
 
 #---------------------------------------------------------------------------
@@ -48,6 +49,8 @@ playeraxis = None # Variable to keep track on which axis the player is
 handsize = 7 # Used when automatically refilling your hand
 favorBought = 0
 CHOAMDone = 0
+DeployedDuneEvent = 0
+DeployedImperiumEvent = 0
 
 
 #---------------------------------------------------------------------------
@@ -124,6 +127,22 @@ def nextPhase(group, x = 0, y = 0):
    else: shared.Phase += 1 # Otherwise, just move up one phase
    showCurrentPhase()
 
+def goToOpening(group, x = 0, y = 0): # Go directly to the Opening Interval
+   mute()
+   shared.Phase = 1
+   showCurrentPhase()
+
+def goToHouse(group, x = 0, y = 0): # Go directly to the House Interval
+   mute()
+   shared.Phase = 2
+   showCurrentPhase()
+
+def goToClosing(group, x = 0, y = 0): # Go directly to the Closing Interval
+   mute()
+   shared.Phase = 3
+   showCurrentPhase()
+
+
 def showCurrentPhase(): # Just say a nice notification about which phase you're on.
    notify(phases[shared.Phase].format(me))
 
@@ -192,6 +211,7 @@ def subdue(card, x = 0, y = 0):
     if not card.isFaceUp: # Horrible hack until the devs can allow me to look at facedown card properties.
        card.isFaceUp = not card.isFaceUp  # Gah!
        type = card.Type
+       subtype = card.Subtype
        cost = num(card.properties['Deployment Cost']) 
        card.isFaceUp = not card.isFaceUp # GAH!
 #    notify("{} Deferments. {} Cost(int). Cost(str). {} is the difference.".format(card.markers[Deferment_Token], cost, card.properties['Deployment Cost'], cost - card.markers[Deferment_Token]))
@@ -199,16 +219,25 @@ def subdue(card, x = 0, y = 0):
         if card.isFaceUp:
             notify("{} subdues {}.".format(me, card))
             card.isFaceUp = False
+        elif type == 'Event': # Events have special deployment rules
+            if card.markers[Deferment_Token] < cost:
+                if confirm("Events cannot normally be played unless they have equal or more deferment tokens than their deployment cost. Are you sure you want to do this?"):
+                    deployCHK = eventDeployTypeChk(subtype)
+                    if deployCHK != 'NOK': # Check if there's been any other events of the same typed played this turn by this player.
+                        card.isFaceUp = True
+                        if deployCHK == 'OK': notify("{} deploys {} with {} deferment tokens.".format(me, card, card.markers[Deferment_Token]))
+                        else: notify("{} deploys another {} event - {} with {} deferment tokens.".format(me, subtype, card, card.markers[Deferment_Token]))
+            else: 
+                deployCHK = eventDeployTypeChk(subtype)
+                if deployCHK != 'NOK': # Check if there's been any other events of the same typed played this turn by this player.
+                    card.isFaceUp = True
+                    if deployCHK == 'OK': notify("{} deploys {} with {} deferment tokens.".format(me, card, card.markers[Deferment_Token]))
+                    else: notify("{} deploys another {} event - {} with {} deferment tokens.".format(me, subtype, card, card.markers[Deferment_Token]))
         elif card.markers[Deferment_Token] == 0 and cost > 0:                         
             notify("{} deploys {} which had 0 deferment tokens.".format(me, card))   
             card.isFaceUp = True
         elif card.markers[Deferment_Token] < cost:
-            if type == 'Event': 
-                if confirm("Events cannot normally be played unless they have equal or more deferment tokens than their deployment cost. Are you sure you want to do this?"):
-                    card.isFaceUp = True
-                    notify("{} deploys {} with {} deferment tokens.".format(me, card, card.markers[Deferment_Token]))
-                    card.markers[Deferment_Token] = 0
-            elif confirm("Card has less deferment tokens than its deployment cost. Do you need to automatically pay the difference remaining from your treasury?"):
+            if confirm("Card has less deferment tokens than its deployment cost. Do you need to automatically pay the difference remaining from your treasury?"):
                 card.isFaceUp = True
                 payCost(cost - card.markers[Deferment_Token])
                 notify("{} pays {} and deploys {}.".format(me, cost - card.markers[Deferment_Token], card))
@@ -224,6 +253,23 @@ def subdue(card, x = 0, y = 0):
         else:
             card.isFaceUp = True
             notify("{} initiates a petition for {}.".format(me, card))
+
+def eventDeployTypeChk(subtype): # Check if the subtype of the event has been played this turn already.
+   global DeployedDuneEvent, DeployedImperiumEvent 
+   if re.search(r'Imperium', subtype): 
+      if DeployedImperiumEvent == 0: # If no Imperium event has been played this turn, just mark one as played and continue.
+         DeployedImperiumEvent = 1
+         return 'OK'
+      elif confirm("You have already deployed one Imperium event this turn. Are you sure you are allowed to deploy another?"):
+         return 'Extra' # If one has been played this turn, ask the player to confirm (in case they have a card effect) and continue or not accordingly.
+      else: return 'NOK'
+   elif re.search(r'Dune', subtype):
+      if DeployedDuneEvent == 0:
+         DeployedDuneEvent = 1
+         return 'OK'
+      elif confirm("You have already deployed one Dune event this turn. Are you sure you are allowed to deploy another?"):
+         return 'Extra'
+      else: return 'NOK'
 
 def restoreAll(group, x = 0, y = 0): 
     mute()
@@ -371,6 +417,61 @@ def buyFavor(group, x = 0, y = 0): # Very similar to CHOAMbuy, but player buys F
           whisper("You cannot buy more than 5 favor per exchange.")
 
 
+def automatedOpening(group, x = 0, y = 0):
+    global favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent
+    favorBought = 0 # Reset the player's favor exchanges for the round.
+    CHOAMDone = 0 # Reset the player's CHOAM exchanges for the round.
+    DeployedDuneEvent = 0 # Reset the amount of Dune events for this round.
+    DeployedImperiumEvent = 0 # Reset the amount of Imperium events for this round.
+    mute()
+    if shared.Phase != 1: # This function is allowed only during the Opening Interval
+      whisper("You can only perform this action during the Opening Interval")
+      return
+    myCards = (card for card in table
+               if card.controller == me
+               and card.owner == me)
+    for card in myCards:
+        if card.highlight != DoesntDisengageColor: card.orientation &= ~Rot90 # If a card can disengage, disengage it.
+        if card.markers[Assembly] > 0 and card.isFaceUp: card.markers[Assembly] = 0 # If a card came from the assembly last turn. Remove its special assembly marker.
+        if not card.isFaceUp and card.markers[Assembly] == 0: card.markers[Deferment_Token] += 1 # If a card is face down (subdued) add a deferment token on it.
+    notify("{} disengaged all his cards and added deferment tokens to all subdued ones.".format(me))
+
+def automatedClosing(group, x = 0, y = 0):
+   if shared.Phase != 3: # This function is allowed only during the Closing Interval
+      whisper("You can only perform this action during the Closing Interval")
+      return
+   if me.Favor < 1:
+      notify("{} does not refill their hand because they have 0 Imperial favor.".format(me))
+      return   
+   if not confirm("Have you remembered to discard any cards you don't want from your hand?"): return
+   refill()
+   notify("{} refills their hand back to {}.".format(me, handsize))
+
+def doesNotDisengage(card, x = 0, y = 0): # Mark a card as "Does not disengage" or unmark it. We use a card highlight to do this.
+   if card.highlight == DoesntDisengageColor: # If it's already marked, remove highlight from it and inform.
+      card.highlight = None
+      notify("{}'s {} can now Disengage during Opening Interval.".format(me, card))
+   else:
+      card.highlight = DoesntDisengageColor # Otherwise highlight it and inform. 
+      notify("{}'s {} will not Disengage during Opening Interval.".format(me, card))
+
+def discard(cards, x = 0, y = 0): # Discard a card.
+   mute()
+   for card in cards: # Can be done at more than one card at the same time, since attached cards follow their parent always.
+      cardowner = card.owner
+      if card.Imperial == 'Yes': card.moveTo(cardowner.piles['Imperial Discard'])
+      else: card.moveTo(cardowner.piles['House Discard'])
+      notify("{} has discarded {}.".format(me, card))
+
+def produceSpice(card, x = 0, y = 0):
+   mute()
+   spiceNR = askInteger("How much spice to produce directly into the Guild Hoard?", 1)
+   if spiceNR == 0: return
+   card.orientation = Rot90
+   shared.counters['Guild Hoard'].value += spiceNR
+   shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
+   notify("{} has engaged {} to produce {} spice directly into the Guild Hoard. The Guild Hoard now has {} Spice and the CROE is set at {}".format(me, card, spiceNR, shared.counters['Guild Hoard'].value, shared.CROE))
+
 #------------------------------------------------------------------------------
 # Hand Actions
 #------------------------------------------------------------------------------
@@ -386,9 +487,16 @@ def payCost(count = 1, notification = silent):
 def play(card, x = 0, y = 0):
     mute()
     src = card.group
-    card.moveToTable(0, 0)
-    notify("{} plays {} from his {}.".format(me, card, src.name))
-    payCost(card.properties['Deployment Cost'], loud) # Take cost out of the bank, if there is any.
+    if card.type == 'Event' and not re.search(r'Nexus', card.Subtype): 
+       placeCard(card, 'PlayEvent')
+       notify("{} plays an event from their hand.".format(me))
+    elif card.type == 'Event' and re.search(r'Nexus', card.Subtype):
+       placeCard(card, 'PlayNexus')
+       notify("{} plays Nexus event {} from their hand.".format(me, card))
+    else:
+       card.moveToTable(0, 0)
+       notify("{} plays {} from their hand.".format(me, card))
+       payCost(card.properties['Deployment Cost'], loud) # Take cost out of the bank, if there is any.
 
 def setup(group):
 # This function is usually the first one the player does. It will setup their homeworld on their side of the table. 
@@ -433,10 +541,15 @@ def placeCard(card,type = None):
       if type == 'SetupDune':
          card.moveToTable(homeDistance(card), cheight(card)* -3 * playerside) # We move it to one side depending on what side the player chose.
          card.isFaceUp = False
-      if type == 'SetupProgram':
+      if type == 'SetupProgram':          # We move them behind the homeworld
          card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), cheight(card)* -4 * playerside)
          card.sendToBack()
-         # We move them behind the homeworld
+      if type == 'PlayEvent': # Events are placed subdued
+         card.moveToTable(homeDistance(card), cheight(card)* 4 * playerside) 
+         card.isFaceUp = False
+      if type == 'PlayNexus': # Events are placed subdued
+         card.moveToTable(homeDistance(card) + cardDistance(card), cheight(card)* 4 * playerside) 
+         card.markers[Deferment_Token] += card.properties['Deployment Cost']
    elif playeraxis == Yaxis:
 #      if type == 'HireAide':# Not implemented yet
 #         card.moveToTable(0,homeDistance(card) + (playerside * cheight(card,-4)))
@@ -448,6 +561,12 @@ def placeCard(card,type = None):
       if type == 'SetupProgram': 
          card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card) + (playerside * cheight(card,-4)))
          card.sendToBack()
+      if type == 'PlayEvent':
+         card.moveToTable(cwidth(card)* 4 * playerside,homeDistance(card)) 
+         card.isFaceUp = False
+      if type == 'PlayNexus':
+         card.moveToTable(cwidth(card)* 4 * playerside,homeDistance(card) + cardDistance(card)) 
+         card.markers[Deferment_Token] += card.properties['Deployment Cost']
    else: card.moveToTable(0,0)
 
 def homeDistance(card):
@@ -483,6 +602,18 @@ def refill(group = me.hand): # Refill the player's hand to its hand size.
    playhand = len(me.hand) # count how many cards there are currently there.
    if playhand < handsize: drawMany(me.piles['House Deck'], handsize - playhand, silent) # If there's less cards than the handsize, draw from the deck until it's full.
 
+def handDiscard(card, x = 0, y = 0): # Discard a card from your hand.
+   mute()
+   card.moveTo(me.piles['House Discard'])
+   notify("{} has discarded {}.".format(me, card))  
+
+def randomDiscard(group): # Discard a card from your hand randomly.
+   mute()
+   card = group.random() # Select a random card
+   if card == None: return # If hand is empty, do nothing.
+   notify("{} randomly discards a card.".format(me)) # Inform that a random card was discarded
+   card.moveTo(me.piles['House Discard']) # Move the card in the discard pile.
+
 #------------------------------------------------------------------------------
 # Pile Actions
 #------------------------------------------------------------------------------
@@ -517,9 +648,11 @@ def shuffle(group):
   group.shuffle()
 
 def drawMany(group, count = None, notification = loud): # This function draws a variable number cards into the player's hand.
-    if len(group) == 0: return
     mute()
     if count == None: count = askInteger("Draw how many cards?", 7)
+    if len(group) < count: 
+       notify("{}'s House deck has {} cards and they attempted to draw {} cards. Did they just lose the game?.".format(me, len(group), count))
+       return
     for c in group.top(count): c.moveTo(me.hand)
     if notification == loud : notify("{} draws {} cards to their play hand.".format(me, count)) # And if we're "loud", notify what happened.
 

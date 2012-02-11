@@ -28,25 +28,35 @@
 		<cardaction menu="Remove Spice Token" default="false" shortcut="Alt+Shift+S" execute="subSpice" />
 		<cardaction menu="Add Deferment Token" default="false" shortcut="Alt+D" execute="addDeferment" />
 		<cardaction menu="Remove Deferment Token" default="false" shortcut="Alt+Shift+D" execute="subDeferment" />
+		<cardaction menu="(Un)Mark card as &quot;Does not Disengage&quot;" default="false" execute="doesNotDisengage" />
 		<groupaction menu="Buy Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+C" execute="CHOAMbuy" />
 		<groupaction menu="Sell Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+Shift+C" execute="CHOAMsell" />
-		<cardaction menu="Produce Spice to the Guild Hoard" default="false" execute="produceSpice" />
+		<cardaction menu="Engage to produce Spice to the Guild Hoard" default="false" execute="produceSpice" />
 		<groupaction menu="Purchase Favor" default="false" shortcut="Ctrl+F" execute="buyFavor" />
 		<groupactions menu="Phases">
 			<groupaction menu="Next Phase" default="false" shortcut="Enter" execute="nextPhase" />
+			<groupaction menu="Jump to Opening Interval" default="false" shortcut="F1" execute="goToOpening" />
+			<groupaction menu="Jump  to House Interval" default="false" shortcut="F2" execute="goToHouse" />
+			<groupaction menu="Jump to Closing Interval" default="false" shortcut="F3" execute="goToClosing" />
 			<groupaction menu="Go to Pre-Game Setup Phase" default="false" execute="goToSetup" />
 		</groupactions>
 		<cardactions menu="Rites">
-			<cardaction menu="Dueling Rite" default="false" shortcut="F1" execute="dueling" />
-			<cardaction menu="Battle Rite" default="false" shortcut="F2" execute="battle" />
-			<cardaction menu="Arbitration Rite" default="false" shortcut="F3" execute="arbitration" />
-			<cardaction menu="Intrigue Rite" default="false" shortcut="F4" execute="intrigue" />
+			<cardaction menu="Dueling Rite" default="false" shortcut="Ctrl+D" execute="dueling" />
+			<cardaction menu="Battle Rite" default="false" shortcut="Ctrl+B" execute="battle" />
+			<cardaction menu="Arbitration Rite" default="false" shortcut="Ctrl+A" execute="arbitration" />
+			<cardaction menu="Intrigue Rite" default="false" shortcut="Ctrl+I" execute="intrigue" />
 		</cardactions>
+		<groupaction menu="Automated Opening Interval" default="false" shortcut="Ctrl+F1" execute="automatedOpening" />
+		<groupaction menu="Automated Closing Interval" default="false" shortcut="Ctrl+F3" execute="automatedClosing" />
+		<cardaction menu="Discard Card" default="false" shortcut="del" batchExecute="discard" />
 	</table>
 	<player summary="{#Solaris} / {#Spice} / {#Favor} / {#Hand}">
 		<hand name="Hand" visibility="me" ordered="false" width="63" height="88" icon="r10">
 			<cardaction menu="Play Card" default="true" shortcut="Ctrl+W" execute="play" />
 			<groupaction menu="Setup Starting Cards and Hand" default="false" shortcut="Ctrl+Shift+S" execute="setup" />
+			<groupaction menu="Set Handsize" default="false" execute="setHandSize" />
+			<cardaction menu="Discard Card" default="false" shortcut="del" execute="handDiscard" />
+			<groupaction menu="Random Discard" default="false" execute="randomDiscard" />
 		</hand>
 		<group name="House Deck" visibility="none" ordered="false" width="63" height="88" icon="r11" collapsed="false">
 			<groupaction menu="Draw" default="true" shortcut="Ctrl+S" execute="draw" />

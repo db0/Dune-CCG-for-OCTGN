@@ -19,6 +19,15 @@ Changelog
 ### 1.0.4
 
 * Added CHOAM Exchange functions for buying and selling Spice. This automatically stops players form doing 2 CHOAM Exchanges per turn, or buying/selling more than 3 spice per exchange, or from buying/selling when there is not  enough Solaris or Spice. These functions also automatically reset the CROE when the Guild Hoard is modified.
+* Automatic Opening Interval functions (card disengage, adding deferal tokens, assign initiative)
+* Automatic Closing Interval functions (hand refresh)
+* Added Table option to Engage a card to produce X spice directly into the guild hoard, as it's a common function
+* Added discard functions for table and hand
+* Added action to mark cards as "Does not Disengage" and they will be ignored during the automated Opening Interval.
+* Implemented function "Engage to produce spice in the Guild Hoard" for all those deserts.
+* Made it so that Events are automatically played face-down (and the player is not charged their deployment cost)
+* Made it so that Nexus events are automatically played with enough deferment tokens equal to their deployment cost, and the player is not charged their deployment cost either.
+* When deploying events, the game will now note down and check if they are of the Imperium or Dune subtype. If the player has played one of the same subtype already, they will need to confirm the deployment and the notification will make it obvious as well.
 
 ### 1.0.3
 
@@ -49,5 +58,4 @@ Changelog
 Roadmap
 -------
 
-- Automatic Opening Interval functions (card disengage, adding deferal tokens, assign initiative)
-- Automatic Closing Interval functions (hand refresh)
+- When playing Events from your hand, make them come in subdued
