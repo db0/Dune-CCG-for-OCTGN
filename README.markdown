@@ -28,6 +28,7 @@ Changelog
 * Made it so that Events are automatically played face-down (and the player is not charged their deployment cost)
 * Made it so that Nexus events are automatically played with enough deferment tokens equal to their deployment cost, and the player is not charged their deployment cost either.
 * When deploying events, the game will now note down and check if they are of the Imperium or Dune subtype. If the player has played one of the same subtype already, they will need to confirm the deployment and the notification will make it obvious as well.
+* F1 - F3 now Jump between the 3 phases of each turn.
 
 ### 1.0.3
 
@@ -58,4 +59,4 @@ Changelog
 Roadmap
 -------
 
-- When playing Events from your hand, make them come in subdued
+- More testing of multiplayer setup. It *should* work OK for four player (if they remember to disable the inverted table), but without more testing I won't know.
