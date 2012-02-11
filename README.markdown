@@ -60,3 +60,4 @@ Roadmap
 -------
 
 - More testing of multiplayer setup. It *should* work OK for four player (if they remember to disable the inverted table), but without more testing I won't know.
+- Make it so that Nexus events lose a deferment token during Opening Interval
