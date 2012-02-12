@@ -16,6 +16,15 @@ Sample screenshot of 1.0.2
 Changelog
 ---------
 
+### 1.0.5 Beta version. Bugs might persist.
+
+* Removed some debug notifications during the setup phase
+* Going to the pre-game setup phase will now reset your counters
+* During the setup phase, the game will check your imperial deck for Allegiances conflicts and inform if your deck is illegal.
+* When playing a native aide or petitioning a native Persona, the game will ask you to confirm, in case you do not control a Dune Fief
+* When petiotining an Assembly card, the game will check if another player has the same card in the game, and will prevent you from petitioning it.
+* When petitioning game will remind you if you need to lose favor, or if you can reduce the cost by discarding favor
+
 ### 1.0.4
 
 * Added CHOAM Exchange functions for buying and selling Spice. This automatically stops players form doing 2 CHOAM Exchanges per turn, or buying/selling more than 3 spice per exchange, or from buying/selling when there is not  enough Solaris or Spice. These functions also automatically reset the CROE when the Guild Hoard is modified.
@@ -61,3 +70,6 @@ Roadmap
 
 - More testing of multiplayer setup. It *should* work OK for four player (if they remember to disable the inverted table), but without more testing I won't know.
 - Make it so that Nexus events lose a deferment token during Opening Interval
+- When bringing cards from an Adversarial faction, the game should remind the player they're normally not allowed to
+- When playing a card with an allegiance, the game should check that the player has at least one card of the same faction in their imperial deck.
+- The function to check for uniques should done for all Imperial cards about to be deployed, not just petitioning from the assembly.

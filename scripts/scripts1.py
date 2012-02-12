@@ -43,7 +43,6 @@ DoesntDisengageColor = "#ffffff"
 # Global variables
 #---------------------------------------------------------------------------
 
-playerAllegiance = None # Variable to keep track of the player's outfit.
 playerside = None # Variable to keep track on which side each player is
 playeraxis = None # Variable to keep track on which axis the player is
 handsize = 7 # Used when automatically refilling your hand
@@ -51,6 +50,8 @@ favorBought = 0
 CHOAMDone = 0
 DeployedDuneEvent = 0
 DeployedImperiumEvent = 0
+allegiances =['','','',''] # List to keep track of the player's allegiances.
+
 
 
 #---------------------------------------------------------------------------
@@ -149,8 +150,21 @@ def showCurrentPhase(): # Just say a nice notification about which phase you're 
 def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
 # This phase is not rotated with the nextPhase function as it is a way to basically restart the game.
 # It also serves as a control, so as to avoid a player by mistake using the setup function during play.
+   global playerside, playeraxis, handsize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances
    mute()
+   playerside = None
+   playeraxis = None
+   handsize = 7
+   favorBought = 0
+   CHOAMDone = 0
+   DeployedDuneEvent = 0
+   DeployedImperiumEvent = 0
+   allegiances =['','','',''] # List to keep track of the player's allegiances.
    shared.Phase = 0
+   me.Spice = 0
+   me.Solaris = 5
+   me.Favor = 10
+   me.Initiative = 0
    showCurrentPhase() # Remind the players which phase it is now
 
 def flipCoin(group, x = 0, y = 0):
@@ -210,11 +224,12 @@ def subdue(card, x = 0, y = 0):
     faceup = 0
     if not card.isFaceUp: # Horrible hack until the devs can allow me to look at facedown card properties.
        card.isFaceUp = not card.isFaceUp  # Gah!
+       snapshot = card
+       name = card.name
        type = card.Type
        subtype = card.Subtype
        cost = num(card.properties['Deployment Cost']) 
        card.isFaceUp = not card.isFaceUp # GAH!
-#    notify("{} Deferments. {} Cost(int). Cost(str). {} is the difference.".format(card.markers[Deferment_Token], cost, card.properties['Deployment Cost'], cost - card.markers[Deferment_Token]))
     if card.markers[Assembly] == 0:
         if card.isFaceUp:
             notify("{} subdues {}.".format(me, card))
@@ -238,10 +253,10 @@ def subdue(card, x = 0, y = 0):
             card.isFaceUp = True
         elif card.markers[Deferment_Token] < cost:
             if confirm("Card has less deferment tokens than its deployment cost. Do you need to automatically pay the difference remaining from your treasury?"):
-                card.isFaceUp = True
-                payCost(cost - card.markers[Deferment_Token])
-                notify("{} pays {} and deploys {}.".format(me, cost - card.markers[Deferment_Token], card))
-                card.markers[Deferment_Token] = 0
+                if payCost(cost - card.markers[Deferment_Token]) == 'OK':
+                    card.isFaceUp = True
+                    notify("{} pays {} and deploys {}.".format(me, cost - card.markers[Deferment_Token], card))
+                    card.markers[Deferment_Token] = 0
         else:
             card.isFaceUp = True
             notify("{} deploys {}.".format(me, card))
@@ -251,8 +266,30 @@ def subdue(card, x = 0, y = 0):
             notify("{}'s petition for {} was unsuccesful.".format(me, card))
             card.isFaceUp = False
         else:
+            if re.search(r'Native', subtype):
+                myDuneFiefs = (c for c in table
+                    if c.controller == me
+                    and re.search(r'Dune Fief', c.Subtype))
+                DuneFiefsNR = 0
+                for mycard in myDuneFiefs: DuneFiefsNR += 1
+                if DuneFiefsNR == 0: 
+                    if not confirm("You must control at least one Dune Fief in order to play a Native aide. Are you sure you want to proceed?"): return
+            allUniques = (c for c in table
+                if c.Imperial == 'Yes'
+                and c.isFaceUp # This is apparently not taken into account. The game still includes the face down cards if they match the other conditions.
+                and c.name == name
+                and c != card)
             card.isFaceUp = True
-            notify("{} initiates a petition for {}.".format(me, card))
+            random = rnd(10,500)
+            for unique in allUniques:
+                notify("{} wanted to petition for {} but it's already controlled by {}.".format(me, name, unique.controller))   
+                card.isFaceUp = False
+                return        
+            if card.Allegiance == allegiances[0]: # Position 0 is always the player's sponsor.
+                notify("{} initiates a petition for {}.".format(me, card))
+                whisper("This card is of your sponsor's allegiance. Remember that if you win the petition. you may opt to reduce its cost by 1 solaris for each favor you discard")
+            elif card.Allegiance in allegiances: notify("{} initiates a petition for {}. If they win, they will have to discard 1 favor as well".format(me, card))
+            else: notify("{} initiates a petition for {}.".format(me, card))
 
 def eventDeployTypeChk(subtype): # Check if the subtype of the event has been played this turn already.
    global DeployedDuneEvent, DeployedImperiumEvent 
@@ -479,24 +516,42 @@ def produceSpice(card, x = 0, y = 0):
 def payCost(count = 1, notification = silent): 
    count = num(count)
    if me.Solaris < count:  
-      if notification == 'loud' and count > 0: notify("{} was supposed to pay {} Solaris but only has {} in their house treasury. Assuming card effect used. **No Solaris has been taken!** Please modify your treasury manually as necessary.".format(me, count, me.Solaris))   
+      if notification == 'loud' and count > 0: 
+         if not confirm("You do not seem to have enough solaris in your house treasury to buy this card. Are you sure you want to proceed? (No solaris will be taken from your treasury. Remove any cost manually)"): return 'ABORT'
+         notify("{} was supposed to pay {} Solaris but only has {} in their house treasury. Assuming card effect used.".format(me, count, me.Solaris))   
    else: 
       me.Solaris -= count
       if notification == 'loud' and count > 0: notify("{} has paid {} Solaris. {} is left their house treasury".format(me, count, me.Solaris))  
+   return 'OK'
 
 def play(card, x = 0, y = 0):
-    mute()
-    src = card.group
-    if card.type == 'Event' and not re.search(r'Nexus', card.Subtype): 
-       placeCard(card, 'PlayEvent')
-       notify("{} plays an event from their hand.".format(me))
-    elif card.type == 'Event' and re.search(r'Nexus', card.Subtype):
-       placeCard(card, 'PlayNexus')
-       notify("{} plays Nexus event {} from their hand.".format(me, card))
-    else:
-       card.moveToTable(0, 0)
-       notify("{} plays {} from their hand.".format(me, card))
-       payCost(card.properties['Deployment Cost'], loud) # Take cost out of the bank, if there is any.
+   mute()
+   src = card.group
+   if card.type == 'Event' and not re.search(r'Nexus', card.Subtype): 
+      placeCard(card, 'PlayEvent')
+      notify("{} plays an event from their hand.".format(me))
+   elif card.type == 'Event' and re.search(r'Nexus', card.Subtype):
+      placeCard(card, 'PlayNexus')
+      notify("{} plays Nexus event {} from their hand.".format(me, card))
+   elif card.type == 'Persona' and re.search(r'Native', card.Subtype):
+      myCards = (c for c in table
+         if c.controller == me
+         and re.search(r'Dune Fief', c.Subtype))
+      DuneFiefsNR = 0
+      for mycard in myCards: DuneFiefsNR += 1
+      if DuneFiefsNR == 0: 
+         if confirm("You must control at least one Dune Fief in order to play a Native aide. Are you sure you want to proceed?"):
+            if payCost(card.properties['Deployment Cost'], loud) == 'OK': # Take cost out of the bank, if there is any.
+               card.moveToTable(0, 0)
+               notify("{} plays {} from their hand.".format(me, card))
+      else: 
+         if payCost(card.properties['Deployment Cost'], loud) == 'OK': # Take cost out of the bank, if there is any.
+            card.moveToTable(0, 0)
+            notify("{} plays {} from their hand.".format(me, card))
+   else:
+      if payCost(card.properties['Deployment Cost'], loud) == 'OK':# Take cost out of the bank, if there is any.
+         card.moveToTable(0, 0)
+         notify("{} plays {} from their hand.".format(me, card))
 
 def setup(group):
 # This function is usually the first one the player does. It will setup their homeworld on their side of the table. 
@@ -504,29 +559,29 @@ def setup(group):
    if shared.Phase == 0: # First check if we're on the pre-setup game phase. 
                      # As this function will play your whole hand and wipe your counters, we don't want any accidents.
       if not confirm("Have bought all the favour and spice you'll need with your bonus solaris?"): return
-      global playerside, playerAllegiance # Import some necessary variables we're using around the game.
+      global playerside, allegiances # Import some necessary variables we're using around the game.
       DuneinHand = 0
       mute()
       chooseSide() # The classic place where the players choose their side.
       me.piles['Imperial Deck'].shuffle() # First let's shuffle our decks now that we have the chance.
       me.piles['House Deck'].shuffle()
       for card in group: # For every card in the player's hand... (which should be just their homeworld and possibly some plans)
-         notify("card is {}. Subtype is {}". format (card, card.subtype))
          if re.search(r'Homeworld', card.Subtype) and card.Type == 'Holding':  # If it's the homeworld...
             placeCard(card,'SetupHomeworld')
-            playerAllegiance = card.Allegiance # We make a note of the Allegiance the player is playing this time (used later for automatically losing favour)
+            allegiances[0] = card.Allegiance # We make a note of the Allegiance the player is playing this time (used later for automatically losing favour)
          if re.search(r'Program', card.Subtype) and card.Type == 'Plan':  # If it's a program...
-            placeCard(card,'SetupProgram')
-            payCost(card.properties['Deployment Cost']) # Pay the cost of the dude
+            if payCost(card.properties['Deployment Cost']) == 'OK': # Pay the cost of the program
+               placeCard(card,'SetupProgram')
          if card.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001': # If the player has put Dune in their hand as well...
             placeCard(card,'SetupDune')
             DuneinHand = 1 # Note down that player brought their own Dune, so that we don't generate a second one.
       if DuneinHand == 0: # If the player didn't bring their own Dune, generate a new one on their side.
          Dune = table.create("2037f0a1-773d-42a9-a498-d0cf54e7a001", 0, 0, 1, True) # Create a Dune card in the middle of the table.
          placeCard(Dune,'SetupDune')
+      noteAllegiances() # Note down the rest allegiances of the player
       me.Solaris += 20     
       refill() # We fill the player's play hand to their hand size (usually 5)
-      notify("{} is playing {}. Their starting Solaris is {} and their Imperial Favour is {}".format(me, playerAllegiance, me.Solaris, me.Favor))  
+      notify("{} is playing {}. Their starting Solaris is {} and their Imperial Favour is {}".format(me, allegiances[0], me.Solaris, me.Favor))  
       setupAssembly() # Setup the 3 imperial cards which will be our assembly.
    else: whisper('You can only setup your starting cards during the Pre-Game setup phase') # If this function was called outside the pre-game setup phase
             
@@ -617,6 +672,34 @@ def randomDiscard(group): # Discard a card from your hand randomly.
 #------------------------------------------------------------------------------
 # Pile Actions
 #------------------------------------------------------------------------------
+
+def noteAllegiances(): # This function checks every card in the Imperial Deck and makes a list of all the available allegiances.
+   global allegiances # A global list that will containing all the allegiances existing in a player's deck.
+   p = 1 # pointer for the list
+   for card in me.piles['Imperial Deck']: 
+      # Ugly hack follows. We need to move each card in the discard pile and then back into the deck because OCTGN won't let us peek at cards in facedown decks.
+      card.moveTo(me.piles['Imperial Discard']) # Put the card in the discard pile in order to make its properties visible to us.
+      if card.Allegiance not in allegiances and card.Allegiance != 'Neutral': # If the allegiance is not neutral and not in our list already...
+         allegiances[p] = card.Allegiance                                     # Then add it at the next available position
+         notify("found allegiance {}. now in position {}".format(allegiances[p], p)) # Temporary notifier.
+         p += 1
+      card.moveToBottom(me.piles['Imperial Deck'])
+   if chkAdversaries() == 'conflict':
+      notify("Faction Adversaries found within {}'s Deck. Deck seems to be illegal".format(me))
+
+def chkAdversaries(): # Check if there are any adversaties of factions in the Imperial deck. (Check page 4 of the ToT Rulebook.)
+   global allegiances
+   for allegiance in allegiances:
+      if allegiance == 'The Fremen' and 'House Harkonnen' in allegiances: return 'conflict'
+      elif allegiance == 'The Spacing Guild' and ('The Bene Gesserit Sisterhood' in allegiances or 'Dune Smugglers' in allegiances): return 'conflict'
+      elif allegiance == 'House Atreides' and ('House Harkonnen' in allegiances or 'House Corrino' in allegiances): return 'conflict'
+      elif allegiance == 'House Corrino' and 'House Atreides' in allegiances: return 'conflict'
+      elif allegiance == 'House Harkonnen' and ('House Atreides' in allegiances or 'The Fremen' in allegiances): return 'conflict'
+      elif allegiance == 'The Bene Gesserit Sisterhood' and 'The Spacing Guild' in allegiances: return 'conflict'
+      elif allegiance == 'Dune Smugglers' and 'The Spacing Guild' in allegiances: return 'conflict'
+      elif allegiance == 'The Spice Miners Guid' and 'The Water Sellers Union' in allegiances: return 'conflict'
+      elif allegiance == 'The Water Sellers Union' and 'The Spice Miners Guid' in allegiances: return 'conflict'
+      else: return 'OK'
 
 def draw(group):
     if len(group) == 0: return
