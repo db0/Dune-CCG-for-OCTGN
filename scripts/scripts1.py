@@ -51,6 +51,7 @@ CHOAMDone = 0
 DeployedDuneEvent = 0
 DeployedImperiumEvent = 0
 allegiances =['','','',''] # List to keep track of the player's allegiances.
+totalevents = 0 # Variable to allow me to move events a bit to avoid hiding on top of exitisting ones.
 
 
 
@@ -98,6 +99,9 @@ def chooseSide(): # Called from many functions to check if the player has chosen
             playeraxis = None
             playerside = 0
 
+#---------------------------------------------------------------------------
+# Card Placement functions
+#---------------------------------------------------------------------------
 
 def cwidth(card, divisor = 10):
 # This function is used to always return the width of the card plus an offset that is based on the percentage of the width of the card used.
@@ -115,6 +119,139 @@ def cheight(card, divisor = 10):
    else: offset = card.height() / divisor
    return (card.height() + offset)
 
+def placeCard(card,type = None):
+# This function automatically places a card on the table according to what type of card is being placed
+# It is called by one of the various custom types and each type has a different value depending on if the player is on the X or Y axis.
+   if playeraxis == Xaxis:
+#      if type == 'HireAide': # Not implemented yet
+#         card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), 0)
+      if type == 'SetupHomeworld':
+         card.moveToTable(homeDistance(card), cheight(card)* -4 * playerside) # We move it to one side depending on what side the player chose.
+      if type == 'SetupDune':
+         card.moveToTable(homeDistance(card), cheight(card)* -3 * playerside) # We move it to one side depending on what side the player chose.
+         card.isFaceUp = False
+      if type == 'SetupProgram':          # We move them behind the homeworld
+         card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), cheight(card)* -4 * playerside)
+         card.sendToBack()
+      if type == 'PlayEvent': # Events are placed subdued
+         card.moveToTable(homeDistance(card) + playerside * totalevents * 15, cheight(card)* 4 * playerside + playerside * totalevents * 15) 
+         card.isFaceUp = False
+   elif playeraxis == Yaxis:
+#      if type == 'HireAide':# Not implemented yet
+#         card.moveToTable(0,homeDistance(card) + (playerside * cheight(card,-4)))
+      if type == 'SetupHomeworld':
+         card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card)) 
+      if type == 'SetupDune':
+         card.moveToTable(cwidth(card)* -3 * playerside,homeDistance(card)) 
+         card.isFaceUp = False
+      if type == 'SetupProgram': 
+         card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card) + (playerside * cheight(card,-4)))
+         card.sendToBack()
+      if type == 'PlayEvent':
+         card.moveToTable(cwidth(card)* 4 * playerside + playerside * totalevents * 15,homeDistance(card) + playerside * totalevents * 15) 
+         card.isFaceUp = False
+   else: card.moveToTable(0,0)
+
+def homeDistance(card):
+# This function returns the distance from the middle each player's homeworld will be setup towards their playerSide. 
+# This makes the code more readable and allows me to tweak these values from one place
+   if table.isTwoSided(): return (playerside * cwidth(card) / 2) # players on an inverted table are placed half a card away from their edge.
+   else:
+      if playeraxis == Xaxis:
+         return (playerside * cwidth(card) * 5) # players on the X axis, are placed 5 times a card's width towards their side (left or right)
+      elif playeraxis == Yaxis:
+         return (playerside * cheight(card) * 3) # players on the Y axis, are placed 3 times a card's height towards their side (top or bottom)
+
+def cardDistance(card):
+# This function returns the size of the card towards a player's side. 
+# This is useful when playing cards on the table, as you can always manipulate the location
+#   by multiples of the card distance towards your side
+# So for example, if a player is playing on the bottom side. This function will always return a positive cardheight.
+#   Thus by adding this in a moveToTable's y integer, the card being placed will be moved towards your side by one multiple of card height
+#   While if you remove it from the y integer, the card being placed will be moved towards the centre of the table by one multiple of card height.
+   if playeraxis == Xaxis:
+      return (playerside * cwidth(card))
+   elif playeraxis == Yaxis:
+      return (playerside * cheight(card))
+
+#---------------------------------------------------------------------------
+# Conditions Check General Functions
+#---------------------------------------------------------------------------
+
+def eventDeployTypeChk(subtype): # Check if the conditions to deploy an event are fulfilled
+   global DeployedDuneEvent, DeployedImperiumEvent  
+   if re.search(r'Imperium', subtype): # Imperium events can only be played if you control a homeworld, or Dune and only one per round per player.
+      if Homeworlds() == 0:
+         if not confirm("You're not allowed to deploy an Imperium Event without controlling a Homeworld . Bypass?"): 
+            notify("{} is deploying an Imperium event, even though they control no Homeworld.".format(me))
+            return 'NOK' 
+      if DeployedImperiumEvent == 0: # If no Imperium event has been played this turn, just mark one as played and continue.
+         DeployedImperiumEvent = 1
+         return 'OK'
+      elif confirm("You have already deployed one Imperium event this turn. Are you sure you are allowed to deploy another?"):
+         return 'Extra' # If one has been played this turn, ask the player to confirm (in case they have a card effect) and continue or not accordingly.
+      else: return 'NOK'
+   elif re.search(r'Dune', subtype): # Dune events can only be played if you control a Dune fief, or Dune and only one per round per player.
+      if DuneFiefs() == 0:
+         if not confirm("You're not allowed to deploy a Dune Event without controlling a Dune fief. Bypass?"): 
+            notify("{} is deploying a Dune event, even though they control no Dune fief.".format(me))
+            return 'NOK' 
+      if DeployedDuneEvent == 0:
+         DeployedDuneEvent = 1
+         return 'OK'
+      elif confirm("You have already deployed one Dune event this turn. Are you sure you are allowed to deploy another?"):
+         return 'Extra'
+      else: return 'NOK'
+
+def DuneFiefs(): # This function goes through your cards on the table and looks to see if you control any Dune Fiefs.
+   DuneFiefsNR = 0
+   myCards = (c for c in table
+      if c.controller == me
+      and c.isFaceUp
+      and (re.search(r'Dune Fief', c.Subtype) or c.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001')) # Dune itself is also a Dune Fief.
+   for mycard in myCards: DuneFiefsNR += 1
+   return DuneFiefsNR
+
+def Homeworlds(): # This function goes through your cards on the table and looks to see if you control any Homeworlds.
+   HomeNR = 0
+   myCards = (c for c in table
+      if c.controller == me
+      and c.isFaceUp
+      and (re.search(r'Homeworld', c.Subtype) or c.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001')) # Dune itself is also a Homeworld.
+   for mycard in myCards: HomeNR += 1
+   return HomeNR
+
+
+def noteAllegiances(): # This function checks every card in the Imperial Deck and makes a list of all the available allegiances.
+   global allegiances # A global list that will containing all the allegiances existing in a player's deck.
+   p = 1 # pointer for the list
+   for card in me.piles['Imperial Deck']: 
+      # Ugly hack follows. We need to move each card in the discard pile and then back into the deck because OCTGN won't let us peek at cards in facedown decks.
+      card.moveTo(me.piles['Imperial Discard']) # Put the card in the discard pile in order to make its properties visible to us.
+      if card.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001':  # If the player moved dune put Dune by mistake to their Deck, move it to their hand to be placed automatically.
+         card.moveTo(me.piles['Imperial Discard'])
+         whisper("Dune found in your Imperial Deck. Discarding. Please remove Dune from your Imperial Deck during deck construction!")
+         continue
+      if card.Allegiance not in allegiances and card.Allegiance != 'Neutral' and card.Allegiance != '': # If the allegiance is not neutral and not in our list already...
+         allegiances[p] = card.Allegiance                                     # Then add it at the next available position
+         p += 1
+      card.moveToBottom(me.piles['Imperial Deck'])
+   if chkAdversaries() != 'OK':
+      notify("Faction Adversaries found within {}'s Deck. Deck seems to be illegal!".format(me))
+
+def chkAdversaries(): # Check if there are any adversaties of factions in the Imperial deck. (Check page 4 of the ToT Rulebook.)
+   global allegiances
+   for allegiance in allegiances:
+      if allegiance == 'The Fremen' and 'House Harkonnen' in allegiances: return 'conflict'
+      elif allegiance == 'The Spacing Guild' and ('The Bene Gesserit Sisterhood' in allegiances or 'Dune Smugglers' in allegiances): return 'conflict'
+      elif allegiance == 'House Atreides' and ('House Harkonnen' in allegiances or 'House Corrino' in allegiances): return 'conflict'
+      elif allegiance == 'House Corrino' and 'House Atreides' in allegiances: return 'conflict'
+      elif allegiance == 'House Harkonnen' and ('House Atreides' in allegiances or 'The Fremen' in allegiances): return 'conflict'
+      elif allegiance == 'The Bene Gesserit Sisterhood' and 'The Spacing Guild' in allegiances: return 'conflict'
+      elif allegiance == 'Dune Smugglers' and 'The Spacing Guild' in allegiances: return 'conflict'
+      elif allegiance == 'The Spice Miners Guid' and 'The Water Sellers Union' in allegiances: return 'conflict'
+      elif allegiance == 'The Water Sellers Union' and 'The Spice Miners Guid' in allegiances: return 'conflict'
+   return 'OK'
 
 #---------------------------------------------------------------------------
 # Table group actions
@@ -150,7 +287,7 @@ def showCurrentPhase(): # Just say a nice notification about which phase you're 
 def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
 # This phase is not rotated with the nextPhase function as it is a way to basically restart the game.
 # It also serves as a control, so as to avoid a player by mistake using the setup function during play.
-   global playerside, playeraxis, handsize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances
+   global playerside, playeraxis, handsize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances, totalevents
    mute()
    playerside = None
    playeraxis = None
@@ -165,6 +302,7 @@ def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
    me.Solaris = 5
    me.Favor = 10
    me.Initiative = 0
+   totalevents = 0
    showCurrentPhase() # Remind the players which phase it is now
 
 def flipCoin(group, x = 0, y = 0):
@@ -228,6 +366,7 @@ def subdue(card, x = 0, y = 0):
        name = card.name
        type = card.Type
        subtype = card.Subtype
+#       imperial = card.Imperial
        cost = num(card.properties['Deployment Cost']) 
        card.isFaceUp = not card.isFaceUp # GAH!
     if card.markers[Assembly] == 0:
@@ -248,6 +387,10 @@ def subdue(card, x = 0, y = 0):
                     card.isFaceUp = True
                     if deployCHK == 'OK': notify("{} deploys {} with {} deferment tokens.".format(me, card, card.markers[Deferment_Token]))
                     else: notify("{} deploys another {} event - {} with {} deferment tokens.".format(me, subtype, card, card.markers[Deferment_Token]))
+        elif searchUniques(card, name, 'deploy') == 'NOK': return # Check if the card is unique and in the table. If so, abort this function.
+        elif re.search(r'Native', subtype):
+            if DuneFiefs() == 0: 
+                if not confirm("You must control at least one Dune Fief in order to deploy a Native aide. Are you sure you want to proceed?"): return
         elif card.markers[Deferment_Token] == 0 and cost > 0:                         
             notify("{} deploys {} which had 0 deferment tokens.".format(me, card))   
             card.isFaceUp = True
@@ -267,46 +410,28 @@ def subdue(card, x = 0, y = 0):
             card.isFaceUp = False
         else:
             if re.search(r'Native', subtype):
-                myDuneFiefs = (c for c in table
-                    if c.controller == me
-                    and re.search(r'Dune Fief', c.Subtype))
-                DuneFiefsNR = 0
-                for mycard in myDuneFiefs: DuneFiefsNR += 1
-                if DuneFiefsNR == 0: 
+                if DuneFiefs() == 0: 
                     if not confirm("You must control at least one Dune Fief in order to play a Native aide. Are you sure you want to proceed?"): return
-            allUniques = (c for c in table
-                if c.Imperial == 'Yes'
-                and c.isFaceUp # This is apparently not taken into account. The game still includes the face down cards if they match the other conditions.
-                and c.name == name
-                and c != card)
+            if searchUniques(card, name, 'petition') == 'NOK': return
             card.isFaceUp = True
-            random = rnd(10,500)
-            for unique in allUniques:
-                notify("{} wanted to petition for {} but it's already controlled by {}.".format(me, name, unique.controller))   
-                card.isFaceUp = False
-                return        
             if card.Allegiance == allegiances[0]: # Position 0 is always the player's sponsor.
                 notify("{} initiates a petition for {}.".format(me, card))
                 whisper("This card is of your sponsor's allegiance. Remember that if you win the petition. you may opt to reduce its cost by 1 solaris for each favor you discard")
             elif card.Allegiance in allegiances: notify("{} initiates a petition for {}. If they win, they will have to discard 1 favor as well".format(me, card))
             else: notify("{} initiates a petition for {}.".format(me, card))
 
-def eventDeployTypeChk(subtype): # Check if the subtype of the event has been played this turn already.
-   global DeployedDuneEvent, DeployedImperiumEvent 
-   if re.search(r'Imperium', subtype): 
-      if DeployedImperiumEvent == 0: # If no Imperium event has been played this turn, just mark one as played and continue.
-         DeployedImperiumEvent = 1
-         return 'OK'
-      elif confirm("You have already deployed one Imperium event this turn. Are you sure you are allowed to deploy another?"):
-         return 'Extra' # If one has been played this turn, ask the player to confirm (in case they have a card effect) and continue or not accordingly.
-      else: return 'NOK'
-   elif re.search(r'Dune', subtype):
-      if DeployedDuneEvent == 0:
-         DeployedDuneEvent = 1
-         return 'OK'
-      elif confirm("You have already deployed one Dune event this turn. Are you sure you are allowed to deploy another?"):
-         return 'Extra'
-      else: return 'NOK'
+def searchUniques(card, name, type = 'deploy'): # Checks if there is a unique card on the table with the same name as the one about to be deployed.
+    allUniques = (c for c in table # Make a comprehension of all the cards on the table
+        if c.Imperial == 'Yes' # That are from Imperial Deck (only those are unique)
+        and c.isFaceUp # This is apparently not taken into account. The game still includes the face down cards if they match the other conditions.
+        and c.name == name # That have the same name as the one being deployed.
+        and c != card) # And that are not the same card object as the one about to be deployed. 
+                       # I don't know why, but the comprehension grabs this card if this isn't here, even though I filtered the comprehension to disregard face down cards.
+    for unique in allUniques:
+        if type == 'petition': notify("{} wanted to petition for {} but it's already controlled by {}.".format(me, name, unique.controller))   
+        else: notify("{} wanted to deploy {} but it's already controlled by {}.".format(me, name, unique.controller)) 
+        return 'NOK'
+    return 'OK'
 
 def restoreAll(group, x = 0, y = 0): 
     mute()
@@ -482,6 +607,19 @@ def automatedClosing(group, x = 0, y = 0):
       return   
    if not confirm("Have you remembered to discard any cards you don't want from your hand?"): return
    refill()
+   myCards = (card for card in table
+              if card.controller == me
+              and card.owner == me
+              and card.type == 'Event')
+   for card in myCards:
+      if re.search(r'Nexus', card.Subtype): 
+         card.markers[Deferment_Token] -= 1 # Nexus events lose one deferment token per House discard phase.
+         if card.markers[Deferment_Token] == 0: # If Nexus events lose their last deferment token, they are discarded.
+            card.moveTo(me.piles['House Discard'])
+            notify ("{}'s Nexus Event {} has expired and was automatically discarded".format(me, card))
+      elif re.search(r'Duration Effect', card.Operation): 
+         card.moveTo(me.piles['House Discard']) # Duration events are discarded at the end of the turn.
+         notify ("{}'s Event {} has expired and was automatically discarded".format(me, card))
    notify("{} refills their hand back to {}.".format(me, handsize))
 
 def doesNotDisengage(card, x = 0, y = 0): # Mark a card as "Does not disengage" or unmark it. We use a card highlight to do this.
@@ -513,7 +651,7 @@ def produceSpice(card, x = 0, y = 0):
 # Hand Actions
 #------------------------------------------------------------------------------
 
-def payCost(count = 1, notification = silent): 
+def payCost(count = 1, notification = silent): # Automatically pays the cost of a card being played from your hand, or confirms/informs if you can't play it.
    count = num(count)
    if me.Solaris < count:  
       if notification == 'loud' and count > 0: 
@@ -525,21 +663,21 @@ def payCost(count = 1, notification = silent):
    return 'OK'
 
 def play(card, x = 0, y = 0):
+   global totalevents
    mute()
    src = card.group
-   if card.type == 'Event' and not re.search(r'Nexus', card.Subtype): 
+   # The function below checks if the player is allowed to play this house card. House cards can only be played if the player has one card of same allegiance in their Imperial deck.
+   if card.Allegiance != 'Neutral' and card.Allegiance != '' and card.Allegiance not in allegiances: 
+      if confirm("{}'s Allegiance ({}) does not exist your Imperial Deck. You are not normally allowed have it in your deck. Continue?".format(card.name, card.Allegiance)):
+         notify("{}'s Allegiance does not exist in {}'s Imperial Deck. Illegal deck?".format(card, me))
+      else: return
+   if card.type == 'Event':  # Events are placed face down.
       placeCard(card, 'PlayEvent')
       notify("{} plays an event from their hand.".format(me))
-   elif card.type == 'Event' and re.search(r'Nexus', card.Subtype):
-      placeCard(card, 'PlayNexus')
-      notify("{} plays Nexus event {} from their hand.".format(me, card))
-   elif card.type == 'Persona' and re.search(r'Native', card.Subtype):
-      myCards = (c for c in table
-         if c.controller == me
-         and re.search(r'Dune Fief', c.Subtype))
-      DuneFiefsNR = 0
-      for mycard in myCards: DuneFiefsNR += 1
-      if DuneFiefsNR == 0: 
+      totalevents += 1 # This is used to moves every new event a bit from the old one, to avoid stacking them and making them invisible.
+      if totalevents == 11: totalevents = 0
+   elif card.type == 'Persona' and re.search(r'Native', card.Subtype): # A player can only play aides with subtype "Native" if they control a "Dune Fief".
+      if DuneFiefs() == 0: 
          if confirm("You must control at least one Dune Fief in order to play a Native aide. Are you sure you want to proceed?"):
             if payCost(card.properties['Deployment Cost'], loud) == 'OK': # Take cost out of the bank, if there is any.
                card.moveToTable(0, 0)
@@ -585,67 +723,6 @@ def setup(group):
       setupAssembly() # Setup the 3 imperial cards which will be our assembly.
    else: whisper('You can only setup your starting cards during the Pre-Game setup phase') # If this function was called outside the pre-game setup phase
             
-def placeCard(card,type = None):
-# This function automatically places a card on the table according to what type of card is being placed
-# It is called by one of the various custom types and each type has a different value depending on if the player is on the X or Y axis.
-   if playeraxis == Xaxis:
-#      if type == 'HireAide': # Not implemented yet
-#         card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), 0)
-      if type == 'SetupHomeworld':
-         card.moveToTable(homeDistance(card), cheight(card)* -4 * playerside) # We move it to one side depending on what side the player chose.
-      if type == 'SetupDune':
-         card.moveToTable(homeDistance(card), cheight(card)* -3 * playerside) # We move it to one side depending on what side the player chose.
-         card.isFaceUp = False
-      if type == 'SetupProgram':          # We move them behind the homeworld
-         card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), cheight(card)* -4 * playerside)
-         card.sendToBack()
-      if type == 'PlayEvent': # Events are placed subdued
-         card.moveToTable(homeDistance(card), cheight(card)* 4 * playerside) 
-         card.isFaceUp = False
-      if type == 'PlayNexus': # Events are placed subdued
-         card.moveToTable(homeDistance(card) + cardDistance(card), cheight(card)* 4 * playerside) 
-         card.markers[Deferment_Token] += card.properties['Deployment Cost']
-   elif playeraxis == Yaxis:
-#      if type == 'HireAide':# Not implemented yet
-#         card.moveToTable(0,homeDistance(card) + (playerside * cheight(card,-4)))
-      if type == 'SetupHomeworld':
-         card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card)) 
-      if type == 'SetupDune':
-         card.moveToTable(cwidth(card)* -3 * playerside,homeDistance(card)) 
-         card.isFaceUp = False
-      if type == 'SetupProgram': 
-         card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card) + (playerside * cheight(card,-4)))
-         card.sendToBack()
-      if type == 'PlayEvent':
-         card.moveToTable(cwidth(card)* 4 * playerside,homeDistance(card)) 
-         card.isFaceUp = False
-      if type == 'PlayNexus':
-         card.moveToTable(cwidth(card)* 4 * playerside,homeDistance(card) + cardDistance(card)) 
-         card.markers[Deferment_Token] += card.properties['Deployment Cost']
-   else: card.moveToTable(0,0)
-
-def homeDistance(card):
-# This function returns the distance from the middle each player's homeworld will be setup towards their playerSide. 
-# This makes the code more readable and allows me to tweak these values from one place
-   if table.isTwoSided(): return (playerside * cwidth(card) / 2) # players on an inverted table are placed half a card away from their edge.
-   else:
-      if playeraxis == Xaxis:
-         return (playerside * cwidth(card) * 5) # players on the X axis, are placed 5 times a card's width towards their side (left or right)
-      elif playeraxis == Yaxis:
-         return (playerside * cheight(card) * 3) # players on the Y axis, are placed 3 times a card's height towards their side (top or bottom)
-
-def cardDistance(card):
-# This function returns the size of the card towards a player's side. 
-# This is useful when playing cards on the table, as you can always manipulate the location
-#   by multiples of the card distance towards your side
-# So for example, if a player is playing on the bottom side. This function will always return a positive cardheight.
-#   Thus by adding this in a moveToTable's y integer, the card being placed will be moved towards your side by one multiple of card height
-#   While if you remove it from the y integer, the card being placed will be moved towards the centre of the table by one multiple of card height.
-   if playeraxis == Xaxis:
-      return (playerside * cwidth(card))
-   elif playeraxis == Yaxis:
-      return (playerside * cheight(card))
-
 def setHandSize(group): # A function to modify a player's hand size. This is used during Closing Interval when refilling the player's hand automatically.
    global handsize
    handsize = askInteger("What is your current hand size?", handsize)
@@ -673,34 +750,6 @@ def randomDiscard(group): # Discard a card from your hand randomly.
 # Pile Actions
 #------------------------------------------------------------------------------
 
-def noteAllegiances(): # This function checks every card in the Imperial Deck and makes a list of all the available allegiances.
-   global allegiances # A global list that will containing all the allegiances existing in a player's deck.
-   p = 1 # pointer for the list
-   for card in me.piles['Imperial Deck']: 
-      # Ugly hack follows. We need to move each card in the discard pile and then back into the deck because OCTGN won't let us peek at cards in facedown decks.
-      card.moveTo(me.piles['Imperial Discard']) # Put the card in the discard pile in order to make its properties visible to us.
-      if card.Allegiance not in allegiances and card.Allegiance != 'Neutral': # If the allegiance is not neutral and not in our list already...
-         allegiances[p] = card.Allegiance                                     # Then add it at the next available position
-         notify("found allegiance {}. now in position {}".format(allegiances[p], p)) # Temporary notifier.
-         p += 1
-      card.moveToBottom(me.piles['Imperial Deck'])
-   if chkAdversaries() == 'conflict':
-      notify("Faction Adversaries found within {}'s Deck. Deck seems to be illegal".format(me))
-
-def chkAdversaries(): # Check if there are any adversaties of factions in the Imperial deck. (Check page 4 of the ToT Rulebook.)
-   global allegiances
-   for allegiance in allegiances:
-      if allegiance == 'The Fremen' and 'House Harkonnen' in allegiances: return 'conflict'
-      elif allegiance == 'The Spacing Guild' and ('The Bene Gesserit Sisterhood' in allegiances or 'Dune Smugglers' in allegiances): return 'conflict'
-      elif allegiance == 'House Atreides' and ('House Harkonnen' in allegiances or 'House Corrino' in allegiances): return 'conflict'
-      elif allegiance == 'House Corrino' and 'House Atreides' in allegiances: return 'conflict'
-      elif allegiance == 'House Harkonnen' and ('House Atreides' in allegiances or 'The Fremen' in allegiances): return 'conflict'
-      elif allegiance == 'The Bene Gesserit Sisterhood' and 'The Spacing Guild' in allegiances: return 'conflict'
-      elif allegiance == 'Dune Smugglers' and 'The Spacing Guild' in allegiances: return 'conflict'
-      elif allegiance == 'The Spice Miners Guid' and 'The Water Sellers Union' in allegiances: return 'conflict'
-      elif allegiance == 'The Water Sellers Union' and 'The Spice Miners Guid' in allegiances: return 'conflict'
-      else: return 'OK'
-
 def draw(group):
     if len(group) == 0: return
     i = 0
@@ -724,9 +773,7 @@ def imperialDraw(group = me.piles['Imperial Deck'], times = 1):
 
 def setupAssembly(group = me.piles['Imperial Deck']):
     imperialDraw(times = 3)
-#    notify("{} Setup his Assembly.".format(me))
     
-
 def shuffle(group):
   group.shuffle()
 

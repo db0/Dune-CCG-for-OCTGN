@@ -16,6 +16,18 @@ Sample screenshot of 1.0.2
 Changelog
 ---------
 
+### 1.0.6 
+
+* Game will now check that for uniqueness on deployment as well
+* Deck checking for Adversaries now works
+* Removed debug notification from adversary checking.
+* When playing a House card, the game will now check that you have at least one card of the same allegiance in your Imperial deck and want/announce it otherwise.
+* If the player has placed Dune by mistake in their Imperial Deck, it will be automatically placed on their discard pile during Setup and player will be iformed
+* Now when deploying an event, the game will check to see if you have the prerequisites (Homeworld for Imperium events, Dune fief for Dune events) and confirm/notify if you bypass.
+* Small tweak so that events don't fall on top of each other.
+* Game will check for Natives' prerequisites (dune fiefs) during deployment from being subdued as well and will confirm/notify.
+
+
 ### 1.0.5 Beta version. Bugs might persist.
 
 * Removed some debug notifications during the setup phase
@@ -69,7 +81,7 @@ Roadmap
 -------
 
 - More testing of multiplayer setup. It *should* work OK for four player (if they remember to disable the inverted table), but without more testing I won't know.
-- Make it so that Nexus events lose a deferment token during Opening Interval
-- When bringing cards from an Adversarial faction, the game should remind the player they're normally not allowed to
-- When playing a card with an allegiance, the game should check that the player has at least one card of the same faction in their imperial deck.
-- The function to check for uniques should done for all Imperial cards about to be deployed, not just petitioning from the assembly.
+- Need to fix the sets
+-- Empty card Allegiances need to be turned to 'Neutral'
+-- Imperial = 'Yes' and House ='No' is Silly. These properties need to be consolidated into one property called "Deck" or something.
+-- Remove the word 'Event' from card subtypes
