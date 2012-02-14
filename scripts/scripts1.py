@@ -54,7 +54,6 @@ allegiances =['','','',''] # List to keep track of the player's allegiances.
 totalevents = 0 # Variable to allow me to move events a bit to avoid hiding on top of exitisting ones.
 
 
-
 #---------------------------------------------------------------------------
 # General functions
 #---------------------------------------------------------------------------
@@ -119,6 +118,14 @@ def cheight(card, divisor = 10):
    else: offset = card.height() / divisor
    return (card.height() + offset)
 
+def yaxisMove(card):
+# Variable to move the cards played by player 2 on a 2-sided table, more towards their own side. 
+# Player's 2 axis will fall one extra card length towards their side.
+# This is because of bug #146 (https://github.com/kellyelton/OCTGN/issues/146)
+   if me.hasInvertedTable(): cardmove = cheight(card)
+   else: cardmove = cardmove = 0
+   return cardmove
+
 def placeCard(card,type = None):
 # This function automatically places a card on the table according to what type of card is being placed
 # It is called by one of the various custom types and each type has a different value depending on if the player is on the X or Y axis.
@@ -140,15 +147,15 @@ def placeCard(card,type = None):
 #      if type == 'HireAide':# Not implemented yet
 #         card.moveToTable(0,homeDistance(card) + (playerside * cheight(card,-4)))
       if type == 'SetupHomeworld':
-         card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card)) 
+         card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card) - yaxisMove(card)) 
       if type == 'SetupDune':
-         card.moveToTable(cwidth(card)* -3 * playerside,homeDistance(card)) 
+         card.moveToTable(cwidth(card)* -3 * playerside,homeDistance(card) - yaxisMove(card)) 
          card.isFaceUp = False
       if type == 'SetupProgram': 
-         card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card) + (playerside * cheight(card,-4)))
+         card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card) + (playerside * cheight(card,-4) - yaxisMove(card)))
          card.sendToBack()
       if type == 'PlayEvent':
-         card.moveToTable(cwidth(card)* 4 * playerside + playerside * totalevents * 15,homeDistance(card) + playerside * totalevents * 15) 
+         card.moveToTable(cwidth(card)* 4 * playerside + playerside * totalevents * 15,homeDistance(card) + playerside * totalevents * 15 - yaxisMove(card)) 
          card.isFaceUp = False
    else: card.moveToTable(0,0)
 
@@ -160,7 +167,7 @@ def homeDistance(card):
       if playeraxis == Xaxis:
          return (playerside * cwidth(card) * 5) # players on the X axis, are placed 5 times a card's width towards their side (left or right)
       elif playeraxis == Yaxis:
-         return (playerside * cheight(card) * 3) # players on the Y axis, are placed 3 times a card's height towards their side (top or bottom)
+         return (playerside * cheight(card) * 3 - yaxisMove(card)) # players on the Y axis, are placed 3 times a card's height towards their side (top or bottom)
 
 def cardDistance(card):
 # This function returns the size of the card towards a player's side. 
@@ -680,15 +687,15 @@ def play(card, x = 0, y = 0):
       if DuneFiefs() == 0: 
          if confirm("You must control at least one Dune Fief in order to play a Native aide. Are you sure you want to proceed?"):
             if payCost(card.properties['Deployment Cost'], loud) == 'OK': # Take cost out of the bank, if there is any.
-               card.moveToTable(0, 0)
+               card.moveToTable(0, 0 - yaxisMove(card))
                notify("{} plays {} from their hand.".format(me, card))
       else: 
          if payCost(card.properties['Deployment Cost'], loud) == 'OK': # Take cost out of the bank, if there is any.
-            card.moveToTable(0, 0)
+            card.moveToTable(0, 0 - yaxisMove(card))
             notify("{} plays {} from their hand.".format(me, card))
    else:
       if payCost(card.properties['Deployment Cost'], loud) == 'OK':# Take cost out of the bank, if there is any.
-         card.moveToTable(0, 0)
+         card.moveToTable(0, 0 - yaxisMove(card))
          notify("{} plays {} from their hand.".format(me, card))
 
 def setup(group):
@@ -764,10 +771,10 @@ def imperialDraw(group = me.piles['Imperial Deck'], times = 1):
     while i < times:
         card = group.top()
         if playeraxis == Yaxis: 
-            group.top().moveToTable(cwidth(card)* -6 - playerside * i * cwidth(card), cardDistance(card) * 2,True)
+            group.top().moveToTable(cwidth(card)* -6 - playerside * i * cwidth(card), cardDistance(card) * 2 - yaxisMove(card),True)
             card.markers[Assembly] = 1
         else: 
-            group.top().moveToTable(cardDistance(card) * 2, cwidth(card)* -6 - playerside * i * cheight(card),True)
+            group.top().moveToTable(cardDistance(card) * 2, cwidth(card)* -6 - playerside * i * cheight(card) - yaxisMove(card),True)
             card.markers[Assembly] = 1
         i += 1
 

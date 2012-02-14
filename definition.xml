@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune" id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="3.0.0.8" version="1.0.6" markersize="24">
+<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune" id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="3.0.0.8" version="1.0.7" markersize="24">
 	<card back="r1" front="r2" width="63" height="88" cornerRadius="0">
 		<property name="Type" type="String" hidden="false" ignoreText="False" />
 		<property name="Deployment Cost" type="String" hidden="false" ignoreText="False" />
@@ -38,7 +38,7 @@
 			<groupaction menu="Jump to Opening Interval" default="false" shortcut="F1" execute="goToOpening" />
 			<groupaction menu="Jump  to House Interval" default="false" shortcut="F2" execute="goToHouse" />
 			<groupaction menu="Jump to Closing Interval" default="false" shortcut="F3" execute="goToClosing" />
-			<groupaction menu="Go to Pre-Game Setup Phase" default="false" execute="goToSetup" />
+			<groupaction menu="Go to Pre-Game Setup Phase (Use this only after a reset)" default="false" execute="goToSetup" />
 		</groupactions>
 		<cardactions menu="Rites">
 			<cardaction menu="Dueling Rite" default="false" shortcut="Ctrl+D" execute="dueling" />
@@ -73,6 +73,7 @@
 		<counter name="Solaris" default="5" reset="false" icon="r7" />
 		<counter name="Favor" default="10" reset="false" icon="r8" />
 		<counter name="Initiative" default="0" reset="false" icon="r15" />
+		<counter name="Bid" default="0" reset="false" icon="r19" />
 	</player>
 	<shared>
 		<counter name="Guild Hoard" default="8" reset="false" icon="r16" />

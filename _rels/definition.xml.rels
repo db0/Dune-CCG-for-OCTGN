@@ -18,4 +18,5 @@
   <Relationship Target="/counters/box.png" Id="r16" Type="http://schemas.octgn.org/picture" />
   <Relationship Target="/counters/CROE.png" Id="r17" Type="http://schemas.octgn.org/picture" />
   <Relationship Target="/counters/phases.png" Id="r18" Type="http://schemas.octgn.org/picture" />
+  <Relationship Target="/counters/bid.png" Id="r19" Type="http://schemas.octgn.org/picture" />
 </Relationships>

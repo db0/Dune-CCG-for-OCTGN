@@ -9,12 +9,21 @@ Screenshots
 -----------
 (Click for larger size)
 
+Sample screenshot of 1.0.6
+
+[![](http://i.imgur.com/wTG33l.jpg)](http://i.imgur.com/wTG33.jpg)
+
 Sample screenshot of 1.0.2
 
 [![](http://i.imgur.com/vrLL5l.jpg)](http://i.imgur.com/vrLL5.jpg)
 
 Changelog
 ---------
+
+### 1.0.7 (Untested)
+
+* Made it so that the 2nd player's placement in a 2-sided table is shifted one card's height to their side. Unfortunately I can't test it because the server is borking too much and it's even more difficult to do a 2-player game.
+
 
 ### 1.0.6 
 
@@ -28,7 +37,7 @@ Changelog
 * Game will check for Natives' prerequisites (dune fiefs) during deployment from being subdued as well and will confirm/notify.
 
 
-### 1.0.5 Beta version. Bugs might persist.
+### 1.0.5 (Untested)
 
 * Removed some debug notifications during the setup phase
 * Going to the pre-game setup phase will now reset your counters
