@@ -420,13 +420,26 @@ def subdue(card, x = 0, y = 0):
                 if DuneFiefs() == 0: 
                     if not confirm("You must control at least one Dune Fief in order to play a Native aide. Are you sure you want to proceed?"): return
             if searchUniques(card, name, 'petition') == 'NOK': return
+            initialBid = -1
+            while initialBid < cost:
+               initialBid = askInteger("What will your initial bid be? (Min {}). 0 will cancel the petition.".format(cost), cost)
+               if initialBid == 0 or initialBid == None: return # If the player puts zero for the bid, or closes the window, abort.
+#               else: me.Bid = initialBid # Will enable this once the bid() function is complete.
             card.isFaceUp = True
             if card.Allegiance == allegiances[0]: # Position 0 is always the player's sponsor.
-                notify("{} initiates a petition for {}.".format(me, card))
+                notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
                 whisper("This card is of your sponsor's allegiance. Remember that if you win the petition. you may opt to reduce its cost by 1 solaris for each favor you discard")
-            elif card.Allegiance in allegiances: notify("{} initiates a petition for {}. If they win, they will have to discard 1 favor as well".format(me, card))
-            else: notify("{} initiates a petition for {}.".format(me, card))
+            elif card.Allegiance in allegiances: notify("{} initiates a petition for {} with an initial bid of {}. If they win, they will have to discard 1 favor as well".format(me, card, initialBid))
+            else: notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
 
+#def bid(group, x = 0, y = 0): 
+# Function abandoned. See https://github.com/db0/Dune-CCG-for-OCTGN/issues/7#issuecomment-4008158
+#   lastOne = False # This binary variable becomes true, is the current player is the only one left with a bid in this petition.
+#   for player in players:
+#      if player.Bid = 0 and player != me: lastOne = True
+#      elif player.Bid > 0 and player != me: lastOne = False # If we find at least one other player with a bid, then we're obviously not the last player that can bid.
+#   if lastOne: 
+   
 def searchUniques(card, name, type = 'deploy'): # Checks if there is a unique card on the table with the same name as the one about to be deployed.
     allUniques = (c for c in table # Make a comprehension of all the cards on the table
         if c.Imperial == 'Yes' # That are from Imperial Deck (only those are unique)

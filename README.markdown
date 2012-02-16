@@ -20,9 +20,11 @@ Sample screenshot of 1.0.2
 Changelog
 ---------
 
-### 1.0.7 (Untested)
+### 1.0.7 
 
-* Made it so that the 2nd player's placement in a 2-sided table is shifted one card's height to their side. Unfortunately I can't test it because the server is borking too much and it's even more difficult to do a 2-player game.
+* Made it so that the 2nd player's placement in a 2-sided table is shifted one card's height to their side. 
+* Fixed the annoying initiative counter being bigger than the others.
+* When starting a petition, the game will now ask you for your starting bid, and announce it to everyone.
 
 
 ### 1.0.6 
