@@ -382,7 +382,7 @@ def subdue(card, x = 0, y = 0):
             card.isFaceUp = False
         elif type == 'Event': # Events have special deployment rules
             if card.markers[Deferment_Token] < cost:
-                if confirm("Events cannot normally be played unless they have equal or more deferment tokens than their deployment cost. Are you sure you want to do this?"):
+                if confirm("Events cannot normally be played unless they have equal or more deferment tokens than their deployment cost. \n\nAre you sure you want to do this?"):
                     deployCHK = eventDeployTypeChk(subtype)
                     if deployCHK != 'NOK': # Check if there's been any other events of the same typed played this turn by this player.
                         card.isFaceUp = True
@@ -397,7 +397,7 @@ def subdue(card, x = 0, y = 0):
         elif searchUniques(card, name, 'deploy') == 'NOK': return # Check if the card is unique and in the table. If so, abort this function.
         elif re.search(r'Native', subtype):
             if DuneFiefs() == 0: 
-                if not confirm("You must control at least one Dune Fief in order to deploy a Native aide. Are you sure you want to proceed?"): return
+                if not confirm("You must control at least one Dune Fief in order to deploy a Native aide. \n\nAre you sure you want to proceed?"): return
         elif card.markers[Deferment_Token] == 0 and cost > 0:                         
             notify("{} deploys {} which had 0 deferment tokens.".format(me, card))   
             card.isFaceUp = True
@@ -416,9 +416,11 @@ def subdue(card, x = 0, y = 0):
             notify("{}'s petition for {} was unsuccesful.".format(me, card))
             card.isFaceUp = False
         else:
+            if me.Solaris < cost:
+                if not confirm("You're not allowed to start a peition when you do not have at least as much solaris as the deployment cost of the card. \n\nAre you sure you want to proceed?"): return
             if re.search(r'Native', subtype):
                 if DuneFiefs() == 0: 
-                    if not confirm("You must control at least one Dune Fief in order to play a Native aide. Are you sure you want to proceed?"): return
+                    if not confirm("You must control at least one Dune Fief in order to play a Native aide. \n\nAre you sure you want to proceed?"): return
             if searchUniques(card, name, 'petition') == 'NOK': return
             initialBid = -1
             while initialBid < cost:
@@ -675,8 +677,10 @@ def payCost(count = 1, notification = silent): # Automatically pays the cost of 
    count = num(count)
    if me.Solaris < count:  
       if notification == 'loud' and count > 0: 
-         if not confirm("You do not seem to have enough solaris in your house treasury to buy this card. Are you sure you want to proceed? (No solaris will be taken from your treasury. Remove any cost manually)"): return 'ABORT'
-         notify("{} was supposed to pay {} Solaris but only has {} in their house treasury. Assuming card effect used.".format(me, count, me.Solaris))   
+         if not confirm("You do not seem to have enough Solaris in your House Treasury to play this card. \n\nAre you sure you want to proceed? \
+         \n(If you do, your solaris will go to the negative. You will need to increase it manually as required.)"): return 'ABORT'
+         notify("{} was supposed to pay {} Solaris but only has {} in their house treasury. They'll need to reduce the cost by {} with card effects.".format(me, count, me.Solaris, count - me.Solaris))   
+         me.Solaris -= num(count)
    else: 
       me.Solaris -= count
       if notification == 'loud' and count > 0: notify("{} has paid {} Solaris. {} is left their house treasury".format(me, count, me.Solaris))  
@@ -688,7 +692,7 @@ def play(card, x = 0, y = 0):
    src = card.group
    # The function below checks if the player is allowed to play this house card. House cards can only be played if the player has one card of same allegiance in their Imperial deck.
    if card.Allegiance != 'Neutral' and card.Allegiance != '' and card.Allegiance not in allegiances: 
-      if confirm("{}'s Allegiance ({}) does not exist your Imperial Deck. You are not normally allowed have it in your deck. Continue?".format(card.name, card.Allegiance)):
+      if confirm("{}'s Allegiance ({}) does not exist your Imperial Deck. You are not normally allowed have it in your deck. \n\nContinue?".format(card.name, card.Allegiance)):
          notify("{}'s Allegiance does not exist in {}'s Imperial Deck. Illegal deck?".format(card, me))
       else: return
    if card.type == 'Event':  # Events are placed face down.
@@ -698,7 +702,7 @@ def play(card, x = 0, y = 0):
       if totalevents == 11: totalevents = 0
    elif card.type == 'Persona' and re.search(r'Native', card.Subtype): # A player can only play aides with subtype "Native" if they control a "Dune Fief".
       if DuneFiefs() == 0: 
-         if confirm("You must control at least one Dune Fief in order to play a Native aide. Are you sure you want to proceed?"):
+         if confirm("You must control at least one Dune Fief in order to play a Native aide. \n\nAre you sure you want to proceed?"):
             if payCost(card.properties['Deployment Cost'], loud) == 'OK': # Take cost out of the bank, if there is any.
                card.moveToTable(0, 0 - yaxisMove(card))
                notify("{} plays {} from their hand.".format(me, card))

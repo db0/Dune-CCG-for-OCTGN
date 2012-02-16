@@ -25,6 +25,7 @@ Changelog
 * Made it so that the 2nd player's placement in a 2-sided table is shifted one card's height to their side. 
 * Fixed the annoying initiative counter being bigger than the others.
 * When starting a petition, the game will now ask you for your starting bid, and announce it to everyone.
+* When petitioning a card, a small check to see that the player has enough solaris to start it.
 
 
 ### 1.0.6 
