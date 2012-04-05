@@ -20,6 +20,10 @@ Sample screenshot of 1.0.2
 Changelog
 ---------
 
+### 1.0.8
+
+* Minor capitalization changes in card properties to make game compatible with the recent OCTGN Betas.
+
 ### 1.0.7 
 
 * Made it so that the 2nd player's placement in a 2-sided table is shifted one card's height to their side. 

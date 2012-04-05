@@ -632,7 +632,7 @@ def automatedClosing(group, x = 0, y = 0):
    myCards = (card for card in table
               if card.controller == me
               and card.owner == me
-              and card.type == 'Event')
+              and card.Type == 'Event')
    for card in myCards:
       if re.search(r'Nexus', card.Subtype): 
          card.markers[Deferment_Token] -= 1 # Nexus events lose one deferment token per House discard phase.
@@ -695,12 +695,12 @@ def play(card, x = 0, y = 0):
       if confirm("{}'s Allegiance ({}) does not exist your Imperial Deck. You are not normally allowed have it in your deck. \n\nContinue?".format(card.name, card.Allegiance)):
          notify("{}'s Allegiance does not exist in {}'s Imperial Deck. Illegal deck?".format(card, me))
       else: return
-   if card.type == 'Event':  # Events are placed face down.
+   if card.Type == 'Event':  # Events are placed face down.
       placeCard(card, 'PlayEvent')
       notify("{} plays an event from their hand.".format(me))
       totalevents += 1 # This is used to moves every new event a bit from the old one, to avoid stacking them and making them invisible.
       if totalevents == 11: totalevents = 0
-   elif card.type == 'Persona' and re.search(r'Native', card.Subtype): # A player can only play aides with subtype "Native" if they control a "Dune Fief".
+   elif card.Type == 'Persona' and re.search(r'Native', card.Subtype): # A player can only play aides with subtype "Native" if they control a "Dune Fief".
       if DuneFiefs() == 0: 
          if confirm("You must control at least one Dune Fief in order to play a Native aide. \n\nAre you sure you want to proceed?"):
             if payCost(card.properties['Deployment Cost'], loud) == 'OK': # Take cost out of the bank, if there is any.
