@@ -20,6 +20,12 @@ Sample screenshot of 1.0.2
 Changelog
 ---------
 
+### 1.0.9
+
+* Modified the card placements to make setup work for 3 and 4 players. 
+* Added "Inspect Card" action to allow you to check cards with bad scans.
+* Made the table much bigger. This means cards might seem smaller (you can zoom in to fix that) but this was necessary to provide enough space for 3-4 player games.
+
 ### 1.0.8
 
 * Minor capitalization changes in card properties to make game compatible with the recent OCTGN Betas.

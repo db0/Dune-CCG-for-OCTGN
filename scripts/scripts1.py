@@ -133,41 +133,41 @@ def placeCard(card,type = None):
 #      if type == 'HireAide': # Not implemented yet
 #         card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), 0)
       if type == 'SetupHomeworld':
-         card.moveToTable(homeDistance(card), cheight(card)* -4 * playerside) # We move it to one side depending on what side the player chose.
+         card.moveToTable(homeDistance(card), 0) # We move it to one side depending on what side the player chose.
       if type == 'SetupDune':
-         card.moveToTable(homeDistance(card), cheight(card)* -3 * playerside) # We move it to one side depending on what side the player chose.
+         card.moveToTable(homeDistance(card), cheight(card)* playerside) # We move it to one side depending on what side the player chose.
          card.isFaceUp = False
       if type == 'SetupProgram':          # We move them behind the homeworld
-         card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), cheight(card)* -4 * playerside)
+         card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), 0)
          card.sendToBack()
       if type == 'PlayEvent': # Events are placed subdued
-         card.moveToTable(homeDistance(card) + playerside * totalevents * 15, cheight(card)* 4 * playerside + playerside * totalevents * 15) 
+         card.moveToTable(homeDistance(card) - cardDistance(card) + playerside * totalevents * 15, cheight(card)* 2 * playerside + playerside * totalevents * 15) 
          card.isFaceUp = False
    elif playeraxis == Yaxis:
 #      if type == 'HireAide':# Not implemented yet
 #         card.moveToTable(0,homeDistance(card) + (playerside * cheight(card,-4)))
       if type == 'SetupHomeworld':
-         card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card) - yaxisMove(card)) 
+         card.moveToTable(0 ,homeDistance(card) - yaxisMove(card)) 
       if type == 'SetupDune':
-         card.moveToTable(cwidth(card)* -3 * playerside,homeDistance(card) - yaxisMove(card)) 
+         card.moveToTable(cwidth(card)* playerside,homeDistance(card) - yaxisMove(card)) 
          card.isFaceUp = False
       if type == 'SetupProgram': 
-         card.moveToTable(cwidth(card)* -4 * playerside,homeDistance(card) + (playerside * cheight(card,-4) - yaxisMove(card)))
+         card.moveToTable(0 ,homeDistance(card) + (playerside * cheight(card,-4) - yaxisMove(card)))
          card.sendToBack()
       if type == 'PlayEvent':
-         card.moveToTable(cwidth(card)* 4 * playerside + playerside * totalevents * 15,homeDistance(card) + playerside * totalevents * 15 - yaxisMove(card)) 
+         card.moveToTable(cwidth(card)* 4 * playerside + playerside * totalevents * 15,homeDistance(card) - cardDistance(card) + playerside * totalevents * 15 - yaxisMove(card)) 
          card.isFaceUp = False
    else: card.moveToTable(0,0)
 
 def homeDistance(card):
 # This function returns the distance from the middle each player's homeworld will be setup towards their playerSide. 
 # This makes the code more readable and allows me to tweak these values from one place
-   if table.isTwoSided(): return (playerside * cwidth(card) / 2) # players on an inverted table are placed half a card away from their edge.
+   if table.isTwoSided(): return (playerside * cheight(card) * 2) # players on an inverted table are placed half a card away from their edge.
    else:
       if playeraxis == Xaxis:
-         return (playerside * cwidth(card) * 5) # players on the X axis, are placed 5 times a card's width towards their side (left or right)
+         return (playerside * cwidth(card) * 10) # players on the X axis, are placed 5 times a card's width towards their side (left or right)
       elif playeraxis == Yaxis:
-         return (playerside * cheight(card) * 3 - yaxisMove(card)) # players on the Y axis, are placed 3 times a card's height towards their side (top or bottom)
+         return (playerside * cheight(card) * 4 - yaxisMove(card)) # players on the Y axis, are placed 3 times a card's height towards their side (top or bottom)
 
 def cardDistance(card):
 # This function returns the size of the card towards a player's side. 
@@ -323,6 +323,9 @@ def flipCoin(group, x = 0, y = 0):
 #---------------------------------------------------------------------------
 # Table card actions
 #---------------------------------------------------------------------------
+
+def inspectCard(card, x = 0, y = 0): # This function shows the player the card text, to allow for easy reading until High Quality scans are procured.
+   confirm("{}".format(card.Operation))
 
 def engage(card, x = 0, y = 0):
     mute()
@@ -788,10 +791,10 @@ def imperialDraw(group = me.piles['Imperial Deck'], times = 1):
     while i < times:
         card = group.top()
         if playeraxis == Yaxis: 
-            group.top().moveToTable(cwidth(card)* -6 - playerside * i * cwidth(card), cardDistance(card) * 2 - yaxisMove(card),True)
+            group.top().moveToTable(cwidth(card) - playerside * i * cwidth(card), homeDistance(card) + cardDistance(card) - yaxisMove(card),True)
             card.markers[Assembly] = 1
         else: 
-            group.top().moveToTable(cardDistance(card) * 2, cwidth(card)* -6 - playerside * i * cheight(card) - yaxisMove(card),True)
+            group.top().moveToTable(homeDistance(card) + cardDistance(card), cwidth(card) - playerside * i * cheight(card) - yaxisMove(card),True)
             card.markers[Assembly] = 1
         i += 1
 
