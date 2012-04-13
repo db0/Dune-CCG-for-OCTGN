@@ -376,7 +376,6 @@ def subdue(card, x = 0, y = 0):
        name = card.name
        type = card.Type
        subtype = card.Subtype
-#       imperial = card.Imperial
        cost = num(card.properties['Deployment Cost']) 
        card.isFaceUp = not card.isFaceUp # GAH!
     if card.markers[Assembly] == 0:
@@ -447,7 +446,7 @@ def subdue(card, x = 0, y = 0):
    
 def searchUniques(card, name, type = 'deploy'): # Checks if there is a unique card on the table with the same name as the one about to be deployed.
     allUniques = (c for c in table # Make a comprehension of all the cards on the table
-        if c.Imperial == 'Yes' # That are from Imperial Deck (only those are unique)
+        if c.Decktype == 'Imperial' # That are from Imperial Deck (only those are unique)
         and c.isFaceUp # This is apparently not taken into account. The game still includes the face down cards if they match the other conditions.
         and c.name == name # That have the same name as the one being deployed.
         and c != card) # And that are not the same card object as the one about to be deployed. 
@@ -659,7 +658,7 @@ def discard(cards, x = 0, y = 0): # Discard a card.
    mute()
    for card in cards: # Can be done at more than one card at the same time, since attached cards follow their parent always.
       cardowner = card.owner
-      if card.Imperial == 'Yes': card.moveTo(cardowner.piles['Imperial Discard'])
+      if card.Decktype == 'Imperial': card.moveTo(cardowner.piles['Imperial Discard'])
       else: card.moveTo(cardowner.piles['House Discard'])
       notify("{} has discarded {}.".format(me, card))
 

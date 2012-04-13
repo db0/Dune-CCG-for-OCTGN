@@ -20,6 +20,13 @@ Sample screenshot of 1.0.2
 Changelog
 ---------
 
+### 1.1.0
+
+Because of the changes below all existing sets at v0.0 are now incompatible with the current definition. Please download the available v1.0 sets or wait for the patch.
+
+* Modified the card properties so that there is now only one property signifying the deck type of the card. Containing a value of either "Imperial" or "House". 
+* Removed the card property "number" who I could seemingly has no purpose.
+
 ### 1.0.9
 
 * Modified the card placements to make setup work for 3 and 4 players. 
