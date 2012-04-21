@@ -25,7 +25,7 @@ Changelog
 Because of the changes below all existing sets at v0.0 are now incompatible with the current definition. Please download the available v1.0 sets or wait for the patch.
 
 * Modified the card properties so that there is now only one property signifying the deck type of the card. Containing a value of either "Imperial" or "House". 
-* Removed the card property "number" who I could seemingly has no purpose.
+* Removed the card property "number" which seemingly has no purpose.
 
 ### 1.0.9
 
@@ -109,8 +109,5 @@ Because of the changes below all existing sets at v0.0 are now incompatible with
 Roadmap
 -------
 
-- More testing of multiplayer setup. It *should* work OK for four player (if they remember to disable the inverted table), but without more testing I won't know.
 - Need to fix the sets
--- Empty card Allegiances need to be turned to 'Neutral'
--- Imperial = 'Yes' and House ='No' is Silly. These properties need to be consolidated into one property called "Deck" or something.
 -- Remove the word 'Event' from card subtypes

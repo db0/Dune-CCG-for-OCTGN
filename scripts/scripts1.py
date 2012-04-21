@@ -427,7 +427,7 @@ def subdue(card, x = 0, y = 0):
             initialBid = -1
             while initialBid < cost:
                initialBid = askInteger("What will your initial bid be? (Min {}). 0 will cancel the petition.".format(cost), cost)
-               if initialBid == 0 or initialBid == None: return # If the player puts zero for the bid, or closes the window, abort.
+               if (initialBid == 0 and cost != 0) or initialBid == None: return # If the player puts zero for the bid, or closes the window, abort.
 #               else: me.Bid = initialBid # Will enable this once the bid() function is complete.
             card.isFaceUp = True
             if card.Allegiance == allegiances[0]: # Position 0 is always the player's sponsor.
