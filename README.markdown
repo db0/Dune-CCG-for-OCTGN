@@ -20,6 +20,17 @@ Sample screenshot of 1.0.2
 Changelog
 ---------
 
+### 1.1.2
+
+* Events that have X deployment cost and 0 deferment tokens will not warn you before deploying
+* Programs should now be placed better at start and also take 1 Solaris per program. Programs also stacked so that they're all visible.
+* Event stacking should now leave a bit more space between them
+* Fixed a bug with the allegiances code after making all cards with no allegiance have "None" in the Allegiances card property.
+
+### 1.1.1
+
+* Fixed not being able to petition cards for 0 solaris when that is their cost
+
 ### 1.1.0
 
 Because of the changes below all existing sets at v0.0 are now incompatible with the current definition. Please download the available v1.0 sets or wait for the patch.

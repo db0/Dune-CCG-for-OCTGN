@@ -52,6 +52,7 @@ DeployedDuneEvent = 0
 DeployedImperiumEvent = 0
 allegiances =['','','',''] # List to keep track of the player's allegiances.
 totalevents = 0 # Variable to allow me to move events a bit to avoid hiding on top of exitisting ones.
+totalprogs = 0 # Variable to allow me to move programs a bit to avoid hiding on top of exitisting ones.
 
 
 #---------------------------------------------------------------------------
@@ -129,6 +130,7 @@ def yaxisMove(card):
 def placeCard(card,type = None):
 # This function automatically places a card on the table according to what type of card is being placed
 # It is called by one of the various custom types and each type has a different value depending on if the player is on the X or Y axis.
+   global totalprogs
    if playeraxis == Xaxis:
 #      if type == 'HireAide': # Not implemented yet
 #         card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), 0)
@@ -138,10 +140,11 @@ def placeCard(card,type = None):
          card.moveToTable(homeDistance(card), cheight(card)* playerside) # We move it to one side depending on what side the player chose.
          card.isFaceUp = False
       if type == 'SetupProgram':          # We move them behind the homeworld
-         card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), 0)
+         card.moveToTable(homeDistance(card) - cardDistance(card) / 4 - (playerside * totalprogs * 20), 0)
          card.sendToBack()
+         totalprogs += 1
       if type == 'PlayEvent': # Events are placed subdued
-         card.moveToTable(homeDistance(card) - cardDistance(card) + playerside * totalevents * 15, cheight(card)* 2 * playerside + playerside * totalevents * 15) 
+         card.moveToTable(homeDistance(card) - cardDistance(card) + playerside * totalevents * 35, cheight(card)* 2 * playerside + playerside * totalevents * 35) 
          card.isFaceUp = False
    elif playeraxis == Yaxis:
 #      if type == 'HireAide':# Not implemented yet
@@ -152,8 +155,9 @@ def placeCard(card,type = None):
          card.moveToTable(cwidth(card)* playerside,homeDistance(card) - yaxisMove(card)) 
          card.isFaceUp = False
       if type == 'SetupProgram': 
-         card.moveToTable(0 ,homeDistance(card) + (playerside * cheight(card,-4) - yaxisMove(card)))
+         card.moveToTable(0 ,homeDistance(card) - cardDistance(card) / 4 - (playerside * totalprogs * 30) - yaxisMove(card))
          card.sendToBack()
+         totalprogs += 1
       if type == 'PlayEvent':
          card.moveToTable(cwidth(card)* 4 * playerside + playerside * totalevents * 15,homeDistance(card) - cardDistance(card) + playerside * totalevents * 15 - yaxisMove(card)) 
          card.isFaceUp = False
@@ -239,7 +243,7 @@ def noteAllegiances(): # This function checks every card in the Imperial Deck an
          card.moveTo(me.piles['Imperial Discard'])
          whisper("Dune found in your Imperial Deck. Discarding. Please remove Dune from your Imperial Deck during deck construction!")
          continue
-      if card.Allegiance not in allegiances and card.Allegiance != 'Neutral' and card.Allegiance != '': # If the allegiance is not neutral and not in our list already...
+      if card.Allegiance not in allegiances and card.Allegiance != 'None' and card.Allegiance != '': # If the allegiance is not neutral and not in our list already...
          allegiances[p] = card.Allegiance                                     # Then add it at the next available position
          p += 1
       card.moveToBottom(me.piles['Imperial Deck'])
@@ -310,6 +314,7 @@ def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
    me.Favor = 10
    me.Initiative = 0
    totalevents = 0
+   totalprogs = 0
    showCurrentPhase() # Remind the players which phase it is now
 
 def flipCoin(group, x = 0, y = 0):
@@ -383,8 +388,8 @@ def subdue(card, x = 0, y = 0):
             notify("{} subdues {}.".format(me, card))
             card.isFaceUp = False
         elif type == 'Event': # Events have special deployment rules
-            if card.markers[Deferment_Token] < cost:
-                if confirm("Events cannot normally be played unless they have equal or more deferment tokens than their deployment cost. \n\nAre you sure you want to do this?"):
+            if card.markers[Deferment_Token] < cost or card.markers[Deferment_Token] == 0:
+                if confirm("Events cannot normally be played unless they have equal or more deferment tokens than their deployment cost and at least one. \n\nAre you sure you want to do this?"):
                     deployCHK = eventDeployTypeChk(subtype)
                     if deployCHK != 'NOK': # Check if there's been any other events of the same typed played this turn by this player.
                         card.isFaceUp = True
@@ -693,7 +698,7 @@ def play(card, x = 0, y = 0):
    mute()
    src = card.group
    # The function below checks if the player is allowed to play this house card. House cards can only be played if the player has one card of same allegiance in their Imperial deck.
-   if card.Allegiance != 'Neutral' and card.Allegiance != '' and card.Allegiance not in allegiances: 
+   if card.Allegiance != 'None' and card.Allegiance != '' and card.Allegiance not in allegiances: 
       if confirm("{}'s Allegiance ({}) does not exist your Imperial Deck. You are not normally allowed have it in your deck. \n\nContinue?".format(card.name, card.Allegiance)):
          notify("{}'s Allegiance does not exist in {}'s Imperial Deck. Illegal deck?".format(card, me))
       else: return
@@ -722,7 +727,7 @@ def setup(group):
 # It will also shuffle their decks, setup their Assembly and Dune and draw 7 cards for them.
    if shared.Phase == 0: # First check if we're on the pre-setup game phase. 
                      # As this function will play your whole hand and wipe your counters, we don't want any accidents.
-      if not confirm("Have bought all the favour and spice you'll need with your bonus solaris?"): return
+      if not confirm("Have bought all the favour and spice you'll need with your bonus solaris? \n\n(Remember you need 1 solaris per program you're going to install.)"): return
       global playerside, allegiances # Import some necessary variables we're using around the game.
       DuneinHand = 0
       mute()
@@ -734,7 +739,7 @@ def setup(group):
             placeCard(card,'SetupHomeworld')
             allegiances[0] = card.Allegiance # We make a note of the Allegiance the player is playing this time (used later for automatically losing favour)
          if re.search(r'Program', card.Subtype) and card.Type == 'Plan':  # If it's a program...
-            if payCost(card.properties['Deployment Cost']) == 'OK': # Pay the cost of the program
+            if payCost(1) == 'OK': # Pay the cost of the program
                placeCard(card,'SetupProgram')
          if card.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001': # If the player has put Dune in their hand as well...
             placeCard(card,'SetupDune')
