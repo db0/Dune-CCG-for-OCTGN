@@ -1,4 +1,4 @@
-    # Python Scripts for the Doomtown CCG definition for OCTGN
+    # Python Scripts for the Dune CCG definition for OCTGN
     # Copyright (C) 2012  Konstantine Thoukydides
 
     # This python script is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ import re
 loud = 'loud' # So that I don't have to use the quotes all the time in my function calls
 silent = 'silent' # Same as above
 Xaxis = 'x'  # Same as above
-Yaxis = 'y'     # Same as above
+Yaxis = 'y'	 # Same as above
 DoesntDisengageColor = "#ffffff"
 
 
@@ -142,6 +142,7 @@ def placeCard(card,type = None):
       if type == 'SetupProgram':          # We move them behind the homeworld
          card.moveToTable(homeDistance(card) - cardDistance(card) / 4 - (playerside * totalprogs * 20), 0)
          card.sendToBack()
+         card.isFaceUp = False
          totalprogs += 1
       if type == 'PlayEvent': # Events are placed subdued
          card.moveToTable(homeDistance(card) - cardDistance(card) + playerside * totalevents * 35, cheight(card)* 2 * playerside + playerside * totalevents * 35) 
@@ -157,6 +158,7 @@ def placeCard(card,type = None):
       if type == 'SetupProgram': 
          card.moveToTable(0 ,homeDistance(card) - cardDistance(card) / 4 - (playerside * totalprogs * 30) - yaxisMove(card))
          card.sendToBack()
+         card.isFaceUp = False
          totalprogs += 1
       if type == 'PlayEvent':
          card.moveToTable(cwidth(card)* 4 * playerside + playerside * totalevents * 15,homeDistance(card) - cardDistance(card) + playerside * totalevents * 15 - yaxisMove(card)) 
@@ -641,14 +643,15 @@ def automatedClosing(group, x = 0, y = 0):
       whisper("You can only perform this action during the Closing Interval")
       return
    if me.Favor < 1:
-      notify("{} does not refill their hand because they have 0 Imperial favor.".format(me))
+      notify("{} does not refill their hand because they have less than 1 Imperial favor.".format(me))
       return   
    if not confirm("Have you remembered to discard any cards you don't want from your hand?"): return
    refill()
    myCards = (card for card in table
               if card.controller == me
               and card.owner == me
-              and card.Type == 'Event')
+              and card.Type == 'Event'
+              and card.isFaceUp)
    for card in myCards:
       if re.search(r'Nexus', card.Subtype): 
          card.markers[Deferment_Token] -= 1 # Nexus events lose one deferment token per House discard phase.
@@ -657,7 +660,7 @@ def automatedClosing(group, x = 0, y = 0):
             notify ("{}'s Nexus Event {} has expired and was automatically discarded".format(me, card))
       elif re.search(r'Duration Effect', card.Operation): 
          card.moveTo(me.piles['House Discard']) # Duration events are discarded at the end of the turn.
-         notify ("{}'s Event {} has expired and was automatically discarded".format(me, card))
+         notify ("{}'s Duration Effect from {} has expired and was automatically discarded".format(me, card))
    notify("{} refills their hand back to {}.".format(me, handsize))
 
 def doesNotDisengage(card, x = 0, y = 0): # Mark a card as "Does not disengage" or unmark it. We use a card highlight to do this.
@@ -691,15 +694,15 @@ def produceSpice(card, x = 0, y = 0):
 
 def payCost(count = 1, notification = silent): # Automatically pays the cost of a card being played from your hand, or confirms/informs if you can't play it.
    count = num(count)
+   if count == 0 : return 0
    if me.Solaris < count:  
-      if notification == 'loud' and count > 0: 
-         if not confirm("You do not seem to have enough Solaris in your House Treasury to play this card. \n\nAre you sure you want to proceed? \
-         \n(If you do, your solaris will go to the negative. You will need to increase it manually as required.)"): return 'ABORT'
-         notify("{} was supposed to pay {} Solaris but only has {} in their house treasury. They'll need to reduce the cost by {} with card effects.".format(me, count, me.Solaris, count - me.Solaris))   
-         me.Solaris -= num(count)
+      if not confirm("You do not seem to have enough Solaris in your House Treasury to pay the cost. \n\nAre you sure you want to proceed? \
+      \n(If you do, your solaris will go to the negative. You will need to increase it manually as required.)"): return 'ABORT'
+      if notification == loud: notify("{} was supposed to pay {} Solaris but only has {} in their house treasury. They'll need to reduce the cost by {} with card effects.".format(me, count, me.Solaris, count - me.Solaris))   
+      me.Solaris -= count
    else: 
       me.Solaris -= count
-      if notification == 'loud' and count > 0: notify("{} has paid {} Solaris. {} is left their house treasury".format(me, count, me.Solaris))  
+      if notification == loud: notify("{} has paid {} Solaris. {} is left their house treasury".format(me, count, me.Solaris))  
    return 'OK'
 
 def play(card, x = 0, y = 0):
@@ -736,7 +739,7 @@ def setup(group):
 # It will also shuffle their decks, setup their Assembly and Dune and draw 7 cards for them.
    if shared.Phase == 0: # First check if we're on the pre-setup game phase. 
                      # As this function will play your whole hand and wipe your counters, we don't want any accidents.
-      if not confirm("Have bought all the favour and spice you'll need with your bonus solaris? \n\n(Remember you need 1 solaris per program you're going to install.)"): return
+#      if not confirm("Have bought all the favour and spice you'll need with your bonus solaris? \n\n(Remember you need 1 solaris per program you're going to install.)"): return
       global playerside, allegiances # Import some necessary variables we're using around the game.
       DuneinHand = 0
       mute()
@@ -757,9 +760,21 @@ def setup(group):
          Dune = table.create("2037f0a1-773d-42a9-a498-d0cf54e7a001", 0, 0, 1, True) # Create a Dune card in the middle of the table.
          placeCard(Dune,'SetupDune')
       noteAllegiances() # Note down the rest allegiances of the player
+      shared.counters['Guild Hoard'].value = 4 + len(players) * 2 # Starting Spice is 4 + (Nr of players * 2)
+      shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
+      startFav = -1
+      startSpice = -1
+      while startSpice < 0 or startSpice >= 5: # keep asking the amount until a valid number is given.
+         startSpice = askInteger("How much spice do you want to buy?\n\n({} per Spice)".format(shared.CROE), 0)
+         if payCost(startSpice * shared.CROE) == 'ABORT': startSpice = -1
+      me.Spice += startSpice
+      while startFav < 0 or startFav >= 5: 
+         startFav = askInteger("How much favor do you want to buy?\n\n(2 per favor)", 0)
+         if payCost(startFav * 2) == 'ABORT': startFav = -1         
+      me.Favor += startFav
       me.Solaris += 20     
       refill() # We fill the player's play hand to their hand size (usually 5)
-      notify("{} is playing {}. Their starting Solaris is {} and their Imperial Favour is {}".format(me, allegiances[0], me.Solaris, me.Favor))  
+      notify("{} is playing {}. Their starting Solaris is {} and their Imperial Favour is {}. They have {} Programs".format(me, allegiances[0], me.Solaris, me.Favor, totalprogs))  
       setupAssembly() # Setup the 3 imperial cards which will be our assembly.
    else: whisper('You can only setup your starting cards during the Pre-Game setup phase') # If this function was called outside the pre-game setup phase
             
