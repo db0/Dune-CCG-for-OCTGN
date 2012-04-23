@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune" id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="3.0.1.0" version="1.1.2" markersize="24">
+<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune" id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="3.0.1.0" version="1.1.3" markersize="24">
 	<card back="r1" front="r2" width="63" height="88" cornerRadius="0">
 		<property name="Type" type="String" hidden="false" ignoreText="False" />
 		<property name="Deployment Cost" type="String" hidden="false" ignoreText="False" />
@@ -49,7 +49,7 @@
 		<cardaction menu="Inspect Card" default="false" execute="inspectCard" />
 		<cardaction menu="Discard Card" default="false" shortcut="del" batchExecute="discard" />
 	</table>
-	<player summary="{#Solaris} / {#Spice} / {#Favor} / {#Hand}">
+	<player summary="Spice:{#Spice}|Sol:{#Solaris}|Favor:{#Favor}|Init:{#Initiative}|Bid:{#Bid}|Cards:{#Hand}">
 		<hand name="Hand" visibility="me" ordered="false" width="63" height="88" icon="r10">
 			<cardaction menu="Play Card" default="true" shortcut="Ctrl+W" execute="play" />
 			<groupaction menu="Setup Starting Cards and Hand" default="false" shortcut="Ctrl+Shift+S" execute="setup" />
@@ -75,7 +75,7 @@
 		<counter name="Initiative" default="0" reset="false" icon="r15" />
 		<counter name="Bid" default="0" reset="false" icon="r19" />
 	</player>
-	<shared>
+	<shared summary="Hoard:{#Guild Hoard}|CROE:{#CROE}">
 		<counter name="Guild Hoard" default="8" reset="false" icon="r16" />
 		<counter name="CROE" default="3" reset="false" icon="r9" />
 		<counter name="Phase" default="0" reset="false" icon="r18" />
