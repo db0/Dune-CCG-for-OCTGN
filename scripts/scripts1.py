@@ -430,9 +430,7 @@ def subdue(card, x = 0, y = 0):
         else:
             if me.Solaris < cost:
                 if not confirm("You're not allowed to start a peition when you do not have at least as much solaris as the deployment cost of the card. \n\nAre you sure you want to proceed?"): return
-            if re.search(r'Native', subtype):
-                if DuneFiefs() == 0: 
-                    if not confirm("You must control at least one Dune Fief in order to play a Native aide. \n\nAre you sure you want to proceed?"): return
+            if searchNatives(subtype) == 'NOK': return
             if searchUniques(card, name, 'petition') == 'NOK': return
             initialBid = -1
             while initialBid < cost:
@@ -445,6 +443,7 @@ def subdue(card, x = 0, y = 0):
                 whisper("This card is of your sponsor's allegiance. Remember that if you win the petition. you may opt to reduce its cost by 1 solaris for each favor you discard")
             elif card.Allegiance in allegiances: notify("{} initiates a petition for {} with an initial bid of {}. If they win, they will have to discard 1 favor as well".format(me, card, initialBid))
             else: notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
+            me.Bid = initialBid
 
 #def bid(group, x = 0, y = 0): 
 # Function abandoned. See https://github.com/db0/Dune-CCG-for-OCTGN/issues/7#issuecomment-4008158
@@ -516,7 +515,7 @@ def CHOAMbuy(group, x = 0, y = 0): # This function allows the player to purchase
        else: notify("{} is performing another CHOAM Exchange this round.".format(me)) # However if they proceed, alter the message to point it out.
     if CHOAMDone == 0: notify("{} is performing a CHOAM Exchange.".format(me)) # Inform everyone that the player is beggingin a CHOAM exchange.
     while spiceNR > 3 or spiceNR == 0: # We start a loop, so that if the player can alter their number if they realize they don't have enough.
-       spiceNR = askInteger("How much spice do you want to buy (Max 3)? Remember that you can only do one CHOAM Exchange per round!", 0)
+       spiceNR = askInteger("How much spice do you want to buy (Max 3. {} Solaris for the first spice and there are {} spice left in the Guild Hoard)?\n\nRemember that you can only do one CHOAM Exchange per round!".format(shared.CROE, shared.counters['Guild Hoard'].value), 0)
        if spiceNR == 0 or spiceNR == None : return # If the player answered 0 or closed the window, cancel the exchange.
        elif spiceNR > 0 and spiceNR < 4:  # If they are within the right value of 1-3...
           fullcost = completeSpiceCost(spiceNR) # Calculate how much the spice they want to purchase would cost. 
@@ -546,7 +545,7 @@ def CHOAMsell(group, x = 0, y = 0): # Very similar as CHOAMbuy, but player sells
        else: notify("{} is performing another CHOAM Exchange this round.".format(me))
     if CHOAMDone == 0: notify("{} is performing a CHOAM Exchange.".format(me))
     while spiceNR > 3 or spiceNR == 0:
-       spiceNR = askInteger("How much spice do you want to sell (Max 3)? Remember that you can only do one CHOAM Exchange per round!", 0)
+       spiceNR = askInteger("How much spice do you want to sell (Max 3. {} Solaris for the first spice and there are {} spice currently in the Guild Hoard)?\n\nRemember that you can only do one CHOAM Exchange per round!".format(shared.CROE, shared.counters['Guild Hoard'].value), 0)
        if spiceNR == 0 or spiceNR == None : return
        elif spiceNR > 0 and spiceNR < 4: 
           if me.Spice - spiceNR < 0: 
@@ -603,7 +602,7 @@ def buyFavor(group, x = 0, y = 0): # Very similar to CHOAMbuy, but player buys F
        else: notify("{} is performing another favor purchase this round.".format(me))
     if favorBought == 0: notify("{} is performing a favor purchase.".format(me))
     while favorNR > 5 or favorNR == 0:
-       favorNR = askInteger("How much Imperial favor do you want to purchase (Max 5)? Remember that you can only purchase favor once per round!", 0)
+       favorNR = askInteger("How much Imperial favor do you want to purchase (Max 5, 2 Solaris per Favor)?\n\n(Remember that you can only purchase favor once per round!)", 0)
        if favorNR == 0 or favorNR == None : return
        elif favorNR > 0 and favorNR < 6: 
           fullcost = favorNR * 2
@@ -642,8 +641,8 @@ def automatedClosing(group, x = 0, y = 0):
    if shared.Phase != 3: # This function is allowed only during the Closing Interval
       whisper("You can only perform this action during the Closing Interval")
       return
-   if me.Favor < 1:
-      notify("{} does not refill their hand because they have less than 1 Imperial favor.".format(me))
+   if me.Favor < 1 and len(me.hand) < handsize:
+      notify("{} cannot not refill their hand because they have less than 1 Imperial favor. Is {} is defeated?".format(me, me))
       return   
    if not confirm("Have you remembered to discard any cards you don't want from your hand?"): return
    refill()
@@ -765,11 +764,11 @@ def setup(group):
       startFav = -1
       startSpice = -1
       while startSpice < 0 or startSpice >= 5: # keep asking the amount until a valid number is given.
-         startSpice = askInteger("How much spice do you want to buy?\n\n({} per Spice)".format(shared.CROE), 0)
-         if payCost(startSpice * shared.CROE) == 'ABORT': startSpice = -1
+         startSpice = askInteger("How much spice do you want to buy with your bonus solaris?\n\n({} per Spice)".format(shared.CROE + 1), 0)
+         if payCost(startSpice * (shared.CROE + 1)) == 'ABORT': startSpice = -1
       me.Spice += startSpice
       while startFav < 0 or startFav >= 5: 
-         startFav = askInteger("How much favor do you want to buy?\n\n(2 per favor)", 0)
+         startFav = askInteger("How much favor do you want to buy with your bonus solaris?\n\n(2 per favor)", 0)
          if payCost(startFav * 2) == 'ABORT': startFav = -1         
       me.Favor += startFav
       me.Solaris += 20     
