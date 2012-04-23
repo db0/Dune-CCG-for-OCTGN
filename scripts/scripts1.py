@@ -337,6 +337,9 @@ def inspectCard(card, x = 0, y = 0): # This function shows the player the card t
 
 def engage(card, x = 0, y = 0):
     mute()
+    if not card.isFaceUp and card.markers[Assembly] == 1:
+      subdue(card)
+      return
     card.orientation ^= Rot90
     if card.orientation & Rot90 == Rot90:
         notify('{} engages {}'.format(me, card))
