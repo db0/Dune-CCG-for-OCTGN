@@ -22,15 +22,18 @@
 		<cardaction menu="Engage/Disengage" default="true" shortcut="Ctrl+E" execute="engage" />
 		<groupaction menu="Disengage all Cards" default="false" shortcut="Ctrl+F5" execute="restoreAll" />
 		<cardaction menu="Subdue/Deploy/Petition" default="false" shortcut="Ctrl+Q" execute="subdue" />
-		<cardaction menu="Add Spice Token" default="false" shortcut="Alt+S" execute="addSpice" />
-		<cardaction menu="Remove Spice Token" default="false" shortcut="Alt+Shift+S" execute="subSpice" />
-		<cardaction menu="Add Deferment Token" default="false" shortcut="Alt+D" execute="addDeferment" />
-		<cardaction menu="Remove Deferment Token" default="false" shortcut="Alt+Shift+D" execute="subDeferment" />
-		<cardaction menu="(Un)Mark card as &quot;Does not Disengage&quot;" default="false" execute="doesNotDisengage" />
 		<groupaction menu="Buy Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+C" execute="CHOAMbuy" />
 		<groupaction menu="Sell Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+Shift+C" execute="CHOAMsell" />
 		<cardaction menu="Engage to produce Spice to the Guild Hoard" default="false" execute="produceSpice" />
 		<groupaction menu="Purchase Favor" default="false" shortcut="Ctrl+F" execute="buyFavor" />
+		<cardactions menu="Markers &amp; Tokens...">
+   		<cardaction menu="Add Spice Token" default="false" shortcut="Alt+S" execute="addSpice" />
+   		<cardaction menu="Remove Spice Token" default="false" shortcut="Alt+Shift+S" execute="subSpice" />
+   		<cardaction menu="Add Deferment Token" default="false" shortcut="Alt+D" execute="addDeferment" />
+   		<cardaction menu="Remove Deferment Token" default="false" shortcut="Alt+Shift+D" execute="subDeferment" />
+   		<cardaction menu="Add Program Token" default="false" shortcut="Alt+P" execute="addProgram" />
+         <cardaction menu="(Un)Mark card as &quot;Does not Disengage&quot;" default="false" execute="doesNotDisengage" />
+		</cardactions>
 		<groupactions menu="Phases">
 			<groupaction menu="Next Phase" default="false" shortcut="Enter" execute="nextPhase" />
 			<groupaction menu="Jump to Opening Interval" default="false" shortcut="F1" execute="goToOpening" />
