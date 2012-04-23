@@ -19,6 +19,7 @@ Spice = ("Spice", "491cf29f-224c-4d8b-8e2d-58467686be88")
 Favor = ("Favor", "6ed72fed-4a63-4f38-95bb-424cbbcdd427")
 Deferment_Token = ("Deferment_Token", "f8f34145-60a8-4d2c-92e9-25824982944e")
 Assembly = ("Imperial Assembly", "a5634dc5-ffd0-4428-95b5-13c6bb3ff00d")
+Program = ("Program Token", "e66b8122-e98a-48bb-a9ba-991fde33d01c")
 
 phases = [
     '{} is currently in the Pre-game Setup Phase'.format(me),
@@ -505,6 +506,11 @@ def subDeferment(card, x = 0, y = 0):
     mute()
     notify("{} removes a Deferment token on {}.".format(me, card))
     card.markers[Deferment_Token] -= 1
+
+def addProgram(card, x = 0, y = 0):
+    mute()
+    notify("{} adds a Program token to {}.".format(me, card))
+    card.markers[Program] += 1
 
 def CHOAMbuy(group, x = 0, y = 0): # This function allows the player to purchase spice through checks and balances to avoid mistakes.
     global CHOAMDone # Import the variable which informs us if the player has done another CHOAM exchange this turn
