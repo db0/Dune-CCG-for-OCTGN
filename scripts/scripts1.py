@@ -35,7 +35,7 @@ import re
 loud = 'loud' # So that I don't have to use the quotes all the time in my function calls
 silent = 'silent' # Same as above
 Xaxis = 'x'  # Same as above
-Yaxis = 'y'	 # Same as above
+Yaxis = 'y'     # Same as above
 DoesntDisengageColor = "#ffffff"
 
 
@@ -402,18 +402,21 @@ def subdue(card, x = 0, y = 0):
                     if deployCHK == 'OK': notify("{} deploys {} with {} deferment tokens.".format(me, card, card.markers[Deferment_Token]))
                     else: notify("{} deploys another {} event - {} with {} deferment tokens.".format(me, subtype, card, card.markers[Deferment_Token]))
         elif searchUniques(card, name, 'deploy') == 'NOK': return # Check if the card is unique and in the table. If so, abort this function.
-        elif re.search(r'Native', subtype):
-            if DuneFiefs() == 0: 
-                if not confirm("You must control at least one Dune Fief in order to deploy a Native aide. \n\nAre you sure you want to proceed?"): return
-        elif card.markers[Deferment_Token] == 0 and cost > 0:                         
-            notify("{} deploys {} which had 0 deferment tokens.".format(me, card))   
-            card.isFaceUp = True
+        elif searchNatives(subtype) == 'NOK': return # Check if the card is a native persona and if there's any dune fiefs in our control. If so, abort this function after a confirm.
+        elif card.markers[Deferment_Token] == 0 and cost > 0:
+            if confirm("You cannot normally deploy cards with 0 deferment tokens. Bypass?"):
+	            notify("{} deploys {} which had 0 deferment tokens.".format(me, card))   
+	            card.isFaceUp = True
         elif card.markers[Deferment_Token] < cost:
             if confirm("Card has less deferment tokens than its deployment cost. Do you need to automatically pay the difference remaining from your treasury?"):
                 if payCost(cost - card.markers[Deferment_Token]) == 'OK':
                     card.isFaceUp = True
                     notify("{} pays {} and deploys {}.".format(me, cost - card.markers[Deferment_Token], card))
                     card.markers[Deferment_Token] = 0
+            elif confirm("Do you want to deploy the card at no cost instead?"):
+                card.isFaceUp = True
+                notify("{} deploys {} at no cost (Card had {} less deferment tokens than its deployment cost).".format(me, card, cost - card.markers[Deferment_Token]))
+                card.markers[Deferment_Token] = 0            
         else:
             card.isFaceUp = True
             notify("{} deploys {}.".format(me, card))
@@ -462,6 +465,12 @@ def searchUniques(card, name, type = 'deploy'): # Checks if there is a unique ca
         return 'NOK'
     return 'OK'
 
+def searchNatives(subtype):
+    if re.search(r'Native', subtype):
+        if DuneFiefs() == 0: 
+            if not confirm("You must control at least one Dune Fief in order to deploy a Native Persona. \n\nAre you sure you want to proceed?"): return 'NOK'
+    return 'OK'
+    
 def restoreAll(group, x = 0, y = 0): 
     mute()
     if shared.Phase != 1: #One can only disengage during the Opening Interval
