@@ -49,7 +49,7 @@
 		<cardaction menu="Inspect Card" default="false" execute="inspectCard" />
 		<cardaction menu="Discard Card" default="false" shortcut="del" batchExecute="discard" />
 	</table>
-	<player summary="Spice:{#Spice}|Sol:{#Solaris}|Favor:{#Favor}|Init:{#Initiative}|Bid:{#Bid}|Cards:{#Hand}">
+	<player summary="Spice:{#Spice} | Sol:{#Solaris} | Favor:{#Favor} | Init:{#Initiative} | Bid:{#Bid} | Cards:{#Hand}">
 		<hand name="Hand" visibility="me" ordered="false" width="63" height="88" icon="r10">
 			<cardaction menu="Play Card" default="true" shortcut="Ctrl+W" execute="play" />
 			<groupaction menu="Setup Starting Cards and Hand" default="false" shortcut="Ctrl+Shift+S" execute="setup" />
@@ -75,7 +75,7 @@
 		<counter name="Initiative" default="0" reset="false" icon="r15" />
 		<counter name="Bid" default="0" reset="false" icon="r19" />
 	</player>
-	<shared summary="Hoard:{#Guild Hoard}|CROE:{#CROE}">
+	<shared summary="Hoard:{#Guild Hoard} | CROE:{#CROE}">
 		<counter name="Guild Hoard" default="8" reset="false" icon="r16" />
 		<counter name="CROE" default="3" reset="false" icon="r9" />
 		<counter name="Phase" default="0" reset="false" icon="r18" />
