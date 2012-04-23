@@ -525,7 +525,9 @@ def CHOAMbuy(group, x = 0, y = 0): # This function allows the player to purchase
     if CHOAMDone == 0: notify("{} is performing a CHOAM Exchange.".format(me)) # Inform everyone that the player is beggingin a CHOAM exchange.
     while spiceNR > 3 or spiceNR == 0: # We start a loop, so that if the player can alter their number if they realize they don't have enough.
        spiceNR = askInteger("How much spice do you want to buy (Max 3. {} Solaris for the first spice and there are {} spice left in the Guild Hoard)?\n\nRemember that you can only do one CHOAM Exchange per round!".format(shared.CROE, shared.counters['Guild Hoard'].value), 0)
-       if spiceNR == 0 or spiceNR == None : return # If the player answered 0 or closed the window, cancel the exchange.
+       if spiceNR == 0 or spiceNR == None: 
+          notify("{} has cancelled the CHOAM exchange".format(me))
+          return # If the player answered 0 or closed the window, cancel the exchange and inform.
        elif spiceNR > 0 and spiceNR < 4:  # If they are within the right value of 1-3...
           fullcost = completeSpiceCost(spiceNR) # Calculate how much the spice they want to purchase would cost. 
           if spiceNR > shared.counters['Guild Hoard'].value:  # Check if the hoard has enough spice left.
@@ -555,7 +557,9 @@ def CHOAMsell(group, x = 0, y = 0): # Very similar as CHOAMbuy, but player sells
     if CHOAMDone == 0: notify("{} is performing a CHOAM Exchange.".format(me))
     while spiceNR > 3 or spiceNR == 0:
        spiceNR = askInteger("How much spice do you want to sell (Max 3. {} Solaris for the first spice and there are {} spice currently in the Guild Hoard)?\n\nRemember that you can only do one CHOAM Exchange per round!".format(shared.CROE, shared.counters['Guild Hoard'].value), 0)
-       if spiceNR == 0 or spiceNR == None : return
+       if spiceNR == 0 or spiceNR == None:
+          notify("{} has cancelled the CHOAM exchange".format(me))
+          return
        elif spiceNR > 0 and spiceNR < 4: 
           if me.Spice - spiceNR < 0: 
              whisper("You do not have this amount of spice to sell. You have only {} to sell.".format(me.Spice))
@@ -612,7 +616,9 @@ def buyFavor(group, x = 0, y = 0): # Very similar to CHOAMbuy, but player buys F
     if favorBought == 0: notify("{} is performing a favor purchase.".format(me))
     while favorNR > 5 or favorNR == 0:
        favorNR = askInteger("How much Imperial favor do you want to purchase (Max 5, 2 Solaris per Favor)?\n\n(Remember that you can only purchase favor once per round!)", 0)
-       if favorNR == 0 or favorNR == None : return
+       if favorNR == 0 or favorNR == None:
+          notify("{} has cancelled the favor purchase".format(me))
+          return
        elif favorNR > 0 and favorNR < 6: 
           fullcost = favorNR * 2
           if me.Solaris < fullcost: 

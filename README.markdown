@@ -20,6 +20,23 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 Changelog
 ---------
 
+### 1.1.3
+
+* Fixed Native Personas not deploying when subdued.
+* Added option to play a card with less deferments than its cost, for no cost.
+* Added counter labels on the player's summary
+* Spice & CROE set appropriately for more than 2 players
+* Setup action will now prompt for the amount of spice and favour to buy
+* Closing interval will now not discard face-down but peeked at duration effects (eg, events)
+* Fixed the wrong cost for the starting spice (Should be CROE+1)
+* Starting a petition now sets your Bid counter
+* If you have to draw cards but can't, the game notes that you probably lost.
+* The Buying/Selling Solaris dialogue now informs how much the CROE is and how many Spice are left
+* Added Program Tokens and relevant markers and scripts to add them on cards. (Required the new v1.0.4 markers file)
+* Using the default action (i.e. double-click) on a face-down assembly card now will start a petition, rather than just engage it.
+* Cancelling a Favor or CHOAM Exchange now informs of the fact.
+
+
 ### 1.1.2
 
 * Events that have X deployment cost and 0 deferment tokens will not warn you before deploying
