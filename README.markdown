@@ -9,13 +9,13 @@ Screenshots
 -----------
 (Click for larger size)
 
-Sample screenshot of 1.0.6
+Sample screenshot of 1.1.2 (A 3-Player game in progress)
 
-[![](http://i.imgur.com/wTG33l.jpg)](http://i.imgur.com/wTG33.jpg)
+[![](http://i.imgur.com/wt1rXl.jpg)](http://i.imgur.com/wt1rX.jpg)
 
-Sample screenshot of 1.0.2
+Sample screenshot of 1.1.2 (Another 3-Player game in progress
 
-[![](http://i.imgur.com/vrLL5l.jpg)](http://i.imgur.com/vrLL5.jpg)
+[![](http://i.imgur.com/9jKNml.jpg)](http://i.imgur.com/9jKNm.jpg)
 
 Changelog
 ---------
