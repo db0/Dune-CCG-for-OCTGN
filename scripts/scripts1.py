@@ -328,6 +328,34 @@ def flipCoin(group, x = 0, y = 0):
     else:
         notify("{} flips tails.".format(me))
 
+def placeBid(group, x = 0, y = 0):
+   mute()
+   passedPL = eval(getGlobalVariable("passedPlayers")) # We grab the variable in string format and use the eval() to make it a list
+   if me._id in passedPL:
+      if not confirm("You have already passed this petition. You are not normally allowed to bid a petition you have passed on the bid.\n\nBypass?"): return
+      notify("{} has re-enterred the bidding contest".format(me))
+      passedPL.remove(me._id)
+      setGlobalVariable("passedPlayers", str(passedPL))
+   highestbid = 0
+   overdraft = False
+   for player in players:
+      if player.Bid > highestbid: highestbid = player.Bid
+   mybid = askInteger("What is your bid?\n\n(Currently highest bid is {} Solaris).\n(Putting 0 will cancel the bid)".format(highestbid), 0)
+   while 0 < mybid <= highestbid and highestbid > 0: 
+      mybid = askInteger("You must bid higher then the current bid of {}. Please bid again.\n\n(0 will cancel the bid)".format(highestbid), 0)
+      if mybid > me.Solaris: 
+         if not confirm("You have bid more than your available Solaris in your bank. You're not normally allowed to do this, even if you would reduce it with favor.\n\nBypass?"): mybid = highestbid
+         else: overdraft = True
+   if mybid == 0 or mybid == None: 
+      notify("{} has passed for this petition".format(me))
+      passedPL.append(me._id)
+      setGlobalVariable("passedPlayers", str(passedPL))
+   else:
+      if overdraft: extraText = " by exceeding their banked Solaris"
+      else: extraText =""
+      notify("{} has increased the bid to {}{}".format(me, mybid,extraText))
+      me.Bid = mybid
+   
 #---------------------------------------------------------------------------
 # Table card actions
 #---------------------------------------------------------------------------
@@ -448,6 +476,7 @@ def subdue(card, x = 0, y = 0):
             elif card.Allegiance in allegiances: notify("{} initiates a petition for {} with an initial bid of {}. If they win, they will have to discard 1 favor as well".format(me, card, initialBid))
             else: notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
             me.Bid = initialBid
+            setGlobalVariable("petitionedCard", card._id)
 
 #def bid(group, x = 0, y = 0): 
 # Function abandoned. See https://github.com/db0/Dune-CCG-for-OCTGN/issues/7#issuecomment-4008158
