@@ -24,7 +24,7 @@
 	<table name="Table" visibility="undefined" ordered="false" width="1280" height="1200" board="r3" boardPosition="0,0,0,0" background="r4" backgroundStyle="uniformToFill">
 		<cardaction menu="Engage/Disengage" default="true" shortcut="Ctrl+E" execute="engage" />
 		<cardaction menu="Subdue/Deploy/Petition" default="false" shortcut="Ctrl+Q" execute="subdue" />
-		<groupaction menu="Place Bid/Pass" default="false" shortcut="Ctrl+Shift+B" execute="placeBid" />
+		<groupaction menu="Place Bid/Pass/Win Petition" default="false" shortcut="Ctrl+Shift+B" execute="placeBid" />
 		<groupaction menu="Buy Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+C" execute="CHOAMbuy" />
 		<groupaction menu="Sell Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+Shift+C" execute="CHOAMsell" />
 		<cardaction menu="Engage to produce Spice to the Guild Hoard" default="false" execute="produceSpice" />
