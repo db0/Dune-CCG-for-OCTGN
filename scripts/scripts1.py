@@ -374,9 +374,16 @@ def placeBid(group, x = 0, y = 0):
       if player.Bid > highestbid: highestbid = player.Bid
       if player.Bid > 0: playersInBid += 1
    if playersInBid == 0: 
-      whisper("No petition seems to be in progress. Please use the 'Subdue/Deploy/Petition' action on a face-down assembly card to start one first.")
-      return
-   if playersInBid == 1 and me.Bid > 0: # If there's just one player remaining in the bid and it's the current player, then it means he's the "last man standing" so they are the winner of the petition
+      chkVar = chkOut("petitionedCard")
+      if chkVar == 'ABORT': return
+      elif chkVar == 'Empty':
+         whisper("No petition seems to be in progress. Please use the 'Subdue/Deploy/Petition' action on a face-down assembly card to start one first.")
+         return
+      else: 
+         costZeroCard = True
+         if Card(int(chkVar)).owner == me: playersInBid = 1
+      setGlobalVariable("petitionedCard", chkVar)
+   if playersInBid == 1 and (me.Bid > 0 or costZeroCard): # If there's just one player remaining in the bid and it's the current player, then it means he's the "last man standing" so they are the winner of the petition
       if confirm("You seem to have won this petition, is this correct?"): # But lets just make sure just in case...
          cardID = chkOut("petitionedCard")
          if cardID == 'ABORT': return

@@ -20,6 +20,12 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 Changelog
 ---------
 
+### 1.1.4
+
+* Created a robust petitioning process. Start a petition with the subdue/deploy/petition card action. You bid on it with the a table action. If all other players have passed, the program will assume you have won and take action.
+* Now Holdings and Personas are played next to each other on the table. 
+* Moved around the starting positions a bit.
+
 ### 1.1.3
 
 * Fixed Native Personas not deploying when subdued.
