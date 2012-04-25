@@ -32,6 +32,7 @@ phases = [
 #---------------------------------------------------------------------------
 
 import re
+import time
 
 loud = 'loud' # So that I don't have to use the quotes all the time in my function calls
 silent = 'silent' # Same as above
@@ -100,6 +101,17 @@ def chooseSide(): # Called from many functions to check if the player has chosen
             playeraxis = None
             playerside = 0
 
+def chkOut(globalvar): # A function which safely grabs a global variable by making sure nobody else is currently modifying it.
+   retry = 0
+   while getGlobalVariable(globalvar) == 'CHECKOUT':
+      if retry == 3: 
+         whisper("Global variable checkout failed after 3 tries. Aborting!")
+         return 'ABORT'
+      whisper("Global variable currently in use, retrying...")
+      time.sleep(1)
+      retry += 1
+   return getGlobalVariable(globalvar)
+      
 #---------------------------------------------------------------------------
 # Card Placement functions
 #---------------------------------------------------------------------------
@@ -330,7 +342,9 @@ def flipCoin(group, x = 0, y = 0):
 
 def placeBid(group, x = 0, y = 0):
    mute()
-   passedPL = eval(getGlobalVariable("passedPlayers")) # We grab the variable in string format and use the eval() to make it a list
+   chkVar = chkOut("passedPlayers")
+   if chkVar == 'ABORT': return
+   passedPL = eval(chkVar) # We grab the variable in string format and use the eval() to make it a list
    if me._id in passedPL:
       if not confirm("You have already passed this petition. You are not normally allowed to bid a petition you have passed on the bid.\n\nBypass?"): return
       notify("{} has re-enterred the bidding contest".format(me))
@@ -476,7 +490,7 @@ def subdue(card, x = 0, y = 0):
             elif card.Allegiance in allegiances: notify("{} initiates a petition for {} with an initial bid of {}. If they win, they will have to discard 1 favor as well".format(me, card, initialBid))
             else: notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
             me.Bid = initialBid
-            setGlobalVariable("petitionedCard", card._id)
+            if chkOut("petitionedCard") != 'ABORT': setGlobalVariable("petitionedCard", card._id)
 
 #def bid(group, x = 0, y = 0): 
 # Function abandoned. See https://github.com/db0/Dune-CCG-for-OCTGN/issues/7#issuecomment-4008158
