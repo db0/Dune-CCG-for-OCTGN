@@ -55,7 +55,8 @@ DeployedImperiumEvent = 0
 allegiances =['','','',''] # List to keep track of the player's allegiances.
 totalevents = 0 # Variable to allow me to move events a bit to avoid hiding on top of exitisting ones.
 totalprogs = 0 # Variable to allow me to move programs a bit to avoid hiding on top of exitisting ones.
-
+totalholdings = 0
+totalpersonas = 0
 
 #---------------------------------------------------------------------------
 # General functions
@@ -105,12 +106,14 @@ def chkOut(globalvar): # A function which safely grabs a global variable by maki
    retry = 0
    while getGlobalVariable(globalvar) == 'CHECKOUT':
       if retry == 3: 
-         whisper("Global variable checkout failed after 3 tries. Aborting!")
+         whisper("Global variable checkout failed after 3 tries. Another player must by doing something! Please try again later.")
          return 'ABORT'
       whisper("Global variable currently in use, retrying...")
       time.sleep(1)
       retry += 1
-   return getGlobalVariable(globalvar)
+   globalVar = getGlobalVariable(globalvar)
+   setGlobalVariable(globalvar, 'CHECKOUT')
+   return globalVar
       
 #---------------------------------------------------------------------------
 # Card Placement functions
@@ -143,10 +146,8 @@ def yaxisMove(card):
 def placeCard(card,type = None):
 # This function automatically places a card on the table according to what type of card is being placed
 # It is called by one of the various custom types and each type has a different value depending on if the player is on the X or Y axis.
-   global totalprogs
+   global totalprogs, totalholdings, totalpersonas
    if playeraxis == Xaxis:
-#      if type == 'HireAide': # Not implemented yet
-#         card.moveToTable(homeDistance(card) + (playerside * cwidth(card,-4)), 0)
       if type == 'SetupHomeworld':
          card.moveToTable(homeDistance(card), 0) # We move it to one side depending on what side the player chose.
       if type == 'SetupDune':
@@ -158,11 +159,20 @@ def placeCard(card,type = None):
          card.isFaceUp = False
          totalprogs += 1
       if type == 'PlayEvent': # Events are placed subdued
-         card.moveToTable(homeDistance(card) - cardDistance(card) + playerside * totalevents * 35, cheight(card)* 2 * playerside + playerside * totalevents * 35) 
+         card.moveToTable(homeDistance(card) + playerside * totalevents * 35, cheight(card)* -2 * playerside + playerside * totalevents * 35) 
          card.isFaceUp = False
+      if type =='DeployHolding':
+         card.moveToTable(homeDistance(card) - cardDistance(card), -cheight(card) * playerside + totalholdings * cheight(card)) # We move them just in front and to the side of the player's homeworld
+         totalholdings += 1
+         if totalholdings == 5: totalholdings = -4
+      if type =='DeployPersona':
+         card.moveToTable(homeDistance(card) - 2 * cardDistance(card), totalpersonas * cheight(card)) # We move them just ahead of the player's homeworld, as some distance.
+         totalpersonas += 1
+         if totalpersonas == 5: totalpersonas = -5
+      if type =='DeployResource':
+         card.moveToTable(cardDistance(card), cheight(card) * playerside) # We move it close to the table center, towards the player's side.
+         card.sendToBack()
    elif playeraxis == Yaxis:
-#      if type == 'HireAide':# Not implemented yet
-#         card.moveToTable(0,homeDistance(card) + (playerside * cheight(card,-4)))
       if type == 'SetupHomeworld':
          card.moveToTable(0 ,homeDistance(card) - yaxisMove(card)) 
       if type == 'SetupDune':
@@ -174,19 +184,30 @@ def placeCard(card,type = None):
          card.isFaceUp = False
          totalprogs += 1
       if type == 'PlayEvent':
-         card.moveToTable(cwidth(card)* 4 * playerside + playerside * totalevents * 15,homeDistance(card) - cardDistance(card) + playerside * totalevents * 15 - yaxisMove(card)) 
+         card.moveToTable(cwidth(card)* -4 * playerside + playerside * totalevents * 15,homeDistance(card) + playerside * totalevents * 15 - yaxisMove(card)) 
          card.isFaceUp = False
+      if type =='DeployHolding':
+         card.moveToTable(-cwidth(card) * playerside + totalholdings * cheight(card), homeDistance(card) - cardDistance(card)) # We move them just in front and to the side of the player's homeworld
+         totalholdings += 1
+         if totalholdings == 7: totalholdings = -4
+      if type =='DeployPersona':
+         card.moveToTable(totalpersonas * cheight(card),homeDistance(card) - 2 * cardDistance(card)) # We move them just ahead of the player's homeworld, as some distance.
+         totalpersonas += 1
+         if totalpersonas == 7: totalpersonas = -5
+      if type =='DeployResource':
+         card.moveToTable(cwidth(card) * playerside,cardDistance(card)) # We move it close to the table center, towards the player's side.
+         card.sendToBack()
    else: card.moveToTable(0,0)
 
 def homeDistance(card):
 # This function returns the distance from the middle each player's homeworld will be setup towards their playerSide. 
 # This makes the code more readable and allows me to tweak these values from one place
-   if table.isTwoSided(): return (playerside * cheight(card) * 2) # players on an inverted table are placed half a card away from their edge.
+   if table.isTwoSided(): return (playerside * cheight(card) * 3) # players on an inverted table are placed half a card away from their edge.
    else:
       if playeraxis == Xaxis:
-         return (playerside * cwidth(card) * 10) # players on the X axis, are placed 5 times a card's width towards their side (left or right)
+         return (playerside * cwidth(card) * 10) # players on the X axis, are placed 10 times a card's width towards their side (left or right)
       elif playeraxis == Yaxis:
-         return (playerside * cheight(card) * 4 - yaxisMove(card)) # players on the Y axis, are placed 3 times a card's height towards their side (top or bottom)
+         return (playerside * cheight(card) * 4 - yaxisMove(card)) # players on the Y axis, are placed 4 times a card's height towards their side (top or bottom)
 
 def cardDistance(card):
 # This function returns the size of the card towards a player's side. 
@@ -341,19 +362,79 @@ def flipCoin(group, x = 0, y = 0):
         notify("{} flips tails.".format(me))
 
 def placeBid(group, x = 0, y = 0):
+# This function does the following:
+#* It Checks to see if the player has passed in this petition already
+#* It check if they are the last player standing in the bidding process and if so, declare them as the winner and take appropriate action, depending on if they are the owner or contestor
+#* If they are not the winner, then they can increase their bid for this petition, or pass.
    mute()
-   chkVar = chkOut("passedPlayers")
+   highestbid = 0 # Variable tracking what the highest bid is
+   playersInBid = 0 # Variable tracking how many players are still in the bid
+   overdraft = False # Variable tracking if the player tried to bid more than the Solaris in their Bank
+   for player in players: # Mark what the highest bid is and see how many players are currently still bidding
+      if player.Bid > highestbid: highestbid = player.Bid
+      if player.Bid > 0: playersInBid += 1
+   if playersInBid == 0: 
+      whisper("No petition seems to be in progress. Please use the 'Subdue/Deploy/Petition' action on a face-down assembly card to start one first.")
+      return
+   if playersInBid == 1 and me.Bid > 0: # If there's just one player remaining in the bid and it's the current player, then it means he's the "last man standing" so they are the winner of the petition
+      if confirm("You seem to have won this petition, is this correct?"): # But lets just make sure just in case...
+         cardID = chkOut("petitionedCard")
+         if cardID == 'ABORT': return
+         card = Card(int(cardID))
+         if card.owner == me: # if we're the petitioner
+            if card.allegiance == allegiances[0]: # if the card is of our own allegiance, we can reduce the cost via favor
+               FavorLost = -1
+               while FavorLost < 0 or FavorLost > highestbid: # This loop is to prevent the user from putting a value higher than the bid and thus gaining solaris.
+                  FavorLost = askInteger("You have the house advantage for this petition and can use favor to reduce the final cost.\n\nHow much favor do you want to spend?\n(Max {})?".format(highestbid), 0)
+                  if FavorLost == None: FavorLost = 0
+                  if FavorLost > highestbid: whisper("You cannot reduce the deployment cost to negative")
+               if me.Solaris < highestbid: # if we don't have enough money to pay the cost, we need to lose favor.
+                  FavorLost = highestbid - me.Solaris
+               me.Solaris -= highestbid - FavorLost
+               me.Favor -= FavorLost
+               if FavorLost > 0: extraText = " and {} favor".format(FavorLost)
+               else: extraText = ''
+            elif card.allegiance in allegiances: # If the card if not of our allegiance, but is of a secondary house we're using, we need to pay one favor extra.
+               FavorLost = 1
+               if me.Solaris < highestbid:
+                  FavorLost += highestbid - me.Solaris
+               me.Favor -= FavorLost
+               me.Solaris -= highestbid - FavorLost
+               extraText = " and lost {} favor".format(FavorLost)
+            else: # If the card is netural, then there's nothing special.
+               FavorLost = 0
+               if me.Solaris < highestbid:
+                  FavorLost += highestbid - me.Solaris
+               me.Favor -= FavorLost
+               me.Solaris -=highestbid
+               if FavorLost > 0: extraText = " and lost {} favor".format(FavorLost)
+               else: extraText = ''
+            notify("{} has successfully petitioned for {} with a final bid of {}. They have spent {} solaris{} to pay the deployment cost.".format(me, card, highestbid, highestbid - FavorLost, extraText))
+            card.markers[Assembly] = 0
+            placeCard(card, "Deploy{}".format(card.Type)) # We deploy the card depending on its type.
+            card.orientation = Rot90
+         else: # If we're a contesting player...
+            ContestCost = highestbid - num(card.properties['Deployment Cost'])
+            FavorLost = 0
+            if me.Solaris < ContestCost: # If we can't pay the full cost, we need to pay the rest with favor.
+               FavorLost -= ContestCost - me.Solaris
+               extraText = " and {} favor".format(FavorLost)
+            else: extraText = ''
+            me.Solaris -= ContestCost
+            notify("{} has paid {} Solaris{} and contested the deployment of {}. The house of {} cannot call any more Petitions this turn".format(me, ContestCost, extraText, card, me))
+            time.sleep(1)
+            card.isFaceUp = False
+         setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables for use in the next petition.
+         setGlobalVariable("passedPlayers", "[]")
+         me.Bid = 0
+         return
+   chkVar = chkOut("passedPlayers") # Checkout the passedPlayers global variable, which is a list with the player IDs of all the players who have passed on this petition.
    if chkVar == 'ABORT': return
    passedPL = eval(chkVar) # We grab the variable in string format and use the eval() to make it a list
-   if me._id in passedPL:
+   if me._id in passedPL: # See if the current player has passed already, and if so, warn them but give a chance to re-enter the bid (say because of card effects or wrongly pressing 0)
       if not confirm("You have already passed this petition. You are not normally allowed to bid a petition you have passed on the bid.\n\nBypass?"): return
       notify("{} has re-enterred the bidding contest".format(me))
       passedPL.remove(me._id)
-      setGlobalVariable("passedPlayers", str(passedPL))
-   highestbid = 0
-   overdraft = False
-   for player in players:
-      if player.Bid > highestbid: highestbid = player.Bid
    mybid = askInteger("What is your bid?\n\n(Currently highest bid is {} Solaris).\n(Putting 0 will cancel the bid)".format(highestbid), 0)
    while 0 < mybid <= highestbid and highestbid > 0: 
       mybid = askInteger("You must bid higher then the current bid of {}. Please bid again.\n\n(0 will cancel the bid)".format(highestbid), 0)
@@ -363,12 +444,13 @@ def placeBid(group, x = 0, y = 0):
    if mybid == 0 or mybid == None: 
       notify("{} has passed for this petition".format(me))
       passedPL.append(me._id)
-      setGlobalVariable("passedPlayers", str(passedPL))
+      me.Bid = 0
    else:
       if overdraft: extraText = " by exceeding their banked Solaris"
       else: extraText =""
       notify("{} has increased the bid to {}{}".format(me, mybid,extraText))
       me.Bid = mybid
+   setGlobalVariable("passedPlayers", str(passedPL))
    
 #---------------------------------------------------------------------------
 # Table card actions
@@ -470,10 +552,18 @@ def subdue(card, x = 0, y = 0):
             notify("{} deploys {}.".format(me, card))
             card.markers[Deferment_Token] = 0
     else:
+        chkVar = chkOut("petitionedCard")
+        if chkVar == 'ABORT': return
         if card.isFaceUp:
-            notify("{}'s petition for {} was unsuccesful.".format(me, card))
+            notify("{} has cancelled their petition.".format(me))
             card.isFaceUp = False
+            setGlobalVariable("petitionedCard", "Empty")
+            setGlobalVariable("passedPlayers", "[]")
         else:
+            if chkVar != 'Empty': 
+               whisper("Another petition (for {}) is currently in progress, please complete that one first.".format(Card(int(chkVar))))
+               setGlobalVariable("petitionedCard", chkVar)
+               return
             if me.Solaris < cost:
                 if not confirm("You're not allowed to start a peition when you do not have at least as much solaris as the deployment cost of the card. \n\nAre you sure you want to proceed?"): return
             if searchNatives(subtype) == 'NOK': return
@@ -482,15 +572,14 @@ def subdue(card, x = 0, y = 0):
             while initialBid < cost:
                initialBid = askInteger("What will your initial bid be? (Min {}). 0 will cancel the petition.".format(cost), cost)
                if (initialBid == 0 and cost != 0) or initialBid == None: return # If the player puts zero for the bid, or closes the window, abort.
-#               else: me.Bid = initialBid # Will enable this once the bid() function is complete.
             card.isFaceUp = True
             if card.Allegiance == allegiances[0]: # Position 0 is always the player's sponsor.
                 notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
-                whisper("This card is of your sponsor's allegiance. Remember that if you win the petition. you may opt to reduce its cost by 1 solaris for each favor you discard")
-            elif card.Allegiance in allegiances: notify("{} initiates a petition for {} with an initial bid of {}. If they win, they will have to discard 1 favor as well".format(me, card, initialBid))
+                #whisper("This card is of your sponsor's allegiance. Remember that if you win the petition. you may opt to reduce its cost by 1 solaris for each favor you discard")
+            elif card.Allegiance in allegiances: notify("{} initiates a petition for {} with an initial bid of {}.".format(me, card, initialBid))
             else: notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
             me.Bid = initialBid
-            if chkOut("petitionedCard") != 'ABORT': setGlobalVariable("petitionedCard", card._id)
+            setGlobalVariable("petitionedCard", card._id)
 
 #def bid(group, x = 0, y = 0): 
 # Function abandoned. See https://github.com/db0/Dune-CCG-for-OCTGN/issues/7#issuecomment-4008158
@@ -780,12 +869,16 @@ def play(card, x = 0, y = 0):
       if DuneFiefs() == 0: 
          if confirm("You must control at least one Dune Fief in order to play a Native aide. \n\nAre you sure you want to proceed?"):
             if payCost(card.properties['Deployment Cost'], loud) == 'OK': # Take cost out of the bank, if there is any.
-               card.moveToTable(0, 0 - yaxisMove(card))
+               placeCard(card, "DeployPersona")
                notify("{} plays {} from their hand.".format(me, card))
       else: 
          if payCost(card.properties['Deployment Cost'], loud) == 'OK': # Take cost out of the bank, if there is any.
-            card.moveToTable(0, 0 - yaxisMove(card))
+            placeCard(card, "DeployPersona")
             notify("{} plays {} from their hand.".format(me, card))
+   elif card.Type == 'Persona':
+      if payCost(card.properties['Deployment Cost'], loud) == 'OK':# Take cost out of the bank, if there is any.
+         placeCard(card, "DeployPersona")
+         notify("{} plays {} from their hand.".format(me, card))   
    else:
       if payCost(card.properties['Deployment Cost'], loud) == 'OK':# Take cost out of the bank, if there is any.
          card.moveToTable(0, 0 - yaxisMove(card))
@@ -876,7 +969,7 @@ def imperialDraw(group = me.piles['Imperial Deck'], times = 1):
     while i < times:
         card = group.top()
         if playeraxis == Yaxis: 
-            group.top().moveToTable(cwidth(card) - playerside * i * cwidth(card), homeDistance(card) + cardDistance(card) - yaxisMove(card),True)
+            group.top().moveToTable(cwidth(card) - i * cwidth(card), homeDistance(card) + cardDistance(card) - yaxisMove(card),True)
             card.markers[Assembly] = 1
         else: 
             group.top().moveToTable(homeDistance(card) + cardDistance(card), cwidth(card) - playerside * i * cheight(card) - yaxisMove(card),True)
