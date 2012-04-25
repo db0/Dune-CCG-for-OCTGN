@@ -351,6 +351,8 @@ def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
    me.Initiative = 0
    totalevents = 0
    totalprogs = 0
+   setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables.
+   setGlobalVariable("passedPlayers", "[]")
    showCurrentPhase() # Remind the players which phase it is now
 
 def flipCoin(group, x = 0, y = 0):
@@ -370,6 +372,7 @@ def placeBid(group, x = 0, y = 0):
    highestbid = 0 # Variable tracking what the highest bid is
    playersInBid = 0 # Variable tracking how many players are still in the bid
    overdraft = False # Variable tracking if the player tried to bid more than the Solaris in their Bank
+   costZeroCard = False
    for player in players: # Mark what the highest bid is and see how many players are currently still bidding
       if player.Bid > highestbid: highestbid = player.Bid
       if player.Bid > 0: playersInBid += 1
