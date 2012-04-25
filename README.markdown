@@ -33,6 +33,7 @@ Changelog
 * Now programs will not receive deferment tokens until you deploy them for the first time.
 * New action to reset the Guild Bank and/or CROE
 * House placement for bottom player on the Y-axis now should leave a bit more space for holding and personas.
+* Checkout will now only retry 2 times.
 
 ### 1.1.4
 
