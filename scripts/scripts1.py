@@ -57,7 +57,7 @@ totalevents = 0 # Variable to allow me to move events a bit to avoid hiding on t
 totalprogs = 0 # Variable to allow me to move programs a bit to avoid hiding on top of exitisting ones.
 totalholdings = 0
 totalpersonas = 0
-
+inactiveProgram = { }
 #---------------------------------------------------------------------------
 # General functions
 #---------------------------------------------------------------------------
@@ -105,7 +105,7 @@ def chooseSide(): # Called from many functions to check if the player has chosen
 def chkOut(globalvar): # A function which safely grabs a global variable by making sure nobody else is currently modifying it.
    retry = 0
    while getGlobalVariable(globalvar) == 'CHECKOUT':
-      if retry == 3: 
+      if retry == 2: 
          whisper("Global variable checkout failed after 3 tries. Another player must by doing something! Please try again later.")
          return 'ABORT'
       whisper("Global variable currently in use, retrying...")
@@ -135,12 +135,13 @@ def cheight(card, divisor = 10):
    else: offset = card.height() / divisor
    return (card.height() + offset)
 
-def yaxisMove(card):
+def yaxisMove(card, force = 'no'):
 # Variable to move the cards played by player 2 on a 2-sided table, more towards their own side. 
 # Player's 2 axis will fall one extra card length towards their side.
 # This is because of bug #146 (https://github.com/kellyelton/OCTGN/issues/146)
    if me.hasInvertedTable(): cardmove = cheight(card)
-   else: cardmove = cardmove = 0
+   elif force == 'force': cardmove = -cheight(card)
+   else: cardmove = 0
    return cardmove
 
 def placeCard(card,type = None):
@@ -174,17 +175,17 @@ def placeCard(card,type = None):
          card.sendToBack()
    elif playeraxis == Yaxis:
       if type == 'SetupHomeworld':
-         card.moveToTable(0 ,homeDistance(card) - yaxisMove(card)) 
+         card.moveToTable(0 ,homeDistance(card) - yaxisMove(card,'force')) 
       if type == 'SetupDune':
-         card.moveToTable(cwidth(card)* playerside,homeDistance(card) - yaxisMove(card)) 
+         card.moveToTable(cwidth(card)* playerside,homeDistance(card) - yaxisMove(card,'force')) 
          card.isFaceUp = False
       if type == 'SetupProgram': 
-         card.moveToTable(0 ,homeDistance(card) - cardDistance(card) / 4 - (playerside * totalprogs * 30) - yaxisMove(card))
+         card.moveToTable(0 ,homeDistance(card) - cardDistance(card) / 4 - (playerside * totalprogs * 30) - yaxisMove(card,'force'))
          card.sendToBack()
          card.isFaceUp = False
          totalprogs += 1
       if type == 'PlayEvent':
-         card.moveToTable(cwidth(card)* -4 * playerside + playerside * totalevents * 15,homeDistance(card) + playerside * totalevents * 15 - yaxisMove(card)) 
+         card.moveToTable(cwidth(card)* -4 * playerside + playerside * totalevents * -35,homeDistance(card) + playerside * totalevents * 35 - yaxisMove(card)) 
          card.isFaceUp = False
       if type =='DeployHolding':
          card.moveToTable(-cwidth(card) * playerside + totalholdings * cheight(card), homeDistance(card) - cardDistance(card)) # We move them just in front and to the side of the player's homeworld
@@ -202,7 +203,7 @@ def placeCard(card,type = None):
 def homeDistance(card):
 # This function returns the distance from the middle each player's homeworld will be setup towards their playerSide. 
 # This makes the code more readable and allows me to tweak these values from one place
-   if table.isTwoSided(): return (playerside * cheight(card) * 3) # players on an inverted table are placed half a card away from their edge.
+   if table.isTwoSided(): return (playerside * cheight(card) * 4) # players on an inverted table are placed half a card away from their edge.
    else:
       if playeraxis == Xaxis:
          return (playerside * cwidth(card) * 10) # players on the X axis, are placed 10 times a card's width towards their side (left or right)
@@ -275,6 +276,7 @@ def noteAllegiances(): # This function checks every card in the Imperial Deck an
    for card in me.piles['Imperial Deck']: 
       # Ugly hack follows. We need to move each card in the discard pile and then back into the deck because OCTGN won't let us peek at cards in facedown decks.
       card.moveTo(me.piles['Imperial Discard']) # Put the card in the discard pile in order to make its properties visible to us.
+      if len(players) > 1: random = rnd(1,100) # Fix for multiplayer only. Makes Singleplayer setup very slow otherwise.
       if card.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001':  # If the player moved dune put Dune by mistake to their Deck, move it to their hand to be placed automatically.
          card.moveTo(me.piles['Imperial Discard'])
          whisper("Dune found in your Imperial Deck. Discarding. Please remove Dune from your Imperial Deck during deck construction!")
@@ -334,7 +336,7 @@ def showCurrentPhase(): # Just say a nice notification about which phase you're 
 def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
 # This phase is not rotated with the nextPhase function as it is a way to basically restart the game.
 # It also serves as a control, so as to avoid a player by mistake using the setup function during play.
-   global playerside, playeraxis, handsize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances, totalevents
+   global playerside, playeraxis, handsize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances, totalevents, inactiveProgram
    mute()
    playerside = None
    playeraxis = None
@@ -353,6 +355,7 @@ def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
    totalprogs = 0
    setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables.
    setGlobalVariable("passedPlayers", "[]")
+   inactiveProgram.clear() # Clear the dictionary for reuse.
    showCurrentPhase() # Remind the players which phase it is now
 
 def flipCoin(group, x = 0, y = 0):
@@ -372,25 +375,23 @@ def placeBid(group, x = 0, y = 0):
    highestbid = 0 # Variable tracking what the highest bid is
    playersInBid = 0 # Variable tracking how many players are still in the bid
    overdraft = False # Variable tracking if the player tried to bid more than the Solaris in their Bank
-   costZeroCard = False
+   costZeroCard = False # A variable to track if the petitioned card has 0 deployment cost and take it into account during checks
+   cardID = chkOut("petitionedCard") # Grab the card ID being petitioned.
+   if cardID == 'ABORT': return # Leave if someone is already using it.
+   card = Card(int(cardID)) # to make things easier and more readable.
    for player in players: # Mark what the highest bid is and see how many players are currently still bidding
       if player.Bid > highestbid: highestbid = player.Bid
       if player.Bid > 0: playersInBid += 1
    if playersInBid == 0: 
-      chkVar = chkOut("petitionedCard")
-      if chkVar == 'ABORT': return
-      elif chkVar == 'Empty':
+      if cardID == 'Empty':
          whisper("No petition seems to be in progress. Please use the 'Subdue/Deploy/Petition' action on a face-down assembly card to start one first.")
+         setGlobalVariable("petitionedCard", cardID) # If we're going to return before the end of the function, we need to checkin, or the next functions will fail.
          return
       else: 
          costZeroCard = True
-         if Card(int(chkVar)).owner == me: playersInBid = 1
-      setGlobalVariable("petitionedCard", chkVar)
+         if Card(int(cardID)).owner == me: playersInBid = 1
    if playersInBid == 1 and (me.Bid > 0 or costZeroCard): # If there's just one player remaining in the bid and it's the current player, then it means he's the "last man standing" so they are the winner of the petition
       if confirm("You seem to have won this petition, is this correct?"): # But lets just make sure just in case...
-         cardID = chkOut("petitionedCard")
-         if cardID == 'ABORT': return
-         card = Card(int(cardID))
          if card.owner == me: # if we're the petitioner
             if card.allegiance == allegiances[0]: # if the card is of our own allegiance, we can reduce the cost via favor
                FavorLost = -1
@@ -431,10 +432,10 @@ def placeBid(group, x = 0, y = 0):
                extraText = " and {} favor".format(FavorLost)
             else: extraText = ''
             me.Solaris -= ContestCost
-            notify("{} has paid {} Solaris{} and contested the deployment of {}. The house of {} cannot call any more Petitions this turn".format(me, ContestCost, extraText, card, me))
+            notify("{} has paid {} Solaris{} to contest the deployment of {}. The house of {} cannot call any more Petitions this turn".format(me, ContestCost, extraText, card, card.owner))
             time.sleep(1)
             card.isFaceUp = False
-         setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables for use in the next petition.
+         setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables for use in the next petition. Always need to do this before a return.
          setGlobalVariable("passedPlayers", "[]")
          me.Bid = 0
          return
@@ -445,7 +446,7 @@ def placeBid(group, x = 0, y = 0):
       if not confirm("You have already passed this petition. You are not normally allowed to bid a petition you have passed on the bid.\n\nBypass?"): return
       notify("{} has re-enterred the bidding contest".format(me))
       passedPL.remove(me._id)
-   mybid = askInteger("What is your bid?\n\n(Currently highest bid is {} Solaris).\n(Putting 0 will cancel the bid)".format(highestbid), 0)
+   mybid = askInteger("What is your bid?\n\n[Currently highest bid is {} Solaris.]\n[Card Deployment Cost is {}].\n(Putting 0 will cancel the bid)".format(highestbid, card.properties['Deployment Cost']), 0)
    while 0 < mybid <= highestbid and highestbid > 0: 
       mybid = askInteger("You must bid higher then the current bid of {}. Please bid again.\n\n(0 will cancel the bid)".format(highestbid), 0)
       if mybid > me.Solaris: 
@@ -461,6 +462,7 @@ def placeBid(group, x = 0, y = 0):
       notify("{} has increased the bid to {}{}".format(me, mybid,extraText))
       me.Bid = mybid
    setGlobalVariable("passedPlayers", str(passedPL))
+   setGlobalVariable("petitionedCard", cardID)
    
 #---------------------------------------------------------------------------
 # Table card actions
@@ -561,6 +563,7 @@ def subdue(card, x = 0, y = 0):
             card.isFaceUp = True
             notify("{} deploys {}.".format(me, card))
             card.markers[Deferment_Token] = 0
+            if re.search(r'Program', card.Subtype) and card.Type == 'Plan': inactiveProgram[card] = False
     else:
         chkVar = chkOut("petitionedCard")
         if chkVar == 'ABORT': return
@@ -590,14 +593,6 @@ def subdue(card, x = 0, y = 0):
             else: notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
             me.Bid = initialBid
             setGlobalVariable("petitionedCard", card._id)
-
-#def bid(group, x = 0, y = 0): 
-# Function abandoned. See https://github.com/db0/Dune-CCG-for-OCTGN/issues/7#issuecomment-4008158
-#   lastOne = False # This binary variable becomes true, is the current player is the only one left with a bid in this petition.
-#   for player in players:
-#      if player.Bid = 0 and player != me: lastOne = True
-#      elif player.Bid > 0 and player != me: lastOne = False # If we find at least one other player with a bid, then we're obviously not the last player that can bid.
-#   if lastOne: 
    
 def searchUniques(card, name, type = 'deploy'): # Checks if there is a unique card on the table with the same name as the one about to be deployed.
     allUniques = (c for c in table # Make a comprehension of all the cards on the table
@@ -656,6 +651,15 @@ def addProgram(card, x = 0, y = 0):
     mute()
     notify("{} adds a Program token to {}.".format(me, card))
     card.markers[Program] += 1
+    
+def switchAssembly(card, x = 0, y = 0):
+   mute()
+   if card.markers[Assembly] == 0:
+      notify("{} marks {} as an Assembly card.".format(me, card))
+      card.markers[Assembly] = 1
+   else:
+      notify("{} takes {} out of the Imperial Assembly.".format(me, card))
+      card.markers[Assembly] = 0
 
 def CHOAMbuy(group, x = 0, y = 0): # This function allows the player to purchase spice through checks and balances to avoid mistakes.
     global CHOAMDone # Import the variable which informs us if the player has done another CHOAM exchange this turn
@@ -717,6 +721,16 @@ def CHOAMsell(group, x = 0, y = 0): # Very similar as CHOAMbuy, but player sells
        else:
           whisper("You cannot sell more than 3 spice per CHOAM Exchange.")
 
+def resetBank(group, x=0, y=0): # Asks the player to set the amount of spice there should be in the bank and resets the CROE.
+   mute()
+   currentbank = shared.counters['Guild Hoard'].value
+   newbank = askInteger("Set the bank at how many spice?\n[Currently at {} Spice]\n\n(Hint: close this window to simply reset the CROE for the current number of spice)".format(currentbank), currentbank)
+   if newbank == None: newbank = currentbank
+   if newbank >= currentbank: difference = '+' + str(newbank - currentbank)
+   elif currentbank > newbank: difference = '-' + str(currentbank - newbank)
+   shared.CROE = CROEAdjust(newbank)
+   shared.counters['Guild Hoard'].value = newbank 
+   notify("{} has reset the Guild Hoard to {} Spice ({}). The CROE is now {}".format(me,shared.counters['Guild Hoard'].value, difference, shared.CROE))
 
 def completeSpiceCost(count = 1): # This takes as input how many spice we want to buy or sell, and returns how much it's going to cost in total.
    i = 0
@@ -776,23 +790,26 @@ def buyFavor(group, x = 0, y = 0): # Very similar to CHOAMbuy, but player buys F
 
 
 def automatedOpening(group, x = 0, y = 0):
-    global favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent
-    favorBought = 0 # Reset the player's favor exchanges for the round.
-    CHOAMDone = 0 # Reset the player's CHOAM exchanges for the round.
-    DeployedDuneEvent = 0 # Reset the amount of Dune events for this round.
-    DeployedImperiumEvent = 0 # Reset the amount of Imperium events for this round.
-    mute()
-    if shared.Phase != 1: # This function is allowed only during the Opening Interval
+   global favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, inactiveProgram
+   favorBought = 0 # Reset the player's favor exchanges for the round.
+   CHOAMDone = 0 # Reset the player's CHOAM exchanges for the round.
+   DeployedDuneEvent = 0 # Reset the amount of Dune events for this round.
+   DeployedImperiumEvent = 0 # Reset the amount of Imperium events for this round.
+   mute()
+   if shared.Phase != 1: # This function is allowed only during the Opening Interval
       whisper("You can only perform this action during the Opening Interval")
       return
-    myCards = (card for card in table
-               if card.controller == me
-               and card.owner == me)
-    for card in myCards:
-        if card.highlight != DoesntDisengageColor: card.orientation &= ~Rot90 # If a card can disengage, disengage it.
-        if card.markers[Assembly] > 0 and card.isFaceUp: card.markers[Assembly] = 0 # If a card came from the assembly last turn. Remove its special assembly marker.
-        if not card.isFaceUp and card.markers[Assembly] == 0: card.markers[Deferment_Token] += 1 # If a card is face down (subdued) add a deferment token on it.
-    notify("{} disengaged all his cards and added deferment tokens to all subdued ones.".format(me))
+   myCards = (card for card in table if card.controller == me and card.owner == me)
+   for card in myCards:
+      if card.highlight != DoesntDisengageColor: card.orientation &= ~Rot90 # If a card can disengage, disengage it.
+      if card.markers[Assembly] > 0 and card.isFaceUp: card.markers[Assembly] = 0 # If a card came from the assembly last turn. Remove its special assembly marker.
+      if not card.isFaceUp and card.markers[Assembly] == 0: card.markers[Deferment_Token] += 1 # If a card is not an Assembly or Program and is face down (subdued), add a deferment token on it.
+      try: # We don't want to put deferment tokens on inactive programs.
+         if inactiveProgram[card]: card.markers[Deferment_Token] = 0
+      except KeyError: pass   
+   notify("{} disengaged all his cards and added deferment tokens to all subdued ones.".format(me))
+   setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables, just in case any of them are stuck
+   setGlobalVariable("passedPlayers", "[]")
 
 def automatedClosing(group, x = 0, y = 0):
    if shared.Phase != 3: # This function is allowed only during the Closing Interval
@@ -818,6 +835,7 @@ def automatedClosing(group, x = 0, y = 0):
          card.moveTo(me.piles['House Discard']) # Duration events are discarded at the end of the turn.
          notify ("{}'s Duration Effect from {} has expired and was automatically discarded".format(me, card))
    notify("{} refills their hand back to {}.".format(me, handsize))
+   
 
 def doesNotDisengage(card, x = 0, y = 0): # Mark a card as "Does not disengage" or unmark it. We use a card highlight to do this.
    if card.highlight == DoesntDisengageColor: # If it's already marked, remove highlight from it and inform.
@@ -850,7 +868,7 @@ def produceSpice(card, x = 0, y = 0):
 
 def payCost(count = 1, notification = silent): # Automatically pays the cost of a card being played from your hand, or confirms/informs if you can't play it.
    count = num(count)
-   if count == 0 : return 0
+   if count == 0 : return 'OK'
    if me.Solaris < count:  
       if not confirm("You do not seem to have enough Solaris in your House Treasury to pay the cost. \n\nAre you sure you want to proceed? \
       \n(If you do, your solaris will go to the negative. You will need to increase it manually as required.)"): return 'ABORT'
@@ -900,7 +918,7 @@ def setup(group):
    if shared.Phase == 0: # First check if we're on the pre-setup game phase. 
                      # As this function will play your whole hand and wipe your counters, we don't want any accidents.
 #      if not confirm("Have bought all the favour and spice you'll need with your bonus solaris? \n\n(Remember you need 1 solaris per program you're going to install.)"): return
-      global playerside, allegiances # Import some necessary variables we're using around the game.
+      global playerside, allegiances, inactiveProgram # Import some necessary variables we're using around the game.
       DuneinHand = 0
       mute()
       chooseSide() # The classic place where the players choose their side.
@@ -913,6 +931,7 @@ def setup(group):
          if re.search(r'Program', card.Subtype) and card.Type == 'Plan':  # If it's a program...
             if payCost(1) == 'OK': # Pay the cost of the program
                placeCard(card,'SetupProgram')
+               inactiveProgram[card] = True
          if card.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001': # If the player has put Dune in their hand as well...
             placeCard(card,'SetupDune')
             DuneinHand = 1 # Note down that player brought their own Dune, so that we don't generate a second one.
@@ -979,10 +998,10 @@ def imperialDraw(group = me.piles['Imperial Deck'], times = 1):
     while i < times:
         card = group.top()
         if playeraxis == Yaxis: 
-            group.top().moveToTable(cwidth(card) - i * cwidth(card), homeDistance(card) + cardDistance(card) - yaxisMove(card),True)
+            group.top().moveToTable(cwidth(card) - i * cwidth(card), homeDistance(card) + cardDistance(card) - yaxisMove(card,'force'),True)
             card.markers[Assembly] = 1
         else: 
-            group.top().moveToTable(homeDistance(card) + cardDistance(card), cwidth(card) - playerside * i * cheight(card) - yaxisMove(card),True)
+            group.top().moveToTable(homeDistance(card) + cardDistance(card), cwidth(card) - playerside * i * cheight(card),True)
             card.markers[Assembly] = 1
         i += 1
 
@@ -1001,3 +1020,9 @@ def drawMany(group, count = None, notification = loud): # This function draws a 
     for c in group.top(count): c.moveTo(me.hand)
     if notification == loud : notify("{} draws {} cards to their play hand.".format(me, count)) # And if we're "loud", notify what happened.
 
+def mill(group):
+   mute()
+   if len(group) == 0: return
+   count = askInteger("Discard how many cards?", 3)
+   for c in group.top(count): c.moveTo(me.piles['House Discard'])
+   notify("{} discards the top {} cards from their house deck.".format(me, count))

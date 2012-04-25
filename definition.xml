@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune" id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="3.0.1.0" version="1.1.4" markersize="24">
+<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune" id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="3.0.1.0" version="1.1.5" markersize="24">
    <globalvariables>
        <globalvariable name="petitionedCard" value="Empty" /> 
        <globalvariable name="passedPlayers" value="[]" /> 
@@ -21,13 +21,14 @@
 		<property name="Prescience" type="String" hidden="false" ignoreText="False" />
 		<property name="Decktype" type="String" hidden="false" ignoreText="False" />
 	</card>
-	<table name="Table" visibility="undefined" ordered="false" width="1280" height="1200" board="r3" boardPosition="0,0,0,0" background="r4" backgroundStyle="uniformToFill">
+	<table name="Table" visibility="undefined" ordered="false" width="1280" height="1300" board="r3" boardPosition="0,0,0,0" background="r4" backgroundStyle="uniformToFill">
 		<cardaction menu="Engage/Disengage" default="true" shortcut="Ctrl+E" execute="engage" />
 		<cardaction menu="Subdue/Deploy/Petition" default="false" shortcut="Ctrl+Q" execute="subdue" />
 		<groupaction menu="Place Bid/Pass/Win Petition" default="false" shortcut="Ctrl+Shift+B" execute="placeBid" />
 		<groupaction menu="Buy Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+C" execute="CHOAMbuy" />
 		<groupaction menu="Sell Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+Shift+C" execute="CHOAMsell" />
 		<cardaction menu="Engage to produce Spice to the Guild Hoard" default="false" execute="produceSpice" />
+		<groupaction menu="Reset the Guild Bank and/or CROE" default="false" execute="resetBank" />
 		<groupaction menu="Purchase Favor" default="false" shortcut="Ctrl+F" execute="buyFavor" />
 		<groupaction menu="Flip a Coin" default="false" shortcut="Ctrl+F" execute="flipCoin" />
 		<cardactions menu="Markers &amp; Tokens...">
@@ -36,6 +37,7 @@
          <cardaction menu="Add Deferment Token" default="false" shortcut="Alt+D" execute="addDeferment" />
          <cardaction menu="Remove Deferment Token" default="false" shortcut="Alt+Shift+D" execute="subDeferment" />
          <cardaction menu="Add Program Token" default="false" shortcut="Alt+P" execute="addProgram" />
+         <cardaction menu="(Un)Mark as Assembly card" default="false" shortcut="Alt+A" execute="switchAssembly" />
          <cardaction menu="(Un)Mark card as &quot;Does not Disengage&quot;" default="false" execute="doesNotDisengage" />
 		</cardactions>
 		<groupactions menu="Phases">
@@ -68,6 +70,7 @@
 		<group name="House Deck" visibility="none" ordered="false" width="63" height="88" icon="r11" collapsed="false">
 			<groupaction menu="Draw" default="true" shortcut="Ctrl+S" execute="draw" />
 			<groupaction menu="Draw Many" default="false" shortcut="Ctrl+Shift+S" execute="drawMany" />
+			<groupaction menu="Discard X Cards" default="false" shortcut="Ctrl+Shift+D" execute="mill" />
 			<groupaction menu="Shuffle" default="false" shortcut="Ctrl+A" execute="shuffle" />
 		</group>
 		<group name="House Discard" visibility="all" ordered="false" width="63" height="88" icon="r12" collapsed="false" />

@@ -20,6 +20,20 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 Changelog
 ---------
 
+### 1.1.5
+
+* Fixed bug where you could not play 0-cost cards from hand
+* Now decks are properly checked for allegiance legality and allegiances are properly stored. Favour should now be removed correctly for out-of-house imperial cards.
+* Put the deployment cost of the card in the Place Bid window.
+* New action to add marker to make a card an assembly card, since it was very common that people would try to move the card and remove the marker instead.
+* When contesting a petition, the notification about the house which cannot start new petitions was wrong. Now points to card.owner.
+* Opening phase will clear the shared variables, just as a security measure
+* Events now stack on the opposite side than before and give even more space between them while on the Y-axis
+* Created function to discard cards from the top of your house deck.
+* Now programs will not receive deferment tokens until you deploy them for the first time.
+* New action to reset the Guild Bank and/or CROE
+* House placement for bottom player on the Y-axis now should leave a bit more space for holding and personas.
+
 ### 1.1.4
 
 * Created a robust petitioning process. Start a petition with the subdue/deploy/petition card action. You bid on it with the a table action. If all other players have passed, the program will assume you have won and take action.
