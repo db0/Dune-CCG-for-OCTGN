@@ -358,6 +358,7 @@ def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
    totalprogs = 0
    setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables.
    setGlobalVariable("passedPlayers", "[]")
+   setGlobalVariable("defeatedPlayers", "[]")
    inactiveProgram.clear() # Clear the dictionary for reuse.
    assemblyCards[:] = [] # Empty the list.
    showCurrentPhase() # Remind the players which phase it is now
@@ -369,6 +370,15 @@ def flipCoin(group, x = 0, y = 0):
         notify("{} flips heads.".format(me))
     else:
         notify("{} flips tails.".format(me))
+
+def petition(card, x=0, y=0): # An almost superfluous function that basically redirects to subdue( ) or placeBid(). It's purpose is that I can have the same menu action on both cards and table context menus.
+   cardID = chkOut("petitionedCard") # A quick grab of the shared peti
+   if cardID == 'ABORT': return # Leave if someone is already using it.
+   setGlobalVariable("petitionedCard", cardID)
+   if cardID != 'Empty': placeBid(table) # If the player used this action and there's a currently petitioning card, we assume they just wanted to bid.
+   elif card.markers[Assembly] == 0: whisper("You can only use this action on Imperial Assembly cards")
+   else: subdue(card)
+
 
 def placeBid(group, x = 0, y = 0):
 # This function does the following:
@@ -383,15 +393,15 @@ def placeBid(group, x = 0, y = 0):
    cardID = chkOut("petitionedCard") # Grab the card ID being petitioned.
    if cardID == 'ABORT': return # Leave if someone is already using it.
    elif cardID == 'Empty':
-      whisper("No petition seems to be in progress. Please use the 'Subdue/Deploy/Petition' action on a face-down assembly card to start one first.")
+      whisper("No petition seems to be in progress. Please use this action on a face-down assembly card to start one first.")
       setGlobalVariable("petitionedCard", cardID) # If we're going to return before the end of the function, we need to checkin, or the next functions will fail.
       return
    else: card = Card(int(cardID)) # to make things easier and more readable.
-   if card.properties['Deployment Cost'] == 0: costZeroCard = True
+   if num(card.properties['Deployment Cost']) == 0: costZeroCard = True
    for player in players: # Mark what the highest bid is and see how many players are currently still bidding
       if player.Bid > highestbid: highestbid = player.Bid
       if player.Bid > 0: playersInBid += 1
-   if playersInBid == 0 and Card(int(cardID)).owner == me: playersInBid = 1
+   if playersInBid == 0 and card.owner == me: playersInBid = 1
    if playersInBid == 1 and (me.Bid > 0 or costZeroCard): # If there's just one player remaining in the bid and it's the current player, then it means he's the "last man standing" so they are the winner of the petition
       if confirm("You seem to have won this petition, is this correct?"): # But lets just make sure just in case...
          if card.owner == me: # if we're the petitioner
