@@ -205,10 +205,10 @@ def placeCard(card,type = None):
 def homeDistance(card):
 # This function returns the distance from the middle each player's homeworld will be setup towards their PLS. 
 # This makes the code more readable and allows me to tweak these values from one place
-   if table.isTwoSided(): return (PLS * cheight(card) * 4) # players on an inverted table are placed half a card away from their edge.
+   if table.isTwoSided(): return (PLS * cheight(card) * 3) # players on an inverted table are placed half a card away from their edge.
    else:
       if playeraxis == Xaxis:
-         return (PLS * cwidth(card) * 10) # players on the X axis, are placed 10 times a card's width towards their side (left or right)
+         return (PLS * cwidth(card) * 11) # players on the X axis, are placed 10 times a card's width towards their side (left or right)
       elif playeraxis == Yaxis:
          return (PLS * cheight(card) * 4 - yaxisMove(card)) # players on the Y axis, are placed 4 times a card's height towards their side (top or bottom)
 
@@ -390,6 +390,7 @@ def placeBid(group, x = 0, y = 0):
    playersInBid = 0 # Variable tracking how many players are still in the bid
    overdraft = False # Variable tracking if the player tried to bid more than the Solaris in their Bank
    costZeroCard = False # A variable to track if the petitioned card has 0 deployment cost and take it into account during checks
+   ABORT = False
    cardID = chkOut("petitionedCard") # Grab the card ID being petitioned.
    if cardID == 'ABORT': return # Leave if someone is already using it.
    elif cardID == 'Empty':
@@ -422,14 +423,15 @@ def placeBid(group, x = 0, y = 0):
                if me.Solaris < highestbid:
                   FavorLost += highestbid - me.Solaris
                me.Favor -= FavorLost
-               me.Solaris -= highestbid - FavorLost
                extraText = " and lost {} favor".format(FavorLost)
+               FavorLost -= 1 # We need to reduce the favour by 1, because the one extra cost is penalty and shouldn't reduce the cost.
+               me.Solaris -= highestbid - FavorLost
             else: # If the card is netural, then there's nothing special.
                FavorLost = 0
                if me.Solaris < highestbid:
                   FavorLost += highestbid - me.Solaris
                me.Favor -= FavorLost
-               me.Solaris -=highestbid
+               me.Solaris -= highestbid - FavorLost
                if FavorLost > 0: extraText = " and lost {} favor".format(FavorLost)
                else: extraText = ''
             notify("{} has successfully petitioned for {} with a final bid of {}. They have spent {} solaris{} to pay the deployment cost.".format(me, card, highestbid, highestbid - FavorLost, extraText))
@@ -448,6 +450,12 @@ def placeBid(group, x = 0, y = 0):
             notify("{} has paid {} Solaris{} to contest the deployment of {}. The house of {} cannot call any more Petitions this turn".format(me, ContestCost, extraText, card, card.owner))
             time.sleep(1)
             card.isFaceUp = False
+            ### Add the defeated player to the list.
+            chkVar = chkOut("defeatedPlayers")
+            if chkVar == 'ABORT': return
+            defeatedPL = eval(chkVar)
+            defeatedPL.append(card.owner._id)
+            setGlobalVariable("defeatedPlayers", str(defeatedPL))
          setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables for use in the next petition. Always need to do this before a return.
          setGlobalVariable("passedPlayers", "[]")
          me.Bid = 0
@@ -456,24 +464,26 @@ def placeBid(group, x = 0, y = 0):
    if chkVar == 'ABORT': return
    passedPL = eval(chkVar) # We grab the variable in string format and use the eval() to make it a list
    if me._id in passedPL: # See if the current player has passed already, and if so, warn them but give a chance to re-enter the bid (say because of card effects or wrongly pressing 0)
-      if not confirm("You have already passed this petition. You are not normally allowed to bid a petition you have passed on the bid.\n\nBypass?"): return
-      notify("{} has re-enterred the bidding contest".format(me))
-      passedPL.remove(me._id)
-   mybid = askInteger("What is your bid?\n\n[Currently highest bid is {} Solaris.]\n[Card Deployment Cost is {}].\n(Putting 0 will cancel the bid)".format(highestbid, card.properties['Deployment Cost']), 0)
-   while 0 < mybid <= highestbid and highestbid > 0: 
-      mybid = askInteger("You must bid higher then the current bid of {}. Please bid again.\n\n(0 will cancel the bid)".format(highestbid), 0)
-      if mybid > me.Solaris: 
-         if not confirm("You have bid more than your available Solaris in your bank. You're not normally allowed to do this, even if you would reduce it with favor.\n\nBypass?"): mybid = highestbid
-         else: overdraft = True
-   if mybid == 0 or mybid == None: 
-      notify("{} has passed for this petition".format(me))
-      passedPL.append(me._id)
-      me.Bid = 0
-   else:
-      if overdraft: extraText = " by exceeding their banked Solaris"
-      else: extraText =""
-      notify("{} has increased the bid to {}{}".format(me, mybid,extraText))
-      me.Bid = mybid
+      if not confirm("You have already passed this petition. You are not normally allowed to bid a petition you have passed on the bid.\n\nBypass?"): ABORT = True
+      else: 
+         notify("{} has re-enterred the bidding contest".format(me))
+         passedPL.remove(me._id)
+   if not ABORT:
+      mybid = askInteger("What is your bid?\n\n[Currently highest bid is {} Solaris.]\n[Card Deployment Cost is {}].\n(Putting 0 will cancel the bid)".format(highestbid, card.properties['Deployment Cost']), 0)
+      while 0 < mybid <= highestbid and highestbid > 0: 
+         mybid = askInteger("You must bid higher then the current bid of {}. Please bid again.\n\n(0 will cancel the bid)".format(highestbid), 0)
+         if mybid > me.Solaris: 
+            if not confirm("You have bid more than your available Solaris in your bank. You're not normally allowed to do this, even if you would reduce it with favor.\n\nBypass?"): mybid = highestbid
+            else: overdraft = True
+      if mybid == 0 or mybid == None: 
+         notify("{} has passed for this petition".format(me))
+         passedPL.append(me._id)
+         me.Bid = 0
+      else:
+         if overdraft: extraText = " by exceeding their banked Solaris"
+         else: extraText =""
+         notify("{} has increased the bid to {}{}".format(me, mybid,extraText))
+         me.Bid = mybid
    setGlobalVariable("passedPlayers", str(passedPL))
    setGlobalVariable("petitionedCard", cardID)
    
@@ -530,6 +540,7 @@ def intrigue(card, x = 0, y = 0):
 def subdue(card, x = 0, y = 0):
     mute()
     faceup = 0
+    ABORT = False
     if not card.isFaceUp: # Horrible hack until the devs can allow me to look at facedown card properties.
        card.isFaceUp = not card.isFaceUp  # Gah!
        snapshot = card
@@ -586,26 +597,32 @@ def subdue(card, x = 0, y = 0):
             setGlobalVariable("petitionedCard", "Empty")
             setGlobalVariable("passedPlayers", "[]")
         else:
-            if chkVar != 'Empty': 
+            chkVar2 = chkOut("defeatedPlayers")
+            if chkVar2 == 'ABORT': ABORT = True # This allows me to go through the rest of the cost but not take any actions and still clear the shared variables by avoiding terminating the function.
+            defeatedPL = eval(chkVar2)
+            if me._id in defeatedPL:
+               if not confirm("You cannot start a petition once you've lost one in a turn.\n\nBypass?"): ABORT = True
+               else: 
+                  notify("{} is starting another petition, even though they lost their previous one".format(me))
+                  defeatedPL.remove(card.owner._id)
+            if chkVar != 'Empty' and not ABORT: 
                whisper("Another petition (for {}) is currently in progress, please complete that one first.".format(Card(int(chkVar))))
-               setGlobalVariable("petitionedCard", chkVar)
-               return
-            if me.Solaris < cost:
-                if not confirm("You're not allowed to start a peition when you do not have at least as much solaris as the deployment cost of the card. \n\nAre you sure you want to proceed?"): return
-            if searchNatives(subtype) == 'NOK': return
-            if searchUniques(card, name, 'petition') == 'NOK': return
-            initialBid = -1
-            while initialBid < cost:
-               initialBid = askInteger("What will your initial bid be? (Min {}). 0 will cancel the petition.".format(cost), cost)
-               if (initialBid == 0 and cost != 0) or initialBid == None: return # If the player puts zero for the bid, or closes the window, abort.
-            card.isFaceUp = True
-            if card.Allegiance == allegiances[0]: # Position 0 is always the player's sponsor.
-                notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
-                #whisper("This card is of your sponsor's allegiance. Remember that if you win the petition. you may opt to reduce its cost by 1 solaris for each favor you discard")
-            elif card.Allegiance in allegiances: notify("{} initiates a petition for {} with an initial bid of {}.".format(me, card, initialBid))
-            else: notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
-            me.Bid = initialBid
-            setGlobalVariable("petitionedCard", card._id)
+               ABORT = True
+            elif me.Solaris < cost and not ABORT and not confirm("You're not allowed to start a peition when you do not have at least as much solaris as the deployment cost of the card. \n\nAre you sure you want to proceed?"): ABORT = True
+            elif searchNatives(subtype) == 'NOK' and not ABORT: ABORT = True
+            elif searchUniques(card, name, 'petition') == 'NOK' and not ABORT: ABORT = True
+            elif not ABORT:
+               initialBid = -1
+               while initialBid < cost:
+                  initialBid = askInteger("What will your initial bid be? (Min {}). 0 will cancel the petition.".format(cost), cost)
+                  if (initialBid == 0 and cost != 0) or initialBid == None: ABORT = True # If the player puts zero for the bid, or closes the window, abort.
+                  elif initialBid > me.Solaris and not confirm("You cannot bid more Solaris than you have in your bank.\n\nBypass?"): initialBid = -1
+               card.isFaceUp = True
+               notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
+               me.Bid = initialBid
+               setGlobalVariable("petitionedCard", card._id)
+            if ABORT: setGlobalVariable("petitionedCard", chkVar)
+            setGlobalVariable("defeatedPlayers", str(defeatedPL))
    
 def searchUniques(card, name, type = 'deploy'): # Checks if there is a unique card on the table with the same name as the one about to be deployed.
     allUniques = (c for c in table # Make a comprehension of all the cards on the table
@@ -825,7 +842,9 @@ def automatedOpening(group, x = 0, y = 0):
    notify("{} disengaged all his cards and added deferment tokens to all subdued ones.".format(me))
    setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables, just in case any of them are stuck
    setGlobalVariable("passedPlayers", "[]")
+   setGlobalVariable("defeatedPlayers", "[]") # Clear the players who have lost a petition last turn.
 
+   
 def automatedClosing(group, x = 0, y = 0):
    if shared.Phase != 3: # This function is allowed only during the Closing Interval
       whisper("You can only perform this action during the Closing Interval")
