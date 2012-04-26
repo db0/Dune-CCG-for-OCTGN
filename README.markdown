@@ -20,6 +20,14 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 Changelog
 ---------
 
+### 1.1.6
+
+* Fixed bug in bidding contest when bid is called with no card targeted.
+* Now Automated Closing Phase autorefills your assembly.
+* New function to set your imperial assembly limit
+* Fixed bug in the placement on top player.
+
+
 ### 1.1.5
 
 * Fixed bug where you could not play 0-cost cards from hand
@@ -33,7 +41,6 @@ Changelog
 * Now programs will not receive deferment tokens until you deploy them for the first time.
 * New action to reset the Guild Bank and/or CROE
 * House placement for bottom player on the Y-axis now should leave a bit more space for holding and personas.
-* Checkout will now only retry 2 times.
 
 ### 1.1.4
 

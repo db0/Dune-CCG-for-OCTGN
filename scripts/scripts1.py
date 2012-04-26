@@ -47,7 +47,8 @@ DoesntDisengageColor = "#ffffff"
 
 playerside = None # Variable to keep track on which side each player is
 playeraxis = None # Variable to keep track on which axis the player is
-handsize = 7 # Used when automatically refilling your hand
+handsize = 7 # Used when automatically refilling your hand.
+assemblysize = 3 # used when automatically refilling your assembly.
 favorBought = 0
 CHOAMDone = 0
 DeployedDuneEvent = 0
@@ -58,6 +59,7 @@ totalprogs = 0 # Variable to allow me to move programs a bit to avoid hiding on 
 totalholdings = 0
 totalpersonas = 0
 inactiveProgram = { }
+assemblyCards = [ ]
 #---------------------------------------------------------------------------
 # General functions
 #---------------------------------------------------------------------------
@@ -139,7 +141,7 @@ def yaxisMove(card, force = 'no'):
 # Variable to move the cards played by player 2 on a 2-sided table, more towards their own side. 
 # Player's 2 axis will fall one extra card length towards their side.
 # This is because of bug #146 (https://github.com/kellyelton/OCTGN/issues/146)
-   if me.hasInvertedTable(): cardmove = cheight(card)
+   if me.hasInvertedTable() or (playeraxis == Yaxis and playerside == -1): cardmove = cheight(card)
    elif force == 'force': cardmove = -cheight(card)
    else: cardmove = 0
    return cardmove
@@ -336,11 +338,12 @@ def showCurrentPhase(): # Just say a nice notification about which phase you're 
 def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
 # This phase is not rotated with the nextPhase function as it is a way to basically restart the game.
 # It also serves as a control, so as to avoid a player by mistake using the setup function during play.
-   global playerside, playeraxis, handsize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances, totalevents, inactiveProgram
+   global playerside, playeraxis, handsize, assemblysize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances, totalevents, inactiveProgram
    mute()
    playerside = None
    playeraxis = None
    handsize = 7
+   assemblysize = 3
    favorBought = 0
    CHOAMDone = 0
    DeployedDuneEvent = 0
@@ -356,6 +359,7 @@ def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
    setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables.
    setGlobalVariable("passedPlayers", "[]")
    inactiveProgram.clear() # Clear the dictionary for reuse.
+   assemblyCards[:] = [] # Empty the list.
    showCurrentPhase() # Remind the players which phase it is now
 
 def flipCoin(group, x = 0, y = 0):
@@ -378,18 +382,16 @@ def placeBid(group, x = 0, y = 0):
    costZeroCard = False # A variable to track if the petitioned card has 0 deployment cost and take it into account during checks
    cardID = chkOut("petitionedCard") # Grab the card ID being petitioned.
    if cardID == 'ABORT': return # Leave if someone is already using it.
-   card = Card(int(cardID)) # to make things easier and more readable.
+   elif cardID == 'Empty':
+      whisper("No petition seems to be in progress. Please use the 'Subdue/Deploy/Petition' action on a face-down assembly card to start one first.")
+      setGlobalVariable("petitionedCard", cardID) # If we're going to return before the end of the function, we need to checkin, or the next functions will fail.
+      return
+   else: card = Card(int(cardID)) # to make things easier and more readable.
+   if card.properties['Deployment Cost'] == 0: costZeroCard = True
    for player in players: # Mark what the highest bid is and see how many players are currently still bidding
       if player.Bid > highestbid: highestbid = player.Bid
       if player.Bid > 0: playersInBid += 1
-   if playersInBid == 0: 
-      if cardID == 'Empty':
-         whisper("No petition seems to be in progress. Please use the 'Subdue/Deploy/Petition' action on a face-down assembly card to start one first.")
-         setGlobalVariable("petitionedCard", cardID) # If we're going to return before the end of the function, we need to checkin, or the next functions will fail.
-         return
-      else: 
-         costZeroCard = True
-         if Card(int(cardID)).owner == me: playersInBid = 1
+   if playersInBid == 0 and Card(int(cardID)).owner == me: playersInBid = 1
    if playersInBid == 1 and (me.Bid > 0 or costZeroCard): # If there's just one player remaining in the bid and it's the current player, then it means he's the "last man standing" so they are the winner of the petition
       if confirm("You seem to have won this petition, is this correct?"): # But lets just make sure just in case...
          if card.owner == me: # if we're the petitioner
@@ -423,6 +425,7 @@ def placeBid(group, x = 0, y = 0):
             notify("{} has successfully petitioned for {} with a final bid of {}. They have spent {} solaris{} to pay the deployment cost.".format(me, card, highestbid, highestbid - FavorLost, extraText))
             card.markers[Assembly] = 0
             placeCard(card, "Deploy{}".format(card.Type)) # We deploy the card depending on its type.
+            assemblyCards.remove(card) # Remove the deployed card from the list of assembly cards
             card.orientation = Rot90
          else: # If we're a contesting player...
             ContestCost = highestbid - num(card.properties['Deployment Cost'])
@@ -657,9 +660,11 @@ def switchAssembly(card, x = 0, y = 0):
    if card.markers[Assembly] == 0:
       notify("{} marks {} as an Assembly card.".format(me, card))
       card.markers[Assembly] = 1
+      assemblyCards.append(card)
    else:
       notify("{} takes {} out of the Imperial Assembly.".format(me, card))
       card.markers[Assembly] = 0
+      assemblyCards.remove(card)
 
 def CHOAMbuy(group, x = 0, y = 0): # This function allows the player to purchase spice through checks and balances to avoid mistakes.
     global CHOAMDone # Import the variable which informs us if the player has done another CHOAM exchange this turn
@@ -818,7 +823,7 @@ def automatedClosing(group, x = 0, y = 0):
    if me.Favor < 1 and len(me.hand) < handsize:
       notify("{} cannot not refill their hand because they have less than 1 Imperial favor. Is {} is defeated?".format(me, me))
       return   
-   if not confirm("Have you remembered to discard any cards you don't want from your hand?"): return
+   if not confirm("Have you remembered to discard any cards you don't want from your hand and Assembly?"): return
    refill()
    myCards = (card for card in table
               if card.controller == me
@@ -834,7 +839,7 @@ def automatedClosing(group, x = 0, y = 0):
       elif re.search(r'Duration Effect', card.Operation): 
          card.moveTo(me.piles['House Discard']) # Duration events are discarded at the end of the turn.
          notify ("{}'s Duration Effect from {} has expired and was automatically discarded".format(me, card))
-   notify("{} refills their hand back to {}.".format(me, handsize))
+   notify("{} refills their hand back to {} and their Imperial Assembly to {}.".format(me, handsize, assemblysize))
    
 
 def doesNotDisengage(card, x = 0, y = 0): # Mark a card as "Does not disengage" or unmark it. We use a card highlight to do this.
@@ -849,6 +854,8 @@ def discard(cards, x = 0, y = 0): # Discard a card.
    mute()
    for card in cards: # Can be done at more than one card at the same time, since attached cards follow their parent always.
       cardowner = card.owner
+      card.isFaceUp = True
+      if card in assemblyCards: assemblyCards.remove(card)
       if card.Decktype == 'Imperial': card.moveTo(cardowner.piles['Imperial Discard'])
       else: card.moveTo(cardowner.piles['House Discard'])
       notify("{} has discarded {}.".format(me, card))
@@ -954,19 +961,25 @@ def setup(group):
       me.Solaris += 20     
       refill() # We fill the player's play hand to their hand size (usually 5)
       notify("{} is playing {}. Their starting Solaris is {} and their Imperial Favour is {}. They have {} Programs".format(me, allegiances[0], me.Solaris, me.Favor, totalprogs))  
-      setupAssembly() # Setup the 3 imperial cards which will be our assembly.
    else: whisper('You can only setup your starting cards during the Pre-Game setup phase') # If this function was called outside the pre-game setup phase
             
 def setHandSize(group): # A function to modify a player's hand size. This is used during Closing Interval when refilling the player's hand automatically.
    global handsize
-   handsize = askInteger("What is your current hand size?", handsize)
-   if handsize == None: handsize = 7
+   tempsize = askInteger("What is your current hand size?", handsize)
+   if tempsize == None: return
+   else: handsize = tempsize
    notify("{} sets their hand size to {}".format(me, handsize))
+
+def setAssemblySize(group): # A function to modify a player's hand size. This is used during Closing Interval when refilling the player's hand automatically.
+   global assemblysize
+   tempsize = askInteger("What is your current Assembly limit?", assemblysize)
+   if tempsize == None: return
+   else: assemblysize = tempsize
+   notify("{} sets their Assembly limit to {}".format(me, assemblysize))
    
 def refill(group = me.hand): # Refill the player's hand to its hand size.
-   global handsize
-   playhand = len(me.hand) # count how many cards there are currently there.
-   if playhand < handsize: drawMany(me.piles['House Deck'], handsize - playhand, silent) # If there's less cards than the handsize, draw from the deck until it's full.
+   if len(me.hand) < handsize: drawMany(me.piles['House Deck'], handsize - len(me.hand), silent) # If there's less cards than the handsize, draw from the deck until it's full.
+   if len(assemblyCards) < assemblysize: imperialDraw(times = assemblysize - len(assemblyCards))
 
 def handDiscard(card, x = 0, y = 0): # Discard a card from your hand.
    mute()
@@ -992,21 +1005,19 @@ def draw(group):
     notify("{} draws a card.".format(me))
 
 def imperialDraw(group = me.piles['Imperial Deck'], times = 1):
-    if len(group) == 0: return
-    mute()
-    i = 0
-    while i < times:
-        card = group.top()
-        if playeraxis == Yaxis: 
-            group.top().moveToTable(cwidth(card) - i * cwidth(card), homeDistance(card) + cardDistance(card) - yaxisMove(card,'force'),True)
-            card.markers[Assembly] = 1
-        else: 
-            group.top().moveToTable(homeDistance(card) + cardDistance(card), cwidth(card) - playerside * i * cheight(card),True)
-            card.markers[Assembly] = 1
-        i += 1
-
-def setupAssembly(group = me.piles['Imperial Deck']):
-    imperialDraw(times = 3)
+   if len(group) == 0: return
+   mute()
+   for i in range(times):
+      card = group.top()
+      card.moveToTable(0,0, True)
+      card.markers[Assembly] = 1
+      assemblyCards.append(card)
+   for n in range(len(assemblyCards)): # Reorganizing the assembly cards.
+      card = assemblyCards[n]
+      if playeraxis == Yaxis:
+         card.moveToTable(playerside * cwidth(card) + (len(assemblyCards) - 2) * (cwidth(card) / 2) - n * cwidth(card), homeDistance(card) + cardDistance(card) - yaxisMove(card,'force'),True)
+      else: 
+         card.moveToTable(homeDistance(card) + cardDistance(card), playerside * cheight(card)  + (len(assemblyCards) - 2) * (cheight(card) / 2) - n * cheight(card),True)
     
 def shuffle(group):
   group.shuffle()
