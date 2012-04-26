@@ -45,7 +45,7 @@ DoesntDisengageColor = "#ffffff"
 # Global variables
 #---------------------------------------------------------------------------
 
-playerside = None # Variable to keep track on which side each player is
+PLS = None # Stands for PLayerSide. Variable to keep track on which side each player is. 
 playeraxis = None # Variable to keep track on which axis the player is
 handsize = 7 # Used when automatically refilling your hand.
 assemblysize = 3 # used when automatically refilling your assembly.
@@ -77,32 +77,32 @@ def num (s):
 
 def chooseSide(): # Called from many functions to check if the player has chosen a side for this game.
    mute()
-   global playerside, playeraxis
-   if playerside == None:  # Has the player selected a side yet? If not, then...
+   global PLS, playeraxis
+   if PLS == None:  # Has the player selected a side yet? If not, then...
       if table.isTwoSided():
          if me.hasInvertedTable():
             playeraxis = Yaxis
-            playerside = -1
+            PLS = -1
          else:
             playeraxis = Yaxis
-            playerside = 1
+            PLS = 1
       else:
          askside = askInteger("On which side do you want to setup?: 1 = Right, 2 = Left, 3 = Bottom, 4 = Top, 0 = None (All your cards will be put in the middle of the table and you'll have to arrange them yourself", 1) # Ask which axis they want,
          if askside == 1:
             playeraxis = Xaxis
-            playerside = 1
+            PLS = 1
          elif askside == 2:
             playeraxis = Xaxis
-            playerside = -1
+            PLS = -1
          elif askside == 3:
             playeraxis = Yaxis
-            playerside = 1
+            PLS = 1
          elif askside == 4:
             playeraxis = Yaxis
-            playerside = -1
+            PLS = -1
          else:
             playeraxis = None
-            playerside = 0
+            PLS = 0
 
 def chkOut(globalvar): # A function which safely grabs a global variable by making sure nobody else is currently modifying it.
    retry = 0
@@ -141,7 +141,7 @@ def yaxisMove(card, force = 'no'):
 # Variable to move the cards played by player 2 on a 2-sided table, more towards their own side. 
 # Player's 2 axis will fall one extra card length towards their side.
 # This is because of bug #146 (https://github.com/kellyelton/OCTGN/issues/146)
-   if me.hasInvertedTable() or (playeraxis == Yaxis and playerside == -1): cardmove = cheight(card)
+   if me.hasInvertedTable() or (playeraxis == Yaxis and PLS == -1): cardmove = cheight(card)
    elif force == 'force': cardmove = -cheight(card)
    else: cardmove = 0
    return cardmove
@@ -154,18 +154,18 @@ def placeCard(card,type = None):
       if type == 'SetupHomeworld':
          card.moveToTable(homeDistance(card), 0) # We move it to one side depending on what side the player chose.
       if type == 'SetupDune':
-         card.moveToTable(homeDistance(card), cheight(card)* playerside) # We move it to one side depending on what side the player chose.
+         card.moveToTable(homeDistance(card), cheight(card)* PLS) # We move it to one side depending on what side the player chose.
          card.isFaceUp = False
       if type == 'SetupProgram':          # We move them behind the homeworld
-         card.moveToTable(homeDistance(card) - cardDistance(card) / 4 - (playerside * totalprogs * 20), 0)
+         card.moveToTable(homeDistance(card) - cardDistance(card) / 2 - (PLS * totalprogs * 20), 0)
          card.sendToBack()
          card.isFaceUp = False
          totalprogs += 1
       if type == 'PlayEvent': # Events are placed subdued
-         card.moveToTable(homeDistance(card) + playerside * totalevents * 35, cheight(card)* -2 * playerside + playerside * totalevents * 35) 
+         card.moveToTable(homeDistance(card) + PLS * totalevents * 35, cheight(card)* -2 * PLS + PLS * totalevents * -35) 
          card.isFaceUp = False
       if type =='DeployHolding':
-         card.moveToTable(homeDistance(card) - cardDistance(card), -cheight(card) * playerside + totalholdings * cheight(card)) # We move them just in front and to the side of the player's homeworld
+         card.moveToTable(homeDistance(card) - cardDistance(card), -cheight(card) * PLS + totalholdings * cheight(card)) # We move them just in front and to the side of the player's homeworld
          totalholdings += 1
          if totalholdings == 5: totalholdings = -4
       if type =='DeployPersona':
@@ -173,24 +173,24 @@ def placeCard(card,type = None):
          totalpersonas += 1
          if totalpersonas == 5: totalpersonas = -5
       if type =='DeployResource':
-         card.moveToTable(cardDistance(card), cheight(card) * playerside) # We move it close to the table center, towards the player's side.
+         card.moveToTable(cardDistance(card), cheight(card) * PLS) # We move it close to the table center, towards the player's side.
          card.sendToBack()
    elif playeraxis == Yaxis:
       if type == 'SetupHomeworld':
          card.moveToTable(0 ,homeDistance(card) - yaxisMove(card,'force')) 
       if type == 'SetupDune':
-         card.moveToTable(cwidth(card)* playerside,homeDistance(card) - yaxisMove(card,'force')) 
+         card.moveToTable(cwidth(card)* PLS,homeDistance(card) - yaxisMove(card,'force')) 
          card.isFaceUp = False
       if type == 'SetupProgram': 
-         card.moveToTable(0 ,homeDistance(card) - cardDistance(card) / 4 - (playerside * totalprogs * 30) - yaxisMove(card,'force'))
+         card.moveToTable(0 ,homeDistance(card) - cardDistance(card) / 4 - (PLS * totalprogs * 30) - yaxisMove(card,'force'))
          card.sendToBack()
          card.isFaceUp = False
          totalprogs += 1
       if type == 'PlayEvent':
-         card.moveToTable(cwidth(card)* -4 * playerside + playerside * totalevents * -35,homeDistance(card) + playerside * totalevents * 35 - yaxisMove(card)) 
+         card.moveToTable(cwidth(card)* -4 * PLS + PLS * totalevents * -35,homeDistance(card) + PLS * totalevents * 35 - yaxisMove(card)) 
          card.isFaceUp = False
       if type =='DeployHolding':
-         card.moveToTable(-cwidth(card) * playerside + totalholdings * cheight(card), homeDistance(card) - cardDistance(card)) # We move them just in front and to the side of the player's homeworld
+         card.moveToTable(-cwidth(card) * PLS + totalholdings * cheight(card), homeDistance(card) - cardDistance(card)) # We move them just in front and to the side of the player's homeworld
          totalholdings += 1
          if totalholdings == 7: totalholdings = -4
       if type =='DeployPersona':
@@ -198,19 +198,19 @@ def placeCard(card,type = None):
          totalpersonas += 1
          if totalpersonas == 7: totalpersonas = -5
       if type =='DeployResource':
-         card.moveToTable(cwidth(card) * playerside,cardDistance(card)) # We move it close to the table center, towards the player's side.
+         card.moveToTable(cwidth(card) * PLS,cardDistance(card)) # We move it close to the table center, towards the player's side.
          card.sendToBack()
    else: card.moveToTable(0,0)
 
 def homeDistance(card):
-# This function returns the distance from the middle each player's homeworld will be setup towards their playerSide. 
+# This function returns the distance from the middle each player's homeworld will be setup towards their PLS. 
 # This makes the code more readable and allows me to tweak these values from one place
-   if table.isTwoSided(): return (playerside * cheight(card) * 4) # players on an inverted table are placed half a card away from their edge.
+   if table.isTwoSided(): return (PLS * cheight(card) * 4) # players on an inverted table are placed half a card away from their edge.
    else:
       if playeraxis == Xaxis:
-         return (playerside * cwidth(card) * 10) # players on the X axis, are placed 10 times a card's width towards their side (left or right)
+         return (PLS * cwidth(card) * 10) # players on the X axis, are placed 10 times a card's width towards their side (left or right)
       elif playeraxis == Yaxis:
-         return (playerside * cheight(card) * 4 - yaxisMove(card)) # players on the Y axis, are placed 4 times a card's height towards their side (top or bottom)
+         return (PLS * cheight(card) * 4 - yaxisMove(card)) # players on the Y axis, are placed 4 times a card's height towards their side (top or bottom)
 
 def cardDistance(card):
 # This function returns the size of the card towards a player's side. 
@@ -220,9 +220,9 @@ def cardDistance(card):
 #   Thus by adding this in a moveToTable's y integer, the card being placed will be moved towards your side by one multiple of card height
 #   While if you remove it from the y integer, the card being placed will be moved towards the centre of the table by one multiple of card height.
    if playeraxis == Xaxis:
-      return (playerside * cwidth(card))
+      return (PLS * cwidth(card))
    elif playeraxis == Yaxis:
-      return (playerside * cheight(card))
+      return (PLS * cheight(card))
 
 #---------------------------------------------------------------------------
 # Conditions Check General Functions
@@ -338,9 +338,9 @@ def showCurrentPhase(): # Just say a nice notification about which phase you're 
 def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
 # This phase is not rotated with the nextPhase function as it is a way to basically restart the game.
 # It also serves as a control, so as to avoid a player by mistake using the setup function during play.
-   global playerside, playeraxis, handsize, assemblysize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances, totalevents, inactiveProgram
+   global PLS, playeraxis, handsize, assemblysize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances, totalevents, inactiveProgram
    mute()
-   playerside = None
+   PLS = None
    playeraxis = None
    handsize = 7
    assemblysize = 3
@@ -925,7 +925,7 @@ def setup(group):
    if shared.Phase == 0: # First check if we're on the pre-setup game phase. 
                      # As this function will play your whole hand and wipe your counters, we don't want any accidents.
 #      if not confirm("Have bought all the favour and spice you'll need with your bonus solaris? \n\n(Remember you need 1 solaris per program you're going to install.)"): return
-      global playerside, allegiances, inactiveProgram # Import some necessary variables we're using around the game.
+      global PLS, allegiances, inactiveProgram # Import some necessary variables we're using around the game.
       DuneinHand = 0
       mute()
       chooseSide() # The classic place where the players choose their side.
@@ -1015,9 +1015,9 @@ def imperialDraw(group = me.piles['Imperial Deck'], times = 1):
    for n in range(len(assemblyCards)): # Reorganizing the assembly cards.
       card = assemblyCards[n]
       if playeraxis == Yaxis:
-         card.moveToTable(playerside * cwidth(card) + (len(assemblyCards) - 2) * (cwidth(card) / 2) - n * cwidth(card), homeDistance(card) + cardDistance(card) - yaxisMove(card,'force'),True)
+         card.moveToTable(PLS * cwidth(card) + PLS * (len(assemblyCards) - 2) * (cwidth(card) / 2) - PLS * n * cwidth(card), homeDistance(card) + cardDistance(card) - yaxisMove(card,'force'),True)
       else: 
-         card.moveToTable(homeDistance(card) + cardDistance(card), playerside * cheight(card)  + (len(assemblyCards) - 2) * (cheight(card) / 2) - n * cheight(card),True)
+         card.moveToTable(homeDistance(card) + cardDistance(card), PLS * cheight(card)  + PLS * (len(assemblyCards) - 2) * (cheight(card) / 2) - n * PLS * cheight(card),True)
     
 def shuffle(group):
   group.shuffle()
