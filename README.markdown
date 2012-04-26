@@ -20,6 +20,14 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 Changelog
 ---------
 
+### 1.1.7
+
+* Game will now take into account if any player has lost a petition in the past when they try to start a new one, and warn them.
+* More robustness in the petitioning/bidding process
+* Changed the name and moved the position of the Bid process. Now it's called "Petition: Start/End/Bid/Pass" and it is supposed to be **the** action to use in regards to petitions. This action can be called from both actions and table.
+* Tweaked deployment points a bit again
+* Fixed a few bugs with the payment of petitions
+
 ### 1.1.6
 
 * Fixed bug in bidding contest when bid is called with no card targeted.
