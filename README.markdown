@@ -19,6 +19,10 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 
 Changelog
 ---------
+### 1.1.8
+
+* Added the [Orthodox Herbetarian](http://www.kullwahad.com/?p=264) fonts for the menu.
+* Added a chat font that is similar to the font used in the Movie from 1984.
 
 ### 1.1.7
 
