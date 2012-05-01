@@ -60,6 +60,7 @@ totalholdings = 0
 totalpersonas = 0
 inactiveProgram = { }
 assemblyCards = [ ]
+Automation = True
 #---------------------------------------------------------------------------
 # General functions
 #---------------------------------------------------------------------------
@@ -253,14 +254,12 @@ def eventDeployTypeChk(subtype): # Check if the conditions to deploy an event ar
          return 'Extra'
       else: return 'NOK'
 
-def DuneFiefs(): # This function goes through your cards on the table and looks to see if you control any Dune Fiefs.
-   DuneFiefsNR = 0
-   myCards = (c for c in table
+def DuneFiefs(DuneOnly = False): # This function goes through your cards on the table and looks to see if you control any Dune Fiefs.
+   myCards = [c for c in table
       if c.controller == me
       and c.isFaceUp
-      and (re.search(r'Dune Fief', c.Subtype) or c.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001')) # Dune itself is also a Dune Fief.
-   for mycard in myCards: DuneFiefsNR += 1
-   return DuneFiefsNR
+      and ((re.search(r'Dune Fief', c.Subtype) and not DuneOnly) or c.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001')] # Dune itself is also a Dune Fief.
+   return len(myCards)
 
 def Homeworlds(): # This function goes through your cards on the table and looks to see if you control any Homeworlds.
    HomeNR = 0
@@ -307,6 +306,15 @@ def chkAdversaries(): # Check if there are any adversaties of factions in the Im
 #---------------------------------------------------------------------------
 # Table group actions
 #---------------------------------------------------------------------------
+
+def switchAutomation(group,x=0,y=0,command = 'Off'):
+    global Automation
+    if Automation and command != 'On':
+        notify ("{}'s automations are OFF.".format(me))
+        Automation = False
+    else:
+        notify ("{}'s automations are ON.".format(me))
+        Automation = True
 
 def nextPhase(group, x = 0, y = 0):  
 # Function to take you to the next phase. 
@@ -494,12 +502,9 @@ def placeBid(group, x = 0, y = 0):
 def inspectCard(card, x = 0, y = 0): # This function shows the player the card text, to allow for easy reading until High Quality scans are procured.
    confirm("{}".format(card.Operation))
 
-def engage(card, x = 0, y = 0):
+def engage(card, x = 0, y = 0, alreadyDone = False):
     mute()
-    if not card.isFaceUp and card.markers[Assembly] == 1:
-      subdue(card)
-      return
-    card.orientation ^= Rot90
+    if not alreadyDone: card.orientation ^= Rot90
     if card.orientation & Rot90 == Rot90:
         notify('{} engages {}'.format(me, card))
     else:
@@ -948,9 +953,10 @@ def play(card, x = 0, y = 0):
          card.moveToTable(0, 0 - yaxisMove(card))
          notify("{} plays {} from their hand.".format(me, card))
 
-def setup(group):
+def setup(group = me.hand, x= 0, y = 0):
 # This function is usually the first one the player does. It will setup their homeworld on their side of the table. 
 # It will also shuffle their decks, setup their Assembly and Dune and draw 7 cards for them.
+   group = me.hand # Because this action can be run from the table as well now.
    if shared.Phase == 0: # First check if we're on the pre-setup game phase. 
                      # As this function will play your whole hand and wipe your counters, we don't want any accidents.
 #      if not confirm("Have bought all the favour and spice you'll need with your bonus solaris? \n\n(Remember you need 1 solaris per program you're going to install.)"): return
@@ -1066,3 +1072,64 @@ def mill(group):
    count = askInteger("Discard how many cards?", 3)
    for c in group.top(count): c.moveTo(me.piles['House Discard'])
    notify("{} discards the top {} cards from their house deck.".format(me, count))
+   
+#------------------------------------------------------------------------------
+# Autoscripts 
+#------------------------------------------------------------------------------
+
+def useAbility(card, x = 0, y = 0, action = ''):
+   mute()
+   if card.markers[Assembly] == 1 or not card.isFaceUp: # If card is face down or assembly, assume they wanted to deploy it.
+      subdue(card)
+      return
+   elif not Automation or card.Autoscript == "": 
+      engage(card) # If card is face up but has no autoscripts or automation is disabled, just engage/disengage it.
+      return
+   Autoscripts = card.Autoscript.split('||')
+#   notify('Autoscripts = {}'.format(Autoscripts)) # Debug
+   if len(Autoscripts) > 1: activeAutoscript = Autoscripts[0] # This needs to become a choice confirm.
+   else: activeAutoscript = Autoscripts[0]
+#   notify('Autoscript is {}'.format(activeAutoscript)) # Debug
+   actionCost = re.match(r"C([ES0])", activeAutoscript)
+#   notify("Cost is {}".format(actionCost.group(1))) # Debug
+
+   if actionCost.group(1) == 'E':
+      if card.orientation == Rot90: 
+         whisper("You must engage to take this action. Please disengage the card first and try again")
+         return
+      else: 
+         card.orientation = Rot90
+         costText = '{} engages {} to'.format(card.controller, card)
+   elif actionCost.group(1) == 'S': 
+      card.isFaceUp = False
+      costText = '{} subdues {} to'.format(card.controller, card)
+   else: costText = '{} activates the ability of {} to'.format(card.controller, card)
+
+   if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText)
+   elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText)
+   else: engage(card, alreadyDone = True)
+   
+def GainX(Autoscript, costText = ''):
+   gain = 0
+   extraText = ''
+   action = re.search(r'Gain([0-9]+)(Solaris|Spice|Favor)', Autoscript) # First see if we're gaining Solaris, Spice or Favour and how much.
+   gain += num(action.group(1))
+   duneXtra = re.search(r'Dune([0-9])Xtra', Autoscript) # Some cards give you extra Solaris if you control Dune.
+   if duneXtra and DuneFiefs(True) == 1: # If the autoscript includes extra cost for controlling Dune, and we contol Dune...
+      extraText = ' ({} + {} for controlling Dune)'.format(action.group(1),duneXtra.group(1))
+      gain += num(duneXtra.group(1))
+#   if not action: notify("No match :-(") # Debug
+#   else: notify("action is {}".format(action.group(0))) # Debug
+   if action.group(2) == 'Solaris': me.Solaris += gain
+   elif action.group(2) == 'Spice': me.Spice += gain
+   elif action.group(2) == 'Favor': me.Favor += gain
+   else: 
+      whisper("Gain what?! (Bad autoscript)")
+      return
+   notify("{} gain {} {}{}.".format(costText, gain, action.group(2),extraText))
+   
+def HoardX(Autoscript, costText = ''):
+   action = re.search(r'Hoard([0-9]+)Spice', Autoscript)
+   shared.counters['Guild Hoard'].value += num(action.group(1))
+   shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)   
+   notify("{} add {} Spice to the Guild Hoard. The Guild Hoard now has {} spice and the CROE is {}".format(costText, action.group(1), shared.counters['Guild Hoard'].value, shared.CROE))

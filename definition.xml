@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune" id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="3.0.1.0" version="1.1.8.2" markersize="24">
+<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune" id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="3.0.1.5" version="2.0.0" markersize="24">
    <globalvariables>
        <globalvariable name="petitionedCard" value="Empty" /> 
        <globalvariable name="passedPlayers" value="[]" /> 
@@ -21,11 +21,13 @@
 		<property name="Weirding" type="String" hidden="false" ignoreText="False" />
 		<property name="Prescience" type="String" hidden="false" ignoreText="False" />
 		<property name="Decktype" type="String" hidden="false" ignoreText="False" />
+		<property name="AutoScript" type="String" hidden="false" ignoreText="False" />
 	</card>
 	<table name="Table" visibility="undefined" ordered="false" width="1280" height="1350" board="r3" boardPosition="0,0,0,0" background="r4" backgroundStyle="uniformToFill">
 		<cardaction menu="Petition: Start/End/Bid/Pass" default="false" shortcut="Ctrl+Q" execute="petition" />
 		<groupaction menu="Petition: Start/End/Bid/Pass" default="false" shortcut="Ctrl+Q" execute="placeBid" />
-		<cardaction menu="Engage/Disengage" default="true" shortcut="Ctrl+E" execute="engage" />
+		<cardaction menu="Use Ability" default="true" execute="useAbility" />
+		<cardaction menu="Engage/Disengage" default="false" shortcut="Ctrl+E" execute="engage" />
 		<cardaction menu="Subdue/Deploy" default="false" shortcut="Ctrl+S" execute="subdue" />
 		<groupaction menu="Buy Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+C" execute="CHOAMbuy" />
 		<groupaction menu="Sell Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+Shift+C" execute="CHOAMsell" />
@@ -42,14 +44,14 @@
          <cardaction menu="(Un)Mark as Assembly card" default="false" shortcut="Alt+A" execute="switchAssembly" />
          <cardaction menu="(Un)Mark card as &quot;Does not Disengage&quot;" default="false" execute="doesNotDisengage" />
 		</cardactions>
-		<groupactions menu="Phases">
+		<groupactions menu="Phases...">
 			<groupaction menu="Next Phase" default="false" shortcut="Enter" execute="nextPhase" />
 			<groupaction menu="Jump to Opening Interval" default="false" shortcut="F1" execute="goToOpening" />
 			<groupaction menu="Jump  to House Interval" default="false" shortcut="F2" execute="goToHouse" />
 			<groupaction menu="Jump to Closing Interval" default="false" shortcut="F3" execute="goToClosing" />
 			<groupaction menu="Go to Pre-Game Setup Phase (Use this only after a reset)" default="false" execute="goToSetup" />
 		</groupactions>
-		<cardactions menu="Rites">
+		<cardactions menu="Rites...">
 			<cardaction menu="Dueling Rite" default="false" shortcut="Ctrl+D" execute="dueling" />
 			<cardaction menu="Battle Rite" default="false" shortcut="Ctrl+B" execute="battle" />
 			<cardaction menu="Arbitration Rite" default="false" shortcut="Ctrl+A" execute="arbitration" />
@@ -59,6 +61,10 @@
 		<groupaction menu="Automated Closing Interval" default="false" shortcut="Ctrl+F3" execute="automatedClosing" />
 		<cardaction menu="Inspect Card" default="false" execute="inspectCard" />
 		<cardaction menu="Discard Card" default="false" shortcut="del" batchExecute="discard" />
+		<groupactions menu="Game...">
+			<groupaction menu="Set up" default="false" shortcut="Ctrl+Shift+S" execute="setup" />
+			<groupaction menu="Switch Automation ON/OFF" default="false" execute="switchAutomation" />  
+		</groupactions>
 	</table>
 	<player summary="Spice:{#Spice} | Sol:{#Solaris} | Favor:{#Favor} | Init:{#Initiative} | Bid:{#Bid} | Cards:{#Hand}">
 		<hand name="Hand" visibility="me" ordered="false" width="63" height="88" icon="r10">
