@@ -1085,14 +1085,13 @@ def useAbility(card, x = 0, y = 0, action = ''):
    elif not Automation or card.Autoscript == "": 
       engage(card) # If card is face up but has no autoscripts or automation is disabled, just engage/disengage it.
       return
-   Autoscripts = card.Autoscript.split('||')
+   Autoscripts = card.AutoScript.split('||')
 #   notify('Autoscripts = {}'.format(Autoscripts)) # Debug
    if len(Autoscripts) > 1: activeAutoscript = Autoscripts[0] # This needs to become a choice confirm.
    else: activeAutoscript = Autoscripts[0]
 #   notify('Autoscript is {}'.format(activeAutoscript)) # Debug
    actionCost = re.match(r"C([ES0])", activeAutoscript)
 #   notify("Cost is {}".format(actionCost.group(1))) # Debug
-
    if actionCost.group(1) == 'E':
       if card.orientation == Rot90: 
          whisper("You must engage to take this action. Please disengage the card first and try again")
@@ -1103,15 +1102,19 @@ def useAbility(card, x = 0, y = 0, action = ''):
    elif actionCost.group(1) == 'S': 
       card.isFaceUp = False
       costText = '{} subdues {} to'.format(card.controller, card)
-   else: costText = '{} activates the ability of {} to'.format(card.controller, card)
+   else: costText = '{} activates {} to'.format(card.controller, card)
 
-   if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText)
+   if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText, card.owner)
    elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText)
    elif re.search(r'Prod([0-9]+)', activeAutoscript): ProdX(activeAutoscript, costText, card)
    else: engage(card, alreadyDone = True)
    
-def GainX(Autoscript, costText = ''):
+def GainX(Autoscript, costText, owner, n = 1):
+# n is used when other scripts are calling this variable, to automatically provide the generated result to the counters of another player owning a specific card.
+# For example if one player owns a card that produces one Solaris per Spice produced in a desert, and another player produces 3 spice with a Spice Blow event...
+# ...then the other script will call this one, giving an n of 3. If no n is passed, the multiplier will be 1, which will do nothing.
    gain = 0
+   multiplier = 1 # We only modify this is the card gives spice per a specific number
    extraText = ''
    action = re.search(r'Gain([0-9]+)(Solaris|Spice|Favor)', Autoscript) # First see if we're gaining Solaris, Spice or Favour and how much.
    gain += num(action.group(1))
@@ -1119,17 +1122,27 @@ def GainX(Autoscript, costText = ''):
    if duneXtra and DuneFiefs(True) == 1: # If the autoscript includes extra cost for controlling Dune, and we contol Dune...
       extraText = ' ({} + {} for controlling Dune)'.format(action.group(1),duneXtra.group(1))
       gain += num(duneXtra.group(1))
-#   if not action: notify("No match :-(") # Debug
-#   else: notify("action is {}".format(action.group(0))) # Debug
-   if action.group(2) == 'Solaris': me.Solaris += gain
-   elif action.group(2) == 'Spice': me.Spice += gain
-   elif action.group(2) == 'Favor': me.Favor += gain
+   per = re.search(r'per([A-Za-z]+)[-]?', Autoscript)   
+   if per:
+      if per.group(1) == 'SpiceProducer':
+         spiceProducers = [c for c in table
+                           if (re.search('Desert', c.Subtype)
+                              or re.search('Spice Harvester', c.name)
+                              or re.search('Carryall', c.name))
+                           and c.controller != me]
+         multiplier = len(spiceProducers)
+      if per.group(1) == 'SpiceGenerated':
+         multiplier = num(n)
+#      notify('per is: {}'.format(per.group(1))) # Debug
+   if action.group(2) == 'Solaris': owner.Solaris += gain * multiplier
+   elif action.group(2) == 'Spice': owner.Spice += gain * multiplier
+   elif action.group(2) == 'Favor': owner.Favor += gain * multiplier
    else: 
       whisper("Gain what?! (Bad autoscript)")
       return
-   notify("{} gain {} {}{}.".format(costText, gain, action.group(2),extraText))
+   notify("{} gain {} {}{}.".format(costText, gain * multiplier, action.group(2),extraText))
    
-def HoardX(Autoscript, costText = ''):
+def HoardX(Autoscript, costText):
    action = re.search(r'Hoard([0-9]+)Spice', Autoscript)
    shared.counters['Guild Hoard'].value += num(action.group(1))
    shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)   
@@ -1142,4 +1155,10 @@ def ProdX(Autoscript, costText, card):
       return
    card.markers[Spice] += num(action.group(1))
    notify("{} produce {} spice assigned to it".format(costText,action.group(1)))
-   
+   autoscriptOtherPlayers('SpiceGenerated',num(action.group(1)))
+
+def autoscriptOtherPlayers(lookup, n = 1):
+   for card in table:
+      costText = '{} activates {} to'.format(card.controller, card)
+      if re.search(r'{}'.format(lookup), card.AutoScript):
+         if lookup == 'SpiceGenerated': GainX(card.AutoScript, costText, card.owner, n)
