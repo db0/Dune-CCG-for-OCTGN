@@ -1107,6 +1107,7 @@ def useAbility(card, x = 0, y = 0, action = ''):
 
    if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText)
    elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText)
+   elif re.search(r'Prod([0-9]+)', activeAutoscript): ProdX(activeAutoscript, costText, card)
    else: engage(card, alreadyDone = True)
    
 def GainX(Autoscript, costText = ''):
@@ -1133,3 +1134,12 @@ def HoardX(Autoscript, costText = ''):
    shared.counters['Guild Hoard'].value += num(action.group(1))
    shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)   
    notify("{} add {} Spice to the Guild Hoard. The Guild Hoard now has {} spice and the CROE is {}".format(costText, action.group(1), shared.counters['Guild Hoard'].value, shared.CROE))
+
+def ProdX(Autoscript, costText, card):
+   action = re.search(r'Prod([0-9]+)Spice', Autoscript)
+   if not confirm('Do you want to produce spice on {}?\n\nPressing "No" will send it directly to the Guild Hoard instead'.format(card.name)):
+      HoardX('Hoard{}Spice'.format(action.group(1)), costText) # If we want to produce the spice to the hoard, we're going to use the HoardX() function, but we need to sent it a modified Autoscript.
+      return
+   card.markers[Spice] += num(action.group(1))
+   notify("{} produce {} spice assigned to it".format(costText,action.group(1)))
+   
