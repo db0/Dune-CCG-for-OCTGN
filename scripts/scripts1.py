@@ -502,13 +502,13 @@ def placeBid(group, x = 0, y = 0):
 def inspectCard(card, x = 0, y = 0): # This function shows the player the card text, to allow for easy reading until High Quality scans are procured.
    confirm("{}".format(card.Operation))
 
-def engage(card, x = 0, y = 0, alreadyDone = False):
+def engage(card, x = 0, y = 0, alreadyDone = False, silent = False):
     mute()
     if not alreadyDone: card.orientation ^= Rot90
-    if card.orientation & Rot90 == Rot90:
-        notify('{} engages {}'.format(me, card))
-    else:
-        notify('{} disengages {}'.format(me, card))
+    if not silent: # If the engage action was called silently, don't announce anything.
+       if card.orientation & Rot90 == Rot90: notify('{} engages {}'.format(me, card))
+       else: notify('{} disengages {}'.format(me, card))
+    if re.search('Desert', card.Subtype): autoscriptOtherPlayers('DesertEngaged')
 
 def dueling(card, x = 0, y = 0):
     mute()
@@ -1097,7 +1097,7 @@ def useAbility(card, x = 0, y = 0, action = ''):
          whisper("You must engage to take this action. Please disengage the card first and try again")
          return
       else: 
-         card.orientation = Rot90
+         engage(card, silent = True)
          costText = '{} engages {} to'.format(card.controller, card)
    elif actionCost.group(1) == 'S': 
       card.isFaceUp = False
@@ -1158,7 +1158,10 @@ def ProdX(Autoscript, costText, card):
    autoscriptOtherPlayers('SpiceGenerated',num(action.group(1)))
 
 def autoscriptOtherPlayers(lookup, n = 1):
+# This function is called from other functions in order to go through the table and see if other players have any cards which would be activated by it.
+# For example a card that would produce solaris whenever a desert was engaged. I would have a
    for card in table:
       costText = '{} activates {} to'.format(card.controller, card)
       if re.search(r'{}'.format(lookup), card.AutoScript):
          if lookup == 'SpiceGenerated': GainX(card.AutoScript, costText, card.owner, n)
+         if lookup == 'DesertEngaged': GainX(card.AutoScript, costText, card.owner)
