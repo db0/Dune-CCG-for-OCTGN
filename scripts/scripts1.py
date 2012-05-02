@@ -1141,6 +1141,7 @@ def useAbility(card, x = 0, y = 0, action = ''):
    elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText)
    elif re.search(r'Prod([0-9]+)', activeAutoscript): ProdX(activeAutoscript, costText, card)
    elif re.search(r'Transfer([0-9]+)', activeAutoscript): TransferX(activeAutoscript, costText, card, targetC)
+   elif re.search(r'(Assign|Remove)([0-9]+)(Deferment|Spice|Program)', activeAutoscript): TokensX(activeAutoscript, costText, card, targetC)
    else: engage(card, alreadyDone = True)
    
 def GainX(Autoscript, costText, owner, n = 1, manual = False, targetCard = None):
@@ -1161,13 +1162,15 @@ def GainX(Autoscript, costText, owner, n = 1, manual = False, targetCard = None)
       if per.group(1) == 'SpiceProducer':
          spiceProducers = [c for c in table
                            if re.search('Desert', c.Subtype)
-                              or re.search('Spice Harvester', c.name)
-                              or re.search('Carryall', c.name)]
+                           or re.search('Spice Harvester', c.name)
+                           or re.search('Carryall', c.name)]
          multiplier = len(spiceProducers) * onlyRival(Autoscript, owner, False) # We send False to the manual variable, because we don't want it to give 1 solaris when nobody has any production
-      if per.group(1) == 'CROE': gain = shared.CROE
+      elif per.group(1) == 'DuneFief':
+         duneFs = [c for c in table if re.search('Dune Fief', c.Subtype)]
+         multiplier = len(duneFs) * onlyRival(Autoscript, owner, False)
+      elif per.group(1) == 'CROE': gain = shared.CROE
       else: multiplier = num(n) * onlyRival(Autoscript, owner, manual) # All non-special-rules per requests use this formula.
                                                                        # There is an n provided to multiply the solaris with, and they may only work with a rival's cards.
-   if multiplier == 0: return # If nothing is to be gained afterall, don't announce it.
    if action.group(2) == 'Solaris': owner.Solaris += gain * multiplier
    elif action.group(2) == 'Spice': owner.Spice += gain * multiplier
    elif action.group(2) == 'Favor': owner.Favor += gain * multiplier
@@ -1218,8 +1221,26 @@ def TransferX(Autoscript, costText, card, targetCard = None):
    if action.group(2) == 'Hoard': 
       shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
       destination += 'The new total is {} and the CROE is set at {}.'.format(shared.counters['Guild Hoard'].value, shared.CROE)
-   notify("{} transfer {} spice to {}".format(costText, transfer + breakadd, destination))
+   notify("{} transfer {} spice from {} to {}".format(costText, transfer + breakadd, targetCard, destination))
    
+def TokensX(Autoscript, costText, card, targetCard = None):
+   action = re.search(r'(Assign|Remove)([0-9]+)(Deferment|Spice|Program)', Autoscript)
+   if action.group(3) == 'Deferment' : token = Deferment_Token
+   elif action.group(3) == 'Spice' : token = Spice
+   elif action.group(3) == 'Program' : token = Program
+   else: 
+      whisper("Wat Token? [Error in autoscript!]")
+      return
+   per = re.search(r'per([A-Za-z]+)[-]?', Autoscript) # We're searching if the card gives Solaris per something else.
+   if per:
+      if per.group(1) == 'Intrigue': multiplier = num(card.Intrigue)
+   else: multiplier = 1
+   if action.group(1) == 'Assign': modtokens = num(action.group(2)) * multiplier
+   else: modtokens = -num(action.group(2)) * multiplier
+   targetCard.markers[token] += modtokens
+   notify("{} {} {} {} tokens to {}".format(costText, action.group(1), abs(modtokens), action.group(3), targetCard))
+   autoscriptOtherPlayers('{}Generated'.format(action.group(3)),modtokens)
+
 def autoscriptOtherPlayers(lookup, n = 1):
 # This function is called from other functions in order to go through the table and see if other players have any cards which would be activated by it.
 # For example a card that would produce solaris whenever a desert was engaged. I would have the engage() function call autoscriptOtherPlayers('DesertEngaged')
