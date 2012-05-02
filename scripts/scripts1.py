@@ -725,6 +725,7 @@ def CHOAMbuy(group, x = 0, y = 0): # This function allows the player to purchase
           else: 
              me.Solaris -=fullcost # Player pays here.
              me.Spice += spiceNR # Then they get their spice.
+             autoscriptOtherPlayers('SpiceTransferred',spiceNR) # We trigger other player's autoscripts
              shared.counters['Guild Hoard'].value -= spiceNR # Then the spice is taken away from the hoard.
              shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value) # Then the CROE is reset.
              notify("{} has bought {} Spice for {}. The Guild Hoard now has {} Spice left and the CROE is set at {}".format(me, spiceNR, fullcost, shared.counters['Guild Hoard'].value, shared.CROE))
@@ -754,6 +755,7 @@ def CHOAMsell(group, x = 0, y = 0): # Very similar as CHOAMbuy, but player sells
              fullcost = completeSpiceCost(-spiceNR)
              me.Solaris +=fullcost
              me.Spice -= spiceNR
+             autoscriptOtherPlayers('SpiceTransferred',spiceNR) # We trigger other player's autoscripts
              shared.counters['Guild Hoard'].value += spiceNR
              shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
              notify("{} has sold {} Spice for {}. The Guild Hoard now has {} Spice left and the CROE is set at {}".format(me, spiceNR, fullcost, shared.counters['Guild Hoard'].value, shared.CROE))
@@ -823,6 +825,7 @@ def buyFavor(group, x = 0, y = 0): # Very similar to CHOAMbuy, but player buys F
           else: 
              me.Solaris -=fullcost
              me.Favor += favorNR
+             autoscriptOtherPlayers('FavorBought',favorNR) # We trigger other player's autoscripts
              notify("{} has bought {} favor. They now have {} favor".format(me, favorNR, me.Favor))
              favorBought = 1
        else:
@@ -1126,22 +1129,17 @@ def GainX(Autoscript, costText, owner, n = 1, manual = False):
    if duneXtra and DuneFiefs(True) == 1: # If the autoscript includes extra cost for controlling Dune, and we contol Dune...
       extraText = ' ({} + {} for controlling Dune)'.format(action.group(1),duneXtra.group(1))
       gain += num(duneXtra.group(1))
-   per = re.search(r'per([A-Za-z]+)[-]?', Autoscript)  
+   per = re.search(r'per([A-Za-z]+)[-]?', Autoscript) # We're searching if the card gives Solaris per something else.
    if per:
       if per.group(1) == 'SpiceProducer':
          spiceProducers = [c for c in table
-                           if (re.search('Desert', c.Subtype)
+                           if re.search('Desert', c.Subtype)
                               or re.search('Spice Harvester', c.name)
-                              or re.search('Carryall', c.name))
-                           and c.controller != me]
-         multiplier = len(spiceProducers)
-      if per.group(1) == 'SpiceGenerated': multiplier = num(n)
+                              or re.search('Carryall', c.name)]
+         multiplier = len(spiceProducers) * onlyRival(Autoscript, owner, manual)
       if per.group(1) == 'CROE': gain = shared.CROE
-      if per.group(1) == 'FavorBought': multiplier = num(n) * onlyRival(Autoscript, owner, manual)
-      if per.group(1) == 'DesertEngaged': pass # This is handled in the engage() function better.
-      if per.group(1) == 'DeployedMentat': multiplier *= onlyRival(Autoscript, owner, manual) # This is usually called from playCard()
-      if per.group(1) == 'DeployedEquipment': multiplier *= onlyRival(Autoscript, owner, manual) # Same as above
-#      notify('per is: {}'.format(per.group(1))) # Debug
+      else: multiplier = num(n) * onlyRival(Autoscript, owner, manual) # All non-special-rules per requests use this formula.
+                                                                       # There is an n provided to multiply the solaris with, and they may only work with a rival's cards.
    if multiplier == 0: return # If nothing is to be gained afterall, don't announce it.
    if action.group(2) == 'Solaris': owner.Solaris += gain * multiplier
    elif action.group(2) == 'Spice': owner.Spice += gain * multiplier
@@ -1156,7 +1154,7 @@ def onlyRival(Autoscript, owner, manual):
 # This is then multiplied by the multiplier, which means that if the card activated only works for Rival's cards, our cards will have a 0 gain.
 # This will probably make no sense when I read it in 10 years...
    byRival = re.search(r'byRival', Autoscript)
-   if not byRival or (byRival and owner != me) or manual: return 1
+   if not byRival or (byRival and owner != me) or manual: return 1 #manual means that the actions was called by a player double clicking on the card. In which case we always do it.
    else: return 0
       
 def HoardX(Autoscript, costText):
@@ -1180,13 +1178,9 @@ def autoscriptOtherPlayers(lookup, n = 1):
    if not Automation: return # If automations have been disabled, do nothing.
    for card in table:
       if not card.isFaceUp: continue # Don't take into accounts cards that are subdued but we've peeked at them.
-      costText = '{} activates {} to'.format(card.controller, card)
-      if re.search(r'{}'.format(lookup), card.AutoScript):
-         if lookup == 'SpiceGenerated': GainX(card.AutoScript, costText, card.owner, n)
-         if lookup == 'DesertEngaged': GainX(card.AutoScript, costText, card.owner)
-         if lookup == 'DeployedMentat': GainX(card.AutoScript, costText, card.owner)
-         if lookup == 'DeployedEquipment': GainX(card.AutoScript, costText, card.owner)
-         if lookup == 'FavorBought': GainX(card.AutoScript, costText, card.owner, n)
+      costText = '{} activates {} to'.format(card.controller, card) 
+      if re.search(r'{}'.format(lookup), card.AutoScript): # Search if in the script of the card, the string that was sent to us exists. The sent string is decided by the function calling us, so for example the ProdX() function knows it only needs to send the 'SpiceGenerated' string.
+         GainX(card.AutoScript, costText, card.owner, n) # If it exists, then call the GainX() function, because cards that automatically do something when other players do something else, always give the player something directly.
 
 def chkDeployAutoscripts(card): # This function is called whenever a card is deployed to check if any other cards on the table will trigger from it
    if re.search(r'Mentat', card.Subtype): autoscriptOtherPlayers('DeployedMentat')
