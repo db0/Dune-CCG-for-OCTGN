@@ -37,7 +37,7 @@ import time
 loud = 'loud' # So that I don't have to use the quotes all the time in my function calls
 silent = 'silent' # Same as above
 Xaxis = 'x'  # Same as above
-Yaxis = 'y'	 # Same as above
+Yaxis = 'y'     # Same as above
 DoesntDisengageColor = "#ffffff"
 
 
@@ -1094,7 +1094,20 @@ def useAbility(card, x = 0, y = 0, action = ''):
       return
    Autoscripts = card.AutoScript.split('||')
 #   notify('Autoscripts = {}'.format(Autoscripts)) # Debug
-   if len(Autoscripts) > 1: activeAutoscript = Autoscripts[0] # This needs to become a choice confirm.
+   if len(Autoscripts) > 1: 
+      abilConcat = "This card has multiple abilities. Which one would you like to use?\n\n" # We start a concat which we use in our confirm window.
+      for idx in range(len(Autoscripts)): # If a card has multiple abilities, we go through each of them to create a nicely written option for the player.
+         abilRegex = re.search(r"C[ES0]:([A-Za-z]+)([0-9]+)([A-Za-z]+)-?([A-Za-z-]*)", Autoscripts[idx]) # This regexp returns 3-4 groups, which we then reformat and put in the confirm dialogue in a better readable format.
+         abilConcat += '{}: {} {} {}'.format(idx, abilRegex.group(1), abilRegex.group(2), abilRegex.group(3)) # We add the first three groups to the concat. Those groups are always Gain/Hoard/Prod ## Favo/Solaris/Spice
+         if abilRegex.lastindex == 4: # If the autoscript has a fourth group, then it means it has subconditions. Such as "per Holding" or "by Rival"
+            subconditions = abilRegex.group(4).split('-') # These subconditions are always separated by dashes "-", so we use them to split the string
+            for idx2 in range(len(subconditions)): abilConcat += ' {}'.format(subconditions[idx2]) #  Then we iterate through each distinct subcondition and display it without the dashes between them. (In the future I may also add whitespaces between the distinct words)
+         abilConcat += '\n' # Finally add a newline at the concatenated string for the next ability to be listed.
+      abilChoice = len(Autoscripts) + 1 # Since we want a valid choice, we put the choice in a loop until the player exists or selects a valid one.
+      while abilChoice >= len(Autoscripts):
+         abilChoice = askInteger('{}'.format(abilConcat), 0) # We use the ability concatenation we crafted before to give the player a choice of the abilities on the card.
+         if abilChoice == None: return # If the player closed the window, abort.
+      activeAutoscript = Autoscripts[abilChoice] # If a valid choice is given, choose the autoscript at the list index the player chose.
    else: activeAutoscript = Autoscripts[0]
 #   notify('Autoscript is {}'.format(activeAutoscript)) # Debug
    actionCost = re.match(r"C([ES0])", activeAutoscript)
@@ -1174,7 +1187,7 @@ def ProdX(Autoscript, costText, card):
 
 def autoscriptOtherPlayers(lookup, n = 1):
 # This function is called from other functions in order to go through the table and see if other players have any cards which would be activated by it.
-# For example a card that would produce solaris whenever a desert was engaged. I would have a
+# For example a card that would produce solaris whenever a desert was engaged. I would have the engage() function call autoscriptOtherPlayers('DesertEngaged')
    if not Automation: return # If automations have been disabled, do nothing.
    for card in table:
       if not card.isFaceUp: continue # Don't take into accounts cards that are subdued but we've peeked at them.
@@ -1185,3 +1198,4 @@ def autoscriptOtherPlayers(lookup, n = 1):
 def chkDeployAutoscripts(card): # This function is called whenever a card is deployed to check if any other cards on the table will trigger from it
    if re.search(r'Mentat', card.Subtype): autoscriptOtherPlayers('DeployedMentat')
    if re.search(r'Equipment', card.Subtype): autoscriptOtherPlayers('DeployedEquipment')
+   if re.search(r'Holding', card.Type): autoscriptOtherPlayers('DeployedHolding')
