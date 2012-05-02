@@ -1092,8 +1092,8 @@ def useAbility(card, x = 0, y = 0, action = ''):
    elif not Automation or card.Autoscript == "": 
       engage(card) # If card is face up but has no autoscripts or automation is disabled, just engage/disengage it.
       return
+   ### Checking if card has multiple autoscript options and providing choice to player.
    Autoscripts = card.AutoScript.split('||')
-#   notify('Autoscripts = {}'.format(Autoscripts)) # Debug
    if len(Autoscripts) > 1: 
       abilConcat = "This card has multiple abilities. Which one would you like to use?\n\n" # We start a concat which we use in our confirm window.
       for idx in range(len(Autoscripts)): # If a card has multiple abilities, we go through each of them to create a nicely written option for the player.
@@ -1101,7 +1101,8 @@ def useAbility(card, x = 0, y = 0, action = ''):
          abilConcat += '{}: {} {} {}'.format(idx, abilRegex.group(1), abilRegex.group(2), abilRegex.group(3)) # We add the first three groups to the concat. Those groups are always Gain/Hoard/Prod ## Favo/Solaris/Spice
          if abilRegex.lastindex == 4: # If the autoscript has a fourth group, then it means it has subconditions. Such as "per Holding" or "by Rival"
             subconditions = abilRegex.group(4).split('-') # These subconditions are always separated by dashes "-", so we use them to split the string
-            for idx2 in range(len(subconditions)): abilConcat += ' {}'.format(subconditions[idx2]) #  Then we iterate through each distinct subcondition and display it without the dashes between them. (In the future I may also add whitespaces between the distinct words)
+            for idx2 in range(len(subconditions)): 
+               abilConcat += ' {}'.format(subconditions[idx2]) #  Then we iterate through each distinct subcondition and display it without the dashes between them. (In the future I may also add whitespaces between the distinct words)
          abilConcat += '\n' # Finally add a newline at the concatenated string for the next ability to be listed.
       abilChoice = len(Autoscripts) + 1 # Since we want a valid choice, we put the choice in a loop until the player exists or selects a valid one.
       while abilChoice >= len(Autoscripts):
@@ -1109,9 +1110,21 @@ def useAbility(card, x = 0, y = 0, action = ''):
          if abilChoice == None: return # If the player closed the window, abort.
       activeAutoscript = Autoscripts[abilChoice] # If a valid choice is given, choose the autoscript at the list index the player chose.
    else: activeAutoscript = Autoscripts[0]
-#   notify('Autoscript is {}'.format(activeAutoscript)) # Debug
    actionCost = re.match(r"C([ES0])", activeAutoscript)
-#   notify("Cost is {}".format(actionCost.group(1))) # Debug
+   ### Checking if the card effect requires a target first
+   targetC = None
+   if re.search(r'Targetted', activeAutoscript):
+      for targetLookup in table:
+         #notify("checking {}".format(targetLookup)) # debug
+         if targetLookup.targetedBy and targetLookup.targetedBy == me: 
+            #notify("Found") # debug
+            targetC = targetLookup
+            break
+      #notify("Checking Target exists") # debug
+      if targetC == None: 
+         whisper("You need to target a card before using this action")
+         return
+   ### Checking the activation cost and preparing a relevant string for the announcement
    if actionCost.group(1) == 'E':
       if card.orientation == Rot90: 
          whisper("You must engage to take this action. Please disengage the card first and try again")
@@ -1123,13 +1136,14 @@ def useAbility(card, x = 0, y = 0, action = ''):
       card.isFaceUp = False
       costText = '{} subdues {} to'.format(card.controller, card)
    else: costText = '{} activates {} to'.format(card.controller, card)
-
-   if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText, card.owner, manual = True)
+   ### Calling the relevant function depending on if we're increasing our own counters, the hoard's or putting card markers.
+   if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText, card.owner, manual = True, targetCard = targetC)
    elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText)
    elif re.search(r'Prod([0-9]+)', activeAutoscript): ProdX(activeAutoscript, costText, card)
+   elif re.search(r'Transfer([0-9]+)', activeAutoscript): TransferX(activeAutoscript, costText, card, targetC)
    else: engage(card, alreadyDone = True)
    
-def GainX(Autoscript, costText, owner, n = 1, manual = False):
+def GainX(Autoscript, costText, owner, n = 1, manual = False, targetCard = None):
 # n is used when other scripts are calling this variable, to automatically provide the generated result to the counters of another player owning a specific card.
 # For example if one player owns a card that produces one Solaris per Spice produced in a desert, and another player produces 3 spice with a Spice Blow event...
 # ...then the other script will call this one, giving an n of 3. If no n is passed, the multiplier will be 1, which will do nothing.
@@ -1149,7 +1163,7 @@ def GainX(Autoscript, costText, owner, n = 1, manual = False):
                            if re.search('Desert', c.Subtype)
                               or re.search('Spice Harvester', c.name)
                               or re.search('Carryall', c.name)]
-         multiplier = len(spiceProducers) * onlyRival(Autoscript, owner, manual)
+         multiplier = len(spiceProducers) * onlyRival(Autoscript, owner, False) # We send False to the manual variable, because we don't want it to give 1 solaris when nobody has any production
       if per.group(1) == 'CROE': gain = shared.CROE
       else: multiplier = num(n) * onlyRival(Autoscript, owner, manual) # All non-special-rules per requests use this formula.
                                                                        # There is an n provided to multiply the solaris with, and they may only work with a rival's cards.
@@ -1185,6 +1199,27 @@ def ProdX(Autoscript, costText, card):
    notify("{} produce {} spice assigned to it".format(costText,action.group(1)))
    autoscriptOtherPlayers('SpiceGenerated',num(action.group(1)))
 
+def TransferX(Autoscript, costText, card, targetCard = None):
+   breakadd = 1
+   action = re.search(r'Transfer([0-9]+)Spice-to(Owner|Hoard|Discard)', Autoscript)
+   for transfer in range(num(action.group(1))):
+      if targetCard.markers[Spice] > 0: 
+         targetCard.markers[Spice] -= 1
+         if action.group(2) == 'Owner': 
+            card.owner.Spice += 1
+            destination = "{}'s hoard.".format(card.owner)
+         elif action.group(2) == 'Hoard': 
+            shared.Spice += 1
+            destination = "the Guild Hoard."
+         elif action.group(2) == 'Discard': destination = "the Discard Pile." # If the tokens are discarded, do nothing
+      else: 
+         breakadd -= 1 # We decrease the transfer variable by one, to make sure we announce the correct total.
+         break # If there's no more tokens to transfer, break out of the loop.
+   if action.group(2) == 'Hoard': 
+      shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
+      destination += 'The new total is {} and the CROE is set at {}.'.format(shared.counters['Guild Hoard'].value, shared.CROE)
+   notify("{} transfer {} spice to {}".format(costText, transfer + breakadd, destination))
+   
 def autoscriptOtherPlayers(lookup, n = 1):
 # This function is called from other functions in order to go through the table and see if other players have any cards which would be activated by it.
 # For example a card that would produce solaris whenever a desert was engaged. I would have the engage() function call autoscriptOtherPlayers('DesertEngaged')
