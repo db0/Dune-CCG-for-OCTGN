@@ -53,7 +53,7 @@ favorBought = 0
 CHOAMDone = 0
 DeployedDuneEvent = 0
 DeployedImperiumEvent = 0
-allegiances =['','','',''] # List to keep track of the player's allegiances.
+allegiances =[] # List to keep track of the player's allegiances.
 totalevents = 0 # Variable to allow me to move events a bit to avoid hiding on top of exitisting ones.
 totalprogs = 0 # Variable to allow me to move programs a bit to avoid hiding on top of exitisting ones.
 totalholdings = 0
@@ -273,7 +273,6 @@ def Homeworlds(): # This function goes through your cards on the table and looks
 
 def noteAllegiances(): # This function checks every card in the Imperial Deck and makes a list of all the available allegiances.
    global allegiances # A global list that will containing all the allegiances existing in a player's deck.
-   p = 1 # pointer for the list
    for card in me.piles['Imperial Deck']: 
       # Ugly hack follows. We need to move each card in the discard pile and then back into the deck because OCTGN won't let us peek at cards in facedown decks.
       card.moveTo(me.piles['Imperial Discard']) # Put the card in the discard pile in order to make its properties visible to us.
@@ -283,8 +282,7 @@ def noteAllegiances(): # This function checks every card in the Imperial Deck an
          whisper("Dune found in your Imperial Deck. Discarding. Please remove Dune from your Imperial Deck during deck construction!")
          continue
       if card.Allegiance not in allegiances and card.Allegiance != 'None' and card.Allegiance != '': # If the allegiance is not neutral and not in our list already...
-         allegiances[p] = card.Allegiance                                     # Then add it at the next available position
-         p += 1
+         allegiances.append(card.Allegiance)                                     # Then add it at the next available position
       card.moveToBottom(me.piles['Imperial Deck'])
    if chkAdversaries() != 'OK':
       notify("Faction Adversaries found within {}'s Deck. Deck seems to be illegal!".format(me))
@@ -447,6 +445,7 @@ def placeBid(group, x = 0, y = 0):
             placeCard(card, "Deploy{}".format(card.Type)) # We deploy the card depending on its type.
             assemblyCards.remove(card) # Remove the deployed card from the list of assembly cards
             card.orientation = Rot90
+            chkDeployAutoscripts(card)
          else: # If we're a contesting player...
             ContestCost = highestbid - num(card.properties['Deployment Cost'])
             FavorLost = 0
@@ -576,20 +575,24 @@ def subdue(card, x = 0, y = 0):
         elif searchNatives(subtype) == 'NOK': return # Check if the card is a native persona and if there's any dune fiefs in our control. If so, abort this function after a confirm.
         elif card.markers[Deferment_Token] == 0 and cost > 0:
             if confirm("You cannot normally deploy cards with 0 deferment tokens. Bypass?"):
-	            notify("{} deploys {} which had 0 deferment tokens.".format(me, card))   
-	            card.isFaceUp = True
+               notify("{} deploys {} which had 0 deferment tokens.".format(me, card))   
+               card.isFaceUp = True
+               chkDeployAutoscripts(card)
         elif card.markers[Deferment_Token] < cost:
             if confirm("Card has less deferment tokens than its deployment cost. Do you need to automatically pay the difference remaining from your treasury?"):
                 if payCost(cost - card.markers[Deferment_Token]) == 'OK':
                     card.isFaceUp = True
+                    chkDeployAutoscripts(card)
                     notify("{} pays {} and deploys {}.".format(me, cost - card.markers[Deferment_Token], card))
                     card.markers[Deferment_Token] = 0
             elif confirm("Do you want to deploy the card at no cost instead?"):
                 card.isFaceUp = True
+                chkDeployAutoscripts(card)
                 notify("{} deploys {} at no cost (Card had {} less deferment tokens than its deployment cost).".format(me, card, cost - card.markers[Deferment_Token]))
-                card.markers[Deferment_Token] = 0            
+                card.markers[Deferment_Token] = 0
         else:
             card.isFaceUp = True
+            chkDeployAutoscripts(card)
             notify("{} deploys {}.".format(me, card))
             card.markers[Deferment_Token] = 0
             if re.search(r'Program', card.Subtype) and card.Type == 'Plan': inactiveProgram[card] = False
@@ -952,7 +955,8 @@ def play(card, x = 0, y = 0):
       if payCost(card.properties['Deployment Cost'], loud) == 'OK':# Take cost out of the bank, if there is any.
          card.moveToTable(0, 0 - yaxisMove(card))
          notify("{} plays {} from their hand.".format(me, card))
-
+   chkDeployAutoscripts(card)
+ 
 def setup(group = me.hand, x= 0, y = 0):
 # This function is usually the first one the player does. It will setup their homeworld on their side of the table. 
 # It will also shuffle their decks, setup their Assembly and Dune and draw 7 cards for them.
@@ -969,7 +973,7 @@ def setup(group = me.hand, x= 0, y = 0):
       for card in group: # For every card in the player's hand... (which should be just their homeworld and possibly some plans)
          if re.search(r'Homeworld', card.Subtype) and card.Type == 'Holding':  # If it's the homeworld...
             placeCard(card,'SetupHomeworld')
-            allegiances[0] = card.Allegiance # We make a note of the Allegiance the player is playing this time (used later for automatically losing favour)
+            allegiances.append(card.Allegiance) # We make a note of the Allegiance the player is playing this time (used later for automatically losing favour)
          if re.search(r'Program', card.Subtype) and card.Type == 'Plan':  # If it's a program...
             if payCost(1) == 'OK': # Pay the cost of the program
                placeCard(card,'SetupProgram')
@@ -1104,12 +1108,12 @@ def useAbility(card, x = 0, y = 0, action = ''):
       costText = '{} subdues {} to'.format(card.controller, card)
    else: costText = '{} activates {} to'.format(card.controller, card)
 
-   if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText, card.owner)
+   if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText, card.owner, manual = True)
    elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText)
    elif re.search(r'Prod([0-9]+)', activeAutoscript): ProdX(activeAutoscript, costText, card)
    else: engage(card, alreadyDone = True)
    
-def GainX(Autoscript, costText, owner, n = 1):
+def GainX(Autoscript, costText, owner, n = 1, manual = False):
 # n is used when other scripts are calling this variable, to automatically provide the generated result to the counters of another player owning a specific card.
 # For example if one player owns a card that produces one Solaris per Spice produced in a desert, and another player produces 3 spice with a Spice Blow event...
 # ...then the other script will call this one, giving an n of 3. If no n is passed, the multiplier will be 1, which will do nothing.
@@ -1122,7 +1126,7 @@ def GainX(Autoscript, costText, owner, n = 1):
    if duneXtra and DuneFiefs(True) == 1: # If the autoscript includes extra cost for controlling Dune, and we contol Dune...
       extraText = ' ({} + {} for controlling Dune)'.format(action.group(1),duneXtra.group(1))
       gain += num(duneXtra.group(1))
-   per = re.search(r'per([A-Za-z]+)[-]?', Autoscript)   
+   per = re.search(r'per([A-Za-z]+)[-]?', Autoscript)  
    if per:
       if per.group(1) == 'SpiceProducer':
          spiceProducers = [c for c in table
@@ -1131,9 +1135,14 @@ def GainX(Autoscript, costText, owner, n = 1):
                               or re.search('Carryall', c.name))
                            and c.controller != me]
          multiplier = len(spiceProducers)
-      if per.group(1) == 'SpiceGenerated':
-         multiplier = num(n)
+      if per.group(1) == 'SpiceGenerated': multiplier = num(n)
+      if per.group(1) == 'CROE': gain = shared.CROE
+      if per.group(1) == 'FavorBought': multiplier = num(n) * onlyRival(Autoscript, owner, manual)
+      if per.group(1) == 'DesertEngaged': pass # This is handled in the engage() function better.
+      if per.group(1) == 'DeployedMentat': multiplier *= onlyRival(Autoscript, owner, manual) # This is usually called from playCard()
+      if per.group(1) == 'DeployedEquipment': multiplier *= onlyRival(Autoscript, owner, manual) # Same as above
 #      notify('per is: {}'.format(per.group(1))) # Debug
+   if multiplier == 0: return # If nothing is to be gained afterall, don't announce it.
    if action.group(2) == 'Solaris': owner.Solaris += gain * multiplier
    elif action.group(2) == 'Spice': owner.Spice += gain * multiplier
    elif action.group(2) == 'Favor': owner.Favor += gain * multiplier
@@ -1141,7 +1150,15 @@ def GainX(Autoscript, costText, owner, n = 1):
       whisper("Gain what?! (Bad autoscript)")
       return
    notify("{} gain {} {}{}.".format(costText, gain * multiplier, action.group(2),extraText))
-   
+
+def onlyRival(Autoscript, owner, manual):
+# Function returns 1 if the card is not only for rivals, or if it is for rivals and the card being activated it not ours.
+# This is then multiplied by the multiplier, which means that if the card activated only works for Rival's cards, our cards will have a 0 gain.
+# This will probably make no sense when I read it in 10 years...
+   byRival = re.search(r'byRival', Autoscript)
+   if not byRival or (byRival and owner != me) or manual: return 1
+   else: return 0
+      
 def HoardX(Autoscript, costText):
    action = re.search(r'Hoard([0-9]+)Spice', Autoscript)
    shared.counters['Guild Hoard'].value += num(action.group(1))
@@ -1160,8 +1177,17 @@ def ProdX(Autoscript, costText, card):
 def autoscriptOtherPlayers(lookup, n = 1):
 # This function is called from other functions in order to go through the table and see if other players have any cards which would be activated by it.
 # For example a card that would produce solaris whenever a desert was engaged. I would have a
+   if not Automation: return # If automations have been disabled, do nothing.
    for card in table:
+      if not card.isFaceUp: continue # Don't take into accounts cards that are subdued but we've peeked at them.
       costText = '{} activates {} to'.format(card.controller, card)
       if re.search(r'{}'.format(lookup), card.AutoScript):
          if lookup == 'SpiceGenerated': GainX(card.AutoScript, costText, card.owner, n)
          if lookup == 'DesertEngaged': GainX(card.AutoScript, costText, card.owner)
+         if lookup == 'DeployedMentat': GainX(card.AutoScript, costText, card.owner)
+         if lookup == 'DeployedEquipment': GainX(card.AutoScript, costText, card.owner)
+         if lookup == 'FavorBought': GainX(card.AutoScript, costText, card.owner, n)
+
+def chkDeployAutoscripts(card): # This function is called whenever a card is deployed to check if any other cards on the table will trigger from it
+   if re.search(r'Mentat', card.Subtype): autoscriptOtherPlayers('DeployedMentat')
+   if re.search(r'Equipment', card.Subtype): autoscriptOtherPlayers('DeployedEquipment')
