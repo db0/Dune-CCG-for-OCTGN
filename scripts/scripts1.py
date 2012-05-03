@@ -899,7 +899,7 @@ def discard(cards, x = 0, y = 0): # Discard a card.
    mute()
    for card in cards: # Can be done at more than one card at the same time, since attached cards follow their parent always.
       cardowner = card.owner
-      card.isFaceUp == True: chkRemoveAutoscripts(card) # We run the removal scripts only if the card was deployed.
+      if card.isFaceUp: chkRemoveAutoscripts(card) # We run the removal scripts only if the card was deployed.
       card.isFaceUp = True
       if card in assemblyCards: assemblyCards.remove(card)
       if card.Decktype == 'Imperial': card.moveTo(cardowner.piles['Imperial Discard'])
@@ -1101,12 +1101,15 @@ def useAbility(card, x = 0, y = 0):
    ### Checking if card has multiple autoscript options and providing choice to player.
    Autoscripts = card.AutoScript.split('||')
    if len(Autoscripts) > 1: 
-      abilConcat = "This card has multiple abilities. Which one would you like to use?\n\n" # We start a concat which we use in our confirm window.
+      abilConcat = "This card has multiple abilities.\nWhich one would you like to use?\n\n" # We start a concat which we use in our confirm window.
       for idx in range(len(Autoscripts)): # If a card has multiple abilities, we go through each of them to create a nicely written option for the player.
-         abilRegex = re.search(r"C[ES0]:([A-Za-z]+)([0-9]+)([A-Za-z]+)-?([A-Za-z-]*)", Autoscripts[idx]) # This regexp returns 3-4 groups, which we then reformat and put in the confirm dialogue in a better readable format.
-         abilConcat += '{}: {} {} {}'.format(idx, abilRegex.group(1), abilRegex.group(2), abilRegex.group(3)) # We add the first three groups to the concat. Those groups are always Gain/Hoard/Prod ## Favo/Solaris/Spice
-         if abilRegex.lastindex == 4: # If the autoscript has a fourth group, then it means it has subconditions. Such as "per Holding" or "by Rival"
-            subconditions = abilRegex.group(4).split('-') # These subconditions are always separated by dashes "-", so we use them to split the string
+         abilRegex = re.search(r"C([ES0]):([A-Za-z]+)([0-9]+)([A-Za-z]+)-?([A-Za-z-]*)", Autoscripts[idx]) # This regexp returns 3-4 groups, which we then reformat and put in the confirm dialogue in a better readable format.
+         if abilRegex.group(1) == 'E': abilCost = 'Engage to'
+         elif abilRegex.group(1) == 'E': abilCost = 'Subdue to'
+         else: abilCost = ''
+         abilConcat += '{}: {} {} {} {}'.format(idx, abilCost, abilRegex.group(2), abilRegex.group(3), abilRegex.group(4)) # We add the first three groups to the concat. Those groups are always Gain/Hoard/Prod ## Favo/Solaris/Spice
+         if abilRegex.lastindex == 5: # If the autoscript has a fourth group, then it means it has subconditions. Such as "per Holding" or "by Rival"
+            subconditions = abilRegex.group(5).split('-') # These subconditions are always separated by dashes "-", so we use them to split the string
             for idx2 in range(len(subconditions)): 
                abilConcat += ' {}'.format(subconditions[idx2]) #  Then we iterate through each distinct subcondition and display it without the dashes between them. (In the future I may also add whitespaces between the distinct words)
          abilConcat += '\n' # Finally add a newline at the concatenated string for the next ability to be listed.
