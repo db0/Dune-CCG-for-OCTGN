@@ -1246,13 +1246,7 @@ def TransferX(Autoscript, costText, card, targetCard = None):
       shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
       destination += 'The new total is {} and the CROE is set at {}.'.format(shared.counters['Guild Hoard'].value, shared.CROE)
    if transfer: notify("{} transfer {} spice from {} to {}".format(costText, transfer + breakadd, targetCard, destination))
-   else: 
-      whisper("There was nothing to transfer. Undoing action...")
-      actionCost = re.match(r"C([ES0])", Autoscript)
-      if actionCost.group(1) == 'E': 
-         random = rnd(10,5000) # Need to wait a bit or card is left engaged but program thinks it's not o.O
-         card.orientation = Rot0
-      if actionCost.group(1) == 'S': card.isFaceUp = True
+   else: autoscriptCostUndo(Autoscript, card)
    
 def TokensX(Autoscript, costText, card, targetCard = None):
    if not targetCard: targetCard = card # If there's been to target card given, assume the target is the card itself.
@@ -1272,12 +1266,23 @@ def TokensX(Autoscript, costText, card, targetCard = None):
 
 def ModifyStatus(Autoscript, costText, card = None, targetCard = None):
    action = re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', Autoscript)
-   if action.group(1) == 'Engage': targetCard.orientation = Rot90
-   if action.group(1) == 'Disengage': targetCard.orientation = 0
-   if action.group(1) == 'Subdue': targetCard.isFaceUp = False
-   if action.group(1) == 'Deploy': targetCard.isFaceUp = True
-   if action.group(1) == 'Discard': whisper(":::Note::: No automatic discard action is taken. Please ask the owner of the card to do take this action themselves.")
+   if action.group(1) == 'Engage' and targetCard.orientation == Rot0 : targetCard.orientation = Rot90
+   elif action.group(1) == 'Disengage'and targetCard.orientation == Rot90: targetCard.orientation = 0
+   elif action.group(1) == 'Subdue' and targetCard.isFaceUp: targetCard.isFaceUp = False
+   elif action.group(1) == 'Deploy' and not targetCard.isFaceUp: targetCard.isFaceUp = True
+   elif action.group(1) == 'Discard': whisper(":::Note::: No automatic discard action is taken. Please ask the owner of the card to do take this action themselves.")
+   else: 
+      autoscriptCostUndo(Autoscript, card)
+      return
    notify('{} {} {}.'.format(costText, action.group(1), targetCard))
+   
+def autoscriptCostUndo(Autoscript, card):
+   whisper("There was nothing to transfer. Undoing action...")
+   actionCost = re.match(r"C([ES0])", Autoscript)
+   if actionCost.group(1) == 'E': 
+      for i in range(10): random = rnd(10,10000) # Need to wait a bit or card is left engaged but program thinks it's not o.O
+      card.orientation = Rot0
+   if actionCost.group(1) == 'S': card.isFaceUp = True
    
 def per(Autoscript, card = None, n = 1, manual = False): # This function goes through the autoscript and looks for the words "per<Something>". Then figures out what the card multiplies its effect with, and returns the appropriate multiplier.
    per = re.search(r'per([A-Za-z]+)[-]?', Autoscript) # We're searching for the word per, and grabbing all after that, until the first dash "-" as the variable.
