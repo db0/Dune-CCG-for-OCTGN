@@ -76,6 +76,10 @@ def num (s):
    except ValueError:
       return 0
 
+def addPos(num): # Quick function to add a + next to prositive numbers
+   if num > 0: return '+{}'.format(num)
+   else: return num
+
 def chooseSide(): # Called from many functions to check if the player has chosen a side for this game.
    mute()
    global PLS, playeraxis
@@ -556,6 +560,7 @@ def subdue(card, x = 0, y = 0):
     if card.markers[Assembly] == 0:
         if card.isFaceUp:
             notify("{} subdues {}.".format(me, card))
+            chkRemoveAutoscripts(card)
             card.isFaceUp = False
         elif type == 'Event': # Events have special deployment rules
             if card.markers[Deferment_Token] < cost or card.markers[Deferment_Token] == 0:
@@ -894,6 +899,7 @@ def discard(cards, x = 0, y = 0): # Discard a card.
    mute()
    for card in cards: # Can be done at more than one card at the same time, since attached cards follow their parent always.
       cardowner = card.owner
+      card.isFaceUp == True: chkRemoveAutoscripts(card) # We run the removal scripts only if the card was deployed.
       card.isFaceUp = True
       if card in assemblyCards: assemblyCards.remove(card)
       if card.Decktype == 'Imperial': card.moveTo(cardowner.piles['Imperial Discard'])
@@ -1084,13 +1090,13 @@ def mill(group):
 # Autoscripts 
 #------------------------------------------------------------------------------
 
-def useAbility(card, x = 0, y = 0, action = ''):
+def useAbility(card, x = 0, y = 0):
    mute()
    if card.markers[Assembly] == 1 or not card.isFaceUp: # If card is face down or assembly, assume they wanted to deploy it.
       subdue(card)
       return
-   elif not Automation or card.Autoscript == "": 
-      engage(card) # If card is face up but has no autoscripts or automation is disabled, just engage/disengage it.
+   elif not Automation or card.Autoscript == "" or re.search(r'WhileDeployed', card.Autoscript): 
+      engage(card) # If card is face up but has no autoscripts, or automation is disabled, or it just has a "WhileDeployed" effect, just engage/disengage it.
       return
    ### Checking if card has multiple autoscript options and providing choice to player.
    Autoscripts = card.AutoScript.split('||')
@@ -1110,7 +1116,6 @@ def useAbility(card, x = 0, y = 0, action = ''):
          if abilChoice == None: return # If the player closed the window, abort.
       activeAutoscript = Autoscripts[abilChoice] # If a valid choice is given, choose the autoscript at the list index the player chose.
    else: activeAutoscript = Autoscripts[0]
-   actionCost = re.match(r"C([ES0])", activeAutoscript)
    ### Checking if the card effect requires a target first
    targetC = None
    if re.search(r'Targetted', activeAutoscript):
@@ -1125,6 +1130,7 @@ def useAbility(card, x = 0, y = 0, action = ''):
          whisper("You need to target a card before using this action")
          return
    ### Checking the activation cost and preparing a relevant string for the announcement
+   actionCost = re.match(r"C([ES0])", activeAutoscript)
    if actionCost.group(1) == 'E':
       if card.orientation == Rot90: 
          whisper("You must engage to take this action. Please disengage the card first and try again")
@@ -1255,3 +1261,22 @@ def chkDeployAutoscripts(card): # This function is called whenever a card is dep
    if re.search(r'Mentat', card.Subtype): autoscriptOtherPlayers('DeployedMentat')
    if re.search(r'Equipment', card.Subtype): autoscriptOtherPlayers('DeployedEquipment')
    if re.search(r'Holding', card.Type): autoscriptOtherPlayers('DeployedHolding')
+   if re.search(r'WhileDeployed', card.AutoScript): whileDeployedEffects(card)
+
+def chkRemoveAutoscripts(card): # This function is called whenever a card is subdued or otherwise leaves active play, to check if any effects on it need to be reversed.
+   if re.search(r'WhileDeployed', card.AutoScript): whileDeployedEffects(card, 'Remove')
+   
+def whileDeployedEffects(card, action='Deploy'):
+   global handsize, assemblysize
+   effect = re.search(r'WhileDeployed:Gain([0-9]+)(AssemblyLimit|HandSize)', card.Autoscript)
+   if action == 'Deploy': 
+      effectNR = num(effect.group(1))
+   else: effectNR = -num(effect.group(1))
+   if effect.group(2) == 'AssemblyLimit': 
+      assemblysize += effectNR
+      affectedText = 'Assembly Limit'
+   if effect.group(2) == 'HandSize': 
+      handsize += effectNR
+      affectedText = 'Hand Size'
+   notify("{} has modified their {} by {}".format(me, affectedText, addPos(effectNR)))
+
