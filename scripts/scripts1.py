@@ -1121,14 +1121,14 @@ def useAbility(card, x = 0, y = 0):
    else: activeAutoscript = Autoscripts[0]
    ### Checking if the card effect requires a target first
    targetC = None
-   if re.search(r'Targetted', activeAutoscript):
+   if re.search(r'Targeted', activeAutoscript):
       invalidTargets = [] # a variable that holds any type that a card must not be to be valid
-      whatTarget = re.search(r'on([A-Za-z_]+)[-]?', activeAutoscript)
+      whatTarget = re.search(r'on([A-Za-z_]+)[-]?', activeAutoscript) # We signify target restrictions keywords by starting a string with "or"
       if whatTarget: validTargets = whatTarget.group(1).split('_or_') # If we have a list of valid targets, split them into a list, separated by the string "_or_". Usually this results in a list of 1 item.
       for chkTarget in validTargets: # Now we go through each list item and see if it has more than one condition (Eg, non-desert fief)
-         if re.search(r'_and_', chkTarget): 
-            multiConditionTargets = chkTarget.split('_and_')
-            for chkCondition in multiConditionTargets:
+         if re.search(r'_and_', chkTarget):  # If there's a string "_and_" between our restriction keywords, then this keyword has mutliple conditions
+            multiConditionTargets = chkTarget.split('_and_') # We put all the mutliple conditions in a new list, separating each element.
+            for chkCondition in multiConditionTargets: 
                invalidCondition = re.search(r'non([A-Za-z]+)', chkCondition) # Do a search to see if in the multicondition targets there's one with "non" in front
                if invalidCondition: invalidTargets.append(invalidCondition.group(1)) # If there is, move it without the "non" into the invalidTargets list.
                else: validTargets.append(chkCondition) # Else just move the individual condition to the end if validTargets list
@@ -1137,9 +1137,9 @@ def useAbility(card, x = 0, y = 0):
             if re.match(r'non', chkTarget): # If the keyword has "non" in front, it means it's something we need to avoid, so we move it to a different list.
                invalidTargets.append(chkTarget)
                validTargets.remove(chkTarget)
-      for targetLookup in table:
-         if targetLookup.targetedBy and targetLookup.targetedBy == me:
-            if len(validTargets) == 0: targetC = targetLookup # If we have no target restrictions, any selected card will do.
+      for targetLookup in table: # Now that we have our list of restrictions, we go through each targeted card on the table to check if it matches.
+         if targetLookup.targetedBy and targetLookup.targetedBy == me: # The card needs to be targeted by the player.
+            if len(validTargets) == 0: targetC = targetLookup # If we have no target restrictions, any targeted  card will do.
             else:
                for validtargetCHK in validTargets: # look if the card we're going through matches our valid target checks
                   if re.search(r'{}'.format(validtargetCHK), targetLookup.Type) or re.search(r'{}'.format(validtargetCHK), targetLookup.Subtype):
