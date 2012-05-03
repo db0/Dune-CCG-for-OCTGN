@@ -1146,19 +1146,18 @@ def useAbility(card, x = 0, y = 0):
       costText = '{} subdues {} to'.format(card.controller, card)
    else: costText = '{} activates {} to'.format(card.controller, card)
    ### Calling the relevant function depending on if we're increasing our own counters, the hoard's or putting card markers.
-   if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText, card.owner, manual = True, targetCard = targetC)
-   elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText)
+   if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText, card, manual = True, targetCard = targetC)
+   elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText, card)
    elif re.search(r'Prod([0-9]+)', activeAutoscript): ProdX(activeAutoscript, costText, card)
    elif re.search(r'Transfer([0-9]+)', activeAutoscript): TransferX(activeAutoscript, costText, card, targetC)
-   elif re.search(r'(Assign|Remove)([0-9]+)(Deferment|Spice|Program)', activeAutoscript): TokensX(activeAutoscript, costText, card, targetC)
+   elif re.search(r'(Assign|Remove)([0-9]+)', activeAutoscript): TokensX(activeAutoscript, costText, card, targetC)
    else: engage(card, alreadyDone = True)
    
-def GainX(Autoscript, costText, owner, n = 1, manual = False, targetCard = None):
+def GainX(Autoscript, costText, card, n = 1, manual = False, targetCard = None):
 # n is used when other scripts are calling this variable, to automatically provide the generated result to the counters of another player owning a specific card.
 # For example if one player owns a card that produces one Solaris per Spice produced in a desert, and another player produces 3 spice with a Spice Blow event...
 # ...then the other script will call this one, giving an n of 3. If no n is passed, the multiplier will be 1, which will do nothing.
    gain = 0
-   multiplier = 1 # We only modify this is the card gives spice per a specific number
    extraText = ''
    action = re.search(r'Gain([0-9]+)(Solaris|Spice|Favor)', Autoscript) # First see if we're gaining Solaris, Spice or Favour and how much.
    gain += num(action.group(1))
@@ -1166,23 +1165,10 @@ def GainX(Autoscript, costText, owner, n = 1, manual = False, targetCard = None)
    if duneXtra and DuneFiefs(True) == 1: # If the autoscript includes extra cost for controlling Dune, and we contol Dune...
       extraText = ' ({} + {} for controlling Dune)'.format(action.group(1),duneXtra.group(1))
       gain += num(duneXtra.group(1))
-   per = re.search(r'per([A-Za-z]+)[-]?', Autoscript) # We're searching if the card gives Solaris per something else.
-   if per:
-      if per.group(1) == 'SpiceProducer':
-         spiceProducers = [c for c in table
-                           if re.search('Desert', c.Subtype)
-                           or re.search('Spice Harvester', c.name)
-                           or re.search('Carryall', c.name)]
-         multiplier = len(spiceProducers) * onlyRival(Autoscript, owner, False) # We send False to the manual variable, because we don't want it to give 1 solaris when nobody has any production
-      elif per.group(1) == 'DuneFief':
-         duneFs = [c for c in table if re.search('Dune Fief', c.Subtype)]
-         multiplier = len(duneFs) * onlyRival(Autoscript, owner, False)
-      elif per.group(1) == 'CROE': gain = shared.CROE
-      else: multiplier = num(n) * onlyRival(Autoscript, owner, manual) # All non-special-rules per requests use this formula.
-                                                                       # There is an n provided to multiply the solaris with, and they may only work with a rival's cards.
-   if action.group(2) == 'Solaris': owner.Solaris += gain * multiplier
-   elif action.group(2) == 'Spice': owner.Spice += gain * multiplier
-   elif action.group(2) == 'Favor': owner.Favor += gain * multiplier
+   multiplier = per(Autoscript, card, n, manual) # We check if the card provides a gain based on something else, such as favour bought, or number of dune fiefs controlled by rivals.
+   if action.group(2) == 'Solaris': card.owner.Solaris += gain * multiplier
+   elif action.group(2) == 'Spice': card.owner.Spice += gain * multiplier
+   elif action.group(2) == 'Favor': card.owner.Favor += gain * multiplier
    else: 
       whisper("Gain what?! (Bad autoscript)")
       return
@@ -1196,16 +1182,17 @@ def onlyRival(Autoscript, owner, manual):
    if not byRival or (byRival and owner != me) or manual: return 1 #manual means that the actions was called by a player double clicking on the card. In which case we always do it.
    else: return 0
       
-def HoardX(Autoscript, costText):
+def HoardX(Autoscript, costText, card):
    action = re.search(r'Hoard([0-9]+)Spice', Autoscript)
-   shared.counters['Guild Hoard'].value += num(action.group(1))
+   multiplier = per(Autoscript, card)
+   shared.counters['Guild Hoard'].value += num(action.group(1)) * multiplier
    shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)   
-   notify("{} add {} Spice to the Guild Hoard. The Guild Hoard now has {} spice and the CROE is {}".format(costText, action.group(1), shared.counters['Guild Hoard'].value, shared.CROE))
+   notify("{} add {} Spice to the Guild Hoard. The Guild Hoard now has {} spice and the CROE is {}".format(costText, num(action.group(1)) * multiplier, shared.counters['Guild Hoard'].value, shared.CROE))
 
 def ProdX(Autoscript, costText, card):
    action = re.search(r'Prod([0-9]+)Spice', Autoscript)
    if not confirm('Do you want to produce spice on {}?\n\nPressing "No" will send it directly to the Guild Hoard instead'.format(card.name)):
-      HoardX('Hoard{}Spice'.format(action.group(1)), costText) # If we want to produce the spice to the hoard, we're going to use the HoardX() function, but we need to sent it a modified Autoscript.
+      HoardX('Hoard{}Spice'.format(action.group(1)), costText, card) # If we want to produce the spice to the hoard, we're going to use the HoardX() function, but we need to sent it a modified Autoscript.
       return
    card.markers[Spice] += num(action.group(1))
    notify("{} produce {} spice assigned to it".format(costText,action.group(1)))
@@ -1240,16 +1227,40 @@ def TokensX(Autoscript, costText, card, targetCard = None):
    else: 
       whisper("Wat Token? [Error in autoscript!]")
       return
-   per = re.search(r'per([A-Za-z]+)[-]?', Autoscript) # We're searching if the card gives Solaris per something else.
-   if per:
-      if per.group(1) == 'Intrigue': multiplier = num(card.Intrigue)
-   else: multiplier = 1
+   multiplier = per(Autoscript, card)
    if action.group(1) == 'Assign': modtokens = num(action.group(2)) * multiplier
    else: modtokens = -num(action.group(2)) * multiplier
    targetCard.markers[token] += modtokens
    notify("{} {} {} {} tokens to {}".format(costText, action.group(1), abs(modtokens), action.group(3), targetCard))
    autoscriptOtherPlayers('{}Generated'.format(action.group(3)),modtokens)
 
+def per(Autoscript, card = None, n = 1, manual = False): # This function goes through the autoscript and looks for the words "per<Something>". Then figures out what the card multiplies its effect with, and returns the appropriate multiplier.
+   per = re.search(r'per([A-Za-z]+)[-]?', Autoscript) # We're searching for the word per, and grabbing all after that, until the first dash "-" as the variable.
+   if per: # If the search was successful...
+      if per.group(1) == 'Intrigue': multiplier = num(card.Intrigue) 
+      elif per.group(1) == 'Arbitration': multiplier = num(card.Arbitration) 
+      elif per.group(1) == 'Battle': multiplier = num(card.Battle) 
+      elif per.group(1) == 'Dueling': multiplier = num(card.Dueling) 
+      elif per.group(1) == 'Weirding': multiplier = num(card.Weirding) 
+      elif per.group(1) == 'Prescience': multiplier = num(card.Prescience) 
+      elif per.group(1) == 'Resistance': multiplier = num(card.Resistance) 
+      elif per.group(1) == 'Command': multiplier = num(card.Command) 
+      elif per.group(1) == 'SpiceProducer':
+         spiceProducers = [c for c in table
+                           if re.search('Desert', c.Subtype)
+                           or re.search('Spice Harvester', c.name)
+                           or re.search('Carryall', c.name)]
+         multiplier = len(spiceProducers) * onlyRival(Autoscript, card.owner, False) # We send False to the manual variable, because we don't want it to give 1 solaris when nobody has any production
+      elif per.group(1) == 'DuneFief':
+         duneFs = [c for c in table if re.search('Dune Fief', c.Subtype)]
+         multiplier = len(duneFs) * onlyRival(Autoscript, card.owner, False)
+      elif per.group(1) == 'CROE': multiplier = shared.CROE
+      else: multiplier = num(n) * onlyRival(Autoscript, card.owner, manual) # All non-special-rules per<somcething> requests use this formula.
+                                                                            # Usually there is an n sent to this function (eg, number of favour purchased) with which to multiply the end result with
+                                                                            # and some cards may only work when a rival owns or does something.
+   else: multiplier = 1 # If the search was not successful, then return a mutliplier of 1.
+   return multiplier
+   
 def autoscriptOtherPlayers(lookup, n = 1):
 # This function is called from other functions in order to go through the table and see if other players have any cards which would be activated by it.
 # For example a card that would produce solaris whenever a desert was engaged. I would have the engage() function call autoscriptOtherPlayers('DesertEngaged')
@@ -1258,7 +1269,7 @@ def autoscriptOtherPlayers(lookup, n = 1):
       if not card.isFaceUp: continue # Don't take into accounts cards that are subdued but we've peeked at them.
       costText = '{} activates {} to'.format(card.controller, card) 
       if re.search(r'{}'.format(lookup), card.AutoScript): # Search if in the script of the card, the string that was sent to us exists. The sent string is decided by the function calling us, so for example the ProdX() function knows it only needs to send the 'SpiceGenerated' string.
-         GainX(card.AutoScript, costText, card.owner, n) # If it exists, then call the GainX() function, because cards that automatically do something when other players do something else, always give the player something directly.
+         GainX(card.AutoScript, costText, card, n) # If it exists, then call the GainX() function, because cards that automatically do something when other players do something else, always give the player something directly.
 
 def chkDeployAutoscripts(card): # This function is called whenever a card is deployed to check if any other cards on the table will trigger from it
    if re.search(r'Mentat', card.Subtype): autoscriptOtherPlayers('DeployedMentat')
@@ -1282,4 +1293,3 @@ def whileDeployedEffects(card, action='Deploy'):
       handsize += effectNR
       affectedText = 'Hand Size'
    notify("{} has modified their {} by {}".format(me, affectedText, addPos(effectNR)))
-
