@@ -1120,41 +1120,8 @@ def useAbility(card, x = 0, y = 0):
       activeAutoscript = Autoscripts[abilChoice] # If a valid choice is given, choose the autoscript at the list index the player chose.
    else: activeAutoscript = Autoscripts[0]
    ### Checking if the card effect requires a target first
-   targetC = None
-   if re.search(r'Targeted', activeAutoscript):
-      invalidTargets = [] # a variable that holds any type that a card must not be to be valid
-      whatTarget = re.search(r'on([A-Za-z_]+)[-]?', activeAutoscript) # We signify target restrictions keywords by starting a string with "or"
-      if whatTarget: validTargets = whatTarget.group(1).split('_or_') # If we have a list of valid targets, split them into a list, separated by the string "_or_". Usually this results in a list of 1 item.
-      for chkTarget in validTargets: # Now we go through each list item and see if it has more than one condition (Eg, non-desert fief)
-         if re.search(r'_and_', chkTarget):  # If there's a string "_and_" between our restriction keywords, then this keyword has mutliple conditions
-            multiConditionTargets = chkTarget.split('_and_') # We put all the mutliple conditions in a new list, separating each element.
-            for chkCondition in multiConditionTargets: 
-               invalidCondition = re.search(r'non([A-Za-z]+)', chkCondition) # Do a search to see if in the multicondition targets there's one with "non" in front
-               if invalidCondition: invalidTargets.append(invalidCondition.group(1)) # If there is, move it without the "non" into the invalidTargets list.
-               else: validTargets.append(chkCondition) # Else just move the individual condition to the end if validTargets list
-            validTargets.remove(chkTarget) # Finally, remove the multicondition keyword from the valid list. Its individual elements should now be on this list or the invalid targets one.
-         else:   
-            if re.match(r'non', chkTarget): # If the keyword has "non" in front, it means it's something we need to avoid, so we move it to a different list.
-               invalidTargets.append(chkTarget)
-               validTargets.remove(chkTarget)
-      for targetLookup in table: # Now that we have our list of restrictions, we go through each targeted card on the table to check if it matches.
-         if targetLookup.targetedBy and targetLookup.targetedBy == me: # The card needs to be targeted by the player.
-            if len(validTargets) == 0: targetC = targetLookup # If we have no target restrictions, any targeted  card will do.
-            else:
-               for validtargetCHK in validTargets: # look if the card we're going through matches our valid target checks
-                  if re.search(r'{}'.format(validtargetCHK), targetLookup.Type) or re.search(r'{}'.format(validtargetCHK), targetLookup.Subtype):
-                     targetC = targetLookup
-            if len(invalidTargets) > 0: # If we have no target restrictions, any selected card will do as long as it's a valid target.
-               for invalidtargetCHK in invalidTargets: # 
-                  if re.search(r'{}'.format(invalidtargetCHK), targetLookup.Type) or re.search(r'{}'.format(invalidtargetCHK), targetLookup.Subtype):
-                     targetC = None
-            if targetC: break
-      if targetC == None: 
-         targetsText = ''
-         if len(validTargets) > 0: targetsText += "\nValid Targets: {}.".format(validTargets)
-         if len(invalidTargets) > 0: targetsText += "\nInvalid Targets: {}.".format(invalidTargets)
-         whisper("You need to target a valid card before using this action{}".format(targetsText))
-         return
+   targetC = findTarget(activeAutoscript)
+   if re.search(r'Targeted', activeAutoscript) and not targetC: return
    ### Checking the activation cost and preparing a relevant string for the announcement
    actionCost = re.match(r"C([ES0])", activeAutoscript)
    if actionCost.group(1) == 'E':
@@ -1176,7 +1143,51 @@ def useAbility(card, x = 0, y = 0):
    elif re.search(r'(Assign|Remove)([0-9]+)', activeAutoscript): TokensX(activeAutoscript, costText, card, targetC)
    elif re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', activeAutoscript): ModifyStatus(activeAutoscript, costText, card, targetC)
    else: engage(card, alreadyDone = True)
-   
+
+def findTarget(Autoscript):
+   targetC = None
+   if re.search(r'Targeted', Autoscript):
+      validTargets = [] # a variable that holds any type that a card must be, in order to be a valid target.
+      invalidTargets = [] # a variable that holds any type that a card must not be to be a valid target.
+      whatTarget = re.search(r'on([A-Za-z_]+)[-]?', Autoscript) # We signify target restrictions keywords by starting a string with "or"
+      if whatTarget: validTargets = whatTarget.group(1).split('_or_') # If we have a list of valid targets, split them into a list, separated by the string "_or_". Usually this results in a list of 1 item.
+      for chkTarget in validTargets: # Now we go through each list item and see if it has more than one condition (Eg, non-desert fief)
+         if re.search(r'_and_', chkTarget):  # If there's a string "_and_" between our restriction keywords, then this keyword has mutliple conditions
+            multiConditionTargets = chkTarget.split('_and_') # We put all the mutliple conditions in a new list, separating each element.
+            for chkCondition in multiConditionTargets: 
+               invalidCondition = re.search(r'non([A-Za-z]+)', chkCondition) # Do a search to see if in the multicondition targets there's one with "non" in front
+               if invalidCondition: invalidTargets.append(invalidCondition.group(1)) # If there is, move it without the "non" into the invalidTargets list.
+               else: validTargets.append(chkCondition) # Else just move the individual condition to the end if validTargets list
+            validTargets.remove(chkTarget) # Finally, remove the multicondition keyword from the valid list. Its individual elements should now be on this list or the invalid targets one.
+         else:   
+            if re.match(r'non', chkTarget): # If the keyword has "non" in front, it means it's something we need to avoid, so we move it to a different list.
+               invalidTargets.append(chkTarget)
+               validTargets.remove(chkTarget)
+      for targetLookup in table: # Now that we have our list of restrictions, we go through each targeted card on the table to check if it matches.
+         if targetLookup.targetedBy and targetLookup.targetedBy == me: # The card needs to be targeted by the player.
+            if not targetLookup.isFaceUp: # If we've targeted a subdued card, we turn it temporarily face-up to grab its properties.
+               targetLookup.isFaceUp = True
+               wasSubdued = True
+            else: wasSubdued = False
+            if len(validTargets) == 0: targetC = targetLookup # If we have no target restrictions, any targeted  card will do.
+            else:
+               for validtargetCHK in validTargets: # look if the card we're going through matches our valid target checks
+                  if re.search(r'{}'.format(validtargetCHK), targetLookup.Type) or re.search(r'{}'.format(validtargetCHK), targetLookup.Subtype):
+                     targetC = targetLookup
+            if len(invalidTargets) > 0: # If we have no target restrictions, any selected card will do as long as it's a valid target.
+               for invalidtargetCHK in invalidTargets:  
+                  if re.search(r'{}'.format(invalidtargetCHK), targetLookup.Type) or re.search(r'{}'.format(invalidtargetCHK), targetLookup.Subtype):
+                     targetC = None
+            if wasSubdued: targetLookup.isFaceUp = False
+            if targetC: return targetC
+      if targetC == None: 
+         targetsText = ''
+         if len(validTargets) > 0: targetsText += "\nValid Targets: {}.".format(validTargets)
+         if len(invalidTargets) > 0: targetsText += "\nInvalid Targets: {}.".format(invalidTargets)
+         whisper("You need to target a valid card before using this action{}".format(targetsText))
+         return targetC
+   else: return targetC
+
 def GainX(Autoscript, costText, card, n = 1, manual = False, targetCard = None):
 # n is used when other scripts are calling this variable, to automatically provide the generated result to the counters of another player owning a specific card.
 # For example if one player owns a card that produces one Solaris per Spice produced in a desert, and another player produces 3 spice with a Spice Blow event...
@@ -1234,7 +1245,14 @@ def TransferX(Autoscript, costText, card, targetCard = None):
    if action.group(2) == 'Hoard': 
       shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
       destination += 'The new total is {} and the CROE is set at {}.'.format(shared.counters['Guild Hoard'].value, shared.CROE)
-   notify("{} transfer {} spice from {} to {}".format(costText, transfer + breakadd, targetCard, destination))
+   if transfer: notify("{} transfer {} spice from {} to {}".format(costText, transfer + breakadd, targetCard, destination))
+   else: 
+      whisper("There was nothing to transfer. Undoing action...")
+      actionCost = re.match(r"C([ES0])", Autoscript)
+      if actionCost.group(1) == 'E': 
+         random = rnd(10,5000) # Need to wait a bit or card is left engaged but program thinks it's not o.O
+         card.orientation = Rot0
+      if actionCost.group(1) == 'S': card.isFaceUp = True
    
 def TokensX(Autoscript, costText, card, targetCard = None):
    if not targetCard: targetCard = card # If there's been to target card given, assume the target is the card itself.
