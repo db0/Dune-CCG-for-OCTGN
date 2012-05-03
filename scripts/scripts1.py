@@ -1174,6 +1174,7 @@ def useAbility(card, x = 0, y = 0):
    elif re.search(r'Prod([0-9]+)', activeAutoscript): ProdX(activeAutoscript, costText, card)
    elif re.search(r'Transfer([0-9]+)', activeAutoscript): TransferX(activeAutoscript, costText, card, targetC)
    elif re.search(r'(Assign|Remove)([0-9]+)', activeAutoscript): TokensX(activeAutoscript, costText, card, targetC)
+   elif re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', activeAutoscript): ModifyStatus(activeAutoscript, costText, card, targetC)
    else: engage(card, alreadyDone = True)
    
 def GainX(Autoscript, costText, card, n = 1, manual = False, targetCard = None):
@@ -1215,6 +1216,7 @@ def ProdX(Autoscript, costText, card):
 
 def TransferX(Autoscript, costText, card, targetCard = None):
    breakadd = 1
+   if not targetCard: targetCard = card # If there's been to target card given, assume the target is the card itself.
    action = re.search(r'Transfer([0-9]+)Spice-to(Owner|Hoard|Discard)', Autoscript)
    for transfer in range(num(action.group(1))):
       if targetCard.markers[Spice] > 0: 
@@ -1235,6 +1237,7 @@ def TransferX(Autoscript, costText, card, targetCard = None):
    notify("{} transfer {} spice from {} to {}".format(costText, transfer + breakadd, targetCard, destination))
    
 def TokensX(Autoscript, costText, card, targetCard = None):
+   if not targetCard: targetCard = card # If there's been to target card given, assume the target is the card itself.
    action = re.search(r'(Assign|Remove)([0-9]+)(Deferment|Spice|Program)', Autoscript)
    if action.group(3) == 'Deferment' : token = Deferment_Token
    elif action.group(3) == 'Spice' : token = Spice
@@ -1249,6 +1252,15 @@ def TokensX(Autoscript, costText, card, targetCard = None):
    notify("{} {} {} {} tokens to {}".format(costText, action.group(1), abs(modtokens), action.group(3), targetCard))
    autoscriptOtherPlayers('{}Generated'.format(action.group(3)),modtokens)
 
+def ModifyStatus(Autoscript, costText, card = None, targetCard = None):
+   action = re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', Autoscript)
+   if action.group(1) == 'Engage': targetCard.orientation = Rot90
+   if action.group(1) == 'Disengage': targetCard.orientation = 0
+   if action.group(1) == 'Subdue': targetCard.isFaceUp = False
+   if action.group(1) == 'Deploy': targetCard.isFaceUp = True
+   if action.group(1) == 'Discard': whisper(":::Note::: No automatic discard action is taken. Please ask the owner of the card to do take this action themselves.")
+   notify('{} {} {}.'.format(costText, action.group(1), targetCard))
+   
 def per(Autoscript, card = None, n = 1, manual = False): # This function goes through the autoscript and looks for the words "per<Something>". Then figures out what the card multiplies its effect with, and returns the appropriate multiplier.
    per = re.search(r'per([A-Za-z]+)[-]?', Autoscript) # We're searching for the word per, and grabbing all after that, until the first dash "-" as the variable.
    if per: # If the search was successful...
