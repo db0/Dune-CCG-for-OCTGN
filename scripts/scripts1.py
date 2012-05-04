@@ -1107,7 +1107,7 @@ def useAbility(card, x = 0, y = 0):
       abilConcat = "This card has multiple abilities.\nWhich one would you like to use?\n\n" # We start a concat which we use in our confirm window.
       for idx in range(len(Autoscripts)): # If a card has multiple abilities, we go through each of them to create a nicely written option for the player.
          #notify("Autoscripts {}".format(Autoscripts)) # Debug
-         abilRegex = re.search(r"C([ES0])F?[0-9]?:([A-Z][a-z]+)([0-9]*)([A-Z][a-z ]+)-?([A-Za-z -]*)", Autoscripts[idx]) # This regexp returns 3-4 groups, which we then reformat and put in the confirm dialogue in a better readable format.
+         abilRegex = re.search(r"C([ES0])F?[0-9]?:([A-Z][a-z]+)([0-9]*)([A-Z][a-z ]+)-?([A-Za-z -{},]*)", Autoscripts[idx]) # This regexp returns 3-4 groups, which we then reformat and put in the confirm dialogue in a better readable format.
          #notify("abilRegex is {}".format(abilRegex.groups())) # Debug
          if abilRegex.group(1) == 'E': abilCost = 'Engage to'
          elif abilRegex.group(1) == 'S': abilCost = 'Subdue to'
