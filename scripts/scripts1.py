@@ -1098,14 +1098,19 @@ def useAbility(card, x = 0, y = 0):
    elif not Automation or card.Autoscript == "" or re.search(r'WhileDeployed', card.Autoscript): 
       engage(card) # If card is face up but has no autoscripts, or automation is disabled, or it just has a "WhileDeployed" effect, just engage/disengage it.
       return
+   elif re.search(r'{Custom:', card.Autoscript): 
+      customScript(card) # Some cards just have a fairly unique effect and there's no use in trying to make them work in the generic framework.
+      return
    ### Checking if card has multiple autoscript options and providing choice to player.
    Autoscripts = card.AutoScript.split('||')
    if len(Autoscripts) > 1: 
       abilConcat = "This card has multiple abilities.\nWhich one would you like to use?\n\n" # We start a concat which we use in our confirm window.
       for idx in range(len(Autoscripts)): # If a card has multiple abilities, we go through each of them to create a nicely written option for the player.
-         abilRegex = re.search(r"C([ES0]):([A-Za-z]+)([0-9]+)([A-Za-z]+)-?([A-Za-z-]*)", Autoscripts[idx]) # This regexp returns 3-4 groups, which we then reformat and put in the confirm dialogue in a better readable format.
+         #notify("Autoscripts {}".format(Autoscripts)) # Debug
+         abilRegex = re.search(r"C([ES0])F?[0-9]?:([A-Z][a-z]+)([0-9]*)([A-Z][a-z ]+)-?([A-Za-z -]*)", Autoscripts[idx]) # This regexp returns 3-4 groups, which we then reformat and put in the confirm dialogue in a better readable format.
+         #notify("abilRegex is {}".format(abilRegex.groups())) # Debug
          if abilRegex.group(1) == 'E': abilCost = 'Engage to'
-         elif abilRegex.group(1) == 'E': abilCost = 'Subdue to'
+         elif abilRegex.group(1) == 'S': abilCost = 'Subdue to'
          else: abilCost = ''
          abilConcat += '{}: {} {} {} {}'.format(idx, abilCost, abilRegex.group(2), abilRegex.group(3), abilRegex.group(4)) # We add the first three groups to the concat. Those groups are always Gain/Hoard/Prod ## Favo/Solaris/Spice
          if abilRegex.lastindex == 5: # If the autoscript has a fourth group, then it means it has subconditions. Such as "per Holding" or "by Rival"
@@ -1122,19 +1127,26 @@ def useAbility(card, x = 0, y = 0):
    ### Checking if the card effect requires a target first
    targetC = findTarget(activeAutoscript)
    if re.search(r'Targeted', activeAutoscript) and not targetC: return
+   #notify('Target: {}'.format(targetC)) # debug
    ### Checking the activation cost and preparing a relevant string for the announcement
-   actionCost = re.match(r"C([ES0])", activeAutoscript)
+   actionCost = re.match(r"C([ES0])F?([0-9]?):", activeAutoscript)
    if actionCost.group(1) == 'E':
       if card.orientation == Rot90: 
          whisper("You must engage to take this action. Please disengage the card first and try again")
          return
       else: 
          engage(card, silent = True)
-         costText = '{} engages {} to'.format(card.controller, card)
+         costText = '{} engages {}'.format(card.controller, card)
    elif actionCost.group(1) == 'S': 
+      costText = '{} subdues {} to'.format(card.controller, card.name)
+      random = rnd(10,1000) # Small wait to grab the name.
       card.isFaceUp = False
-      costText = '{} subdues {} to'.format(card.controller, card)
-   else: costText = '{} activates {} to'.format(card.controller, card)
+   else: costText = '{} activates {}'.format(card.controller, card)
+   if actionCost.group(2): 
+      me.Favor -= num(actionCost.group(2))
+      costText += ' and discards {} favor'.format(actionCost.group(2))
+   costText += ' to'
+   #notify('CosText: {}'.format(costText)) #Debug
    ### Calling the relevant function depending on if we're increasing our own counters, the hoard's or putting card markers.
    if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText, card, manual = True, targetCard = targetC)
    elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText, card)
@@ -1149,42 +1161,53 @@ def findTarget(Autoscript):
    if re.search(r'Targeted', Autoscript):
       validTargets = [] # a variable that holds any type that a card must be, in order to be a valid target.
       invalidTargets = [] # a variable that holds any type that a card must not be to be a valid target.
-      whatTarget = re.search(r'on([A-Za-z_]+)[-]?', Autoscript) # We signify target restrictions keywords by starting a string with "or"
-      if whatTarget: validTargets = whatTarget.group(1).split('_or_') # If we have a list of valid targets, split them into a list, separated by the string "_or_". Usually this results in a list of 1 item.
-      for chkTarget in validTargets: # Now we go through each list item and see if it has more than one condition (Eg, non-desert fief)
-         if re.search(r'_and_', chkTarget):  # If there's a string "_and_" between our restriction keywords, then this keyword has mutliple conditions
-            multiConditionTargets = chkTarget.split('_and_') # We put all the mutliple conditions in a new list, separating each element.
-            for chkCondition in multiConditionTargets: 
-               invalidCondition = re.search(r'non([A-Za-z]+)', chkCondition) # Do a search to see if in the multicondition targets there's one with "non" in front
-               if invalidCondition: invalidTargets.append(invalidCondition.group(1)) # If there is, move it without the "non" into the invalidTargets list.
-               else: validTargets.append(chkCondition) # Else just move the individual condition to the end if validTargets list
-            validTargets.remove(chkTarget) # Finally, remove the multicondition keyword from the valid list. Its individual elements should now be on this list or the invalid targets one.
-         else:   
-            if re.match(r'non', chkTarget): # If the keyword has "non" in front, it means it's something we need to avoid, so we move it to a different list.
-               invalidTargets.append(chkTarget)
-               validTargets.remove(chkTarget)
-      for targetLookup in table: # Now that we have our list of restrictions, we go through each targeted card on the table to check if it matches.
-         if targetLookup.targetedBy and targetLookup.targetedBy == me: # The card needs to be targeted by the player.
-            if not targetLookup.isFaceUp: # If we've targeted a subdued card, we turn it temporarily face-up to grab its properties.
-               targetLookup.isFaceUp = True
-               wasSubdued = True
-            else: wasSubdued = False
-            if len(validTargets) == 0: targetC = targetLookup # If we have no target restrictions, any targeted  card will do.
-            else:
-               for validtargetCHK in validTargets: # look if the card we're going through matches our valid target checks
-                  if re.search(r'{}'.format(validtargetCHK), targetLookup.Type) or re.search(r'{}'.format(validtargetCHK), targetLookup.Subtype):
-                     targetC = targetLookup
-            if len(invalidTargets) > 0: # If we have no target restrictions, any selected card will do as long as it's a valid target.
-               for invalidtargetCHK in invalidTargets:  
-                  if re.search(r'{}'.format(invalidtargetCHK), targetLookup.Type) or re.search(r'{}'.format(invalidtargetCHK), targetLookup.Subtype):
-                     targetC = None
-            if wasSubdued: targetLookup.isFaceUp = False
-            if targetC: return targetC
+      whatTarget = re.search(r'on([A-Za-z_ ]+)[-]?', Autoscript) # We signify target restrictions keywords by starting a string with "or"
+      if re.search(r'Onlyon', Autoscript):
+         if whatTarget.group(1) == 'Carthag': exactSearch = '2037f0a1-773d-42a9-a498-d0cf54e7a003' # The Carthag holding card GUID
+         elif whatTarget.group(1) == 'Arrakeen': exactSearch = '2037f0a1-773d-42a9-a498-d0cf54e7a002' # The Arrakeen holding card GUID
+         else: exactSearch = 'No Target'
+         #notify("Search is {}. regexGrab is {}".format(exactSearch, whatTarget.group(1))) # Debug
+         for targetLookup in table: 
+            if targetLookup.model == exactSearch: 
+               targetC = targetLookup
+               return targetC
+      else: 
+         if whatTarget: validTargets = whatTarget.group(1).split('_or_') # If we have a list of valid targets, split them into a list, separated by the string "_or_". Usually this results in a list of 1 item.
+         for chkTarget in validTargets: # Now we go through each list item and see if it has more than one condition (Eg, non-desert fief)
+            if re.search(r'_and_', chkTarget):  # If there's a string "_and_" between our restriction keywords, then this keyword has mutliple conditions
+               multiConditionTargets = chkTarget.split('_and_') # We put all the mutliple conditions in a new list, separating each element.
+               for chkCondition in multiConditionTargets: 
+                  invalidCondition = re.search(r'non([A-Za-z ]+)', chkCondition) # Do a search to see if in the multicondition targets there's one with "non" in front
+                  if invalidCondition: invalidTargets.append(invalidCondition.group(1)) # If there is, move it without the "non" into the invalidTargets list.
+                  else: validTargets.append(chkCondition) # Else just move the individual condition to the end if validTargets list
+               validTargets.remove(chkTarget) # Finally, remove the multicondition keyword from the valid list. Its individual elements should now be on this list or the invalid targets one.
+            else:   
+               if re.match(r'non', chkTarget): # If the keyword has "non" in front, it means it's something we need to avoid, so we move it to a different list.
+                  invalidTargets.append(chkTarget)
+                  validTargets.remove(chkTarget)
+         for targetLookup in table: # Now that we have our list of restrictions, we go through each targeted card on the table to check if it matches.
+            if targetLookup.targetedBy and targetLookup.targetedBy == me: # The card needs to be targeted by the player.
+               if not targetLookup.isFaceUp: # If we've targeted a subdued card, we turn it temporarily face-up to grab its properties.
+                  targetLookup.isFaceUp = True
+                  wasSubdued = True
+               else: wasSubdued = False
+               if len(validTargets) == 0: targetC = targetLookup # If we have no target restrictions, any targeted  card will do.
+               else:
+                  for validtargetCHK in validTargets: # look if the card we're going through matches our valid target checks
+                     if re.search(r'{}'.format(validtargetCHK), targetLookup.Type) or re.search(r'{}'.format(validtargetCHK), targetLookup.Subtype) or re.search(r'{}'.format(validtargetCHK), targetLookup.Decktype):
+                        targetC = targetLookup
+               if len(invalidTargets) > 0: # If we have no target restrictions, any selected card will do as long as it's a valid target.
+                  for invalidtargetCHK in invalidTargets:  
+                     if re.search(r'{}'.format(invalidtargetCHK), targetLookup.Type) or re.search(r'{}'.format(invalidtargetCHK), targetLookup.Subtype) or re.search(r'{}'.format(invalidtargetCHK), targetLookup.Decktype):
+                        targetC = None
+               if wasSubdued: targetLookup.isFaceUp = False
+               if targetC: return targetC
       if targetC == None: 
          targetsText = ''
          if len(validTargets) > 0: targetsText += "\nValid Targets: {}.".format(validTargets)
          if len(invalidTargets) > 0: targetsText += "\nInvalid Targets: {}.".format(invalidTargets)
-         whisper("You need to target a valid card before using this action{}".format(targetsText))
+         if re.search(r'Onlyon', Autoscript): whisper("{} does not seem to be deployed on the table. Deploy the card before running this action again.".format(whatTarget.group(1)))
+         else: whisper("You need to target a valid card before using this action{}".format(targetsText))
          return targetC
    else: return targetC
 
@@ -1351,3 +1374,33 @@ def whileDeployedEffects(card, action='Deploy'):
       handsize += effectNR
       affectedText = 'Hand Size'
    notify("{} has modified their {} by {}".format(me, affectedText, addPos(effectNR)))
+
+def customScript(card):
+# This function has specific autoscripts tailored to specific cards which have fairly unique effects.
+   custom = re.search(r'{Custom:([A-Za-z ]+)', card.Autoscript)
+   if custom.group(1) == 'Carthag Engineering' or custom.group(1) == 'Arrakeen Water Facilities': 
+      if re.search('Carthag', custom.group(1)): targetC = findTarget('Targeted-OnlyonCarthag')
+      else: targetC = findTarget('Targeted-OnlyonArrakeen')
+      if not targetC: return
+      elif targetC.controller == me:
+         choice = 2
+         while choice > 1:
+            choice = askInteger("You are the governor of {}. What ability do you want to use?\n\n0: Gain 3 Solaris\n1: Gain 3 Favor".format(targetC.name), 0)
+            if choice == None: return # If the player closed the window, abort.
+         if choice == 0: GainX('Gain3Solaris', '{} engages {} to'.format(me, card), card)
+         else: GainX('Gain3Favor', '{} engages {} to'.format(me, card), card)
+         engage(card, silent = True)
+      else:
+         choice = 2
+         while choice > 1:
+            choice = askInteger("{} is the governor of {}. What ability do you want to use?\n\n0: Take 3 Solaris from {} (Player must accept and be able to pay)\n1: Gain 3 Favor".format(targetC.controller, targetC.name, targetC.controller), 0)
+            if choice == None: return # If the player closed the window, abort.
+            elif choice == 0 and targetC.controller.Solaris < 3: 
+               whisper("{} does not have enough Solaris. You can only gain 3 favor".favor(targetC.controller))
+               choice = 2
+         if choice == 1: 
+            GainX('Gain3Solaris', '{} engages {} to'.format(me, card), card)
+            targetC.controller.Solaris -= 3
+         else: GainX('Gain3Favor', '{} engages {} to'.format(me, card), card)
+         engage(card, silent = True)
+   else: engage(card)
