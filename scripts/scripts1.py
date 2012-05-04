@@ -1280,7 +1280,7 @@ def autoscriptCostUndo(Autoscript, card):
    whisper("There was nothing to transfer. Undoing action...")
    actionCost = re.match(r"C([ES0])", Autoscript)
    if actionCost.group(1) == 'E': 
-      for i in range(10): random = rnd(10,10000) # Need to wait a bit or card is left engaged but program thinks it's not o.O
+      random = rnd(10,1000) # Need to wait a bit or card is left engaged but program thinks it's not o.O
       card.orientation = Rot0
    if actionCost.group(1) == 'S': card.isFaceUp = True
    
