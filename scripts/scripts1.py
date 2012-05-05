@@ -504,7 +504,9 @@ def placeBid(group, x = 0, y = 0):
 #---------------------------------------------------------------------------
 
 def inspectCard(card, x = 0, y = 0): # This function shows the player the card text, to allow for easy reading until High Quality scans are procured.
-   confirm("{}".format(card.Operation))
+   if card.Autoscript == "": ASText = "\n\nThis card is not Auto-Scripted!"
+   else: ASText = "\n\nThis card is Auto-Scripted:\n[{}]".format(card.AutoScript)
+   confirm("{}{}".format(card.Operation,ASText))
 
 def engage(card, x = 0, y = 0, silent = False, force = False):
    mute()
@@ -1156,6 +1158,8 @@ def useAbility(card, x = 0, y = 0):
       ### Checking if the card effect requires a target first
       targetC = findTarget(activeAutoscript)
       if re.search(r'Targeted', activeAutoscript) and not targetC: return
+      ### Warning the player in case we need to
+      if chkWarn(activeAutoscript) == 'ABORT': return
       ### Checking the activation cost and preparing a relevant string for the announcement
       actionCost = re.match(r"C([ES0])F?([0-9]?):", activeAutoscript)
       if actionCost: # If there's no match, it means we've already been through the cost part once.
@@ -1179,6 +1183,7 @@ def useAbility(card, x = 0, y = 0):
       elif re.search(r'Transfer([0-9]+)', activeAutoscript): announceText = TransferX(activeAutoscript, announceText, card, targetC, True)
       elif re.search(r'(Assign|Remove)([0-9]+)', activeAutoscript): announceText = TokensX(activeAutoscript, announceText, card, targetC, True)
       elif re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', activeAutoscript): announceText = ModifyStatus(activeAutoscript, announceText, card, targetC, True)
+      elif re.search(r'Draw([0-9]+)', activeAutoscript): announceText = DrawX(activeAutoscript, announceText, card, True)
       else: timesNothingDone += 1
    if announceText == 'ABORT': return
    if timesNothingDone == len(selectedAutoscripts): notify("{}".format(announceText.rstrip(' to')))
@@ -1186,6 +1191,15 @@ def useAbility(card, x = 0, y = 0):
       announceText += '.' # End the concatenated sentence.
       notify("{}".format(announceText))
 
+def chkWarn(Autoscript):
+   warning = re.search(r'warn([A-Z][A-Za-z0-9 ]+)-?', Autoscript)
+   if warning:
+      if warning.group(1) == 'Discard': 
+         if not confirm("This action requires that you discard some cards. Have you done this already?"):
+            whisper("--> Aborting action. Please discard the necessary amount of cards and run this action again")
+            return 'ABORT'
+   return 'OK'
+            
 def findTarget(Autoscript):
    targetC = None
    if re.search(r'Targeted', Autoscript):
@@ -1300,12 +1314,12 @@ def TransferX(Autoscript, announceText, card, targetCard = None, manual = False)
    if targetCard.markers[Spice] < num(action.group(1)): 
       if re.search(r'isCost', Autoscript):
          whisper("You must have at least {} Spice on the card to take this action".format(action.group(1)))
-         announceString = 'ABORT' #If the card requires this transfer as part of a cost, we want to abort any other autoscripts that would follow.
-      else: 
+         autoscriptCostUndo(Autoscript, card)
+         return 'ABORT'
+      elif targetCard.markers[Spice] == 0: 
          whisper("There was nothing to transfer.")
-         announceString = 'OK'
-      autoscriptCostUndo(Autoscript, card)
-      return announceString
+         autoscriptCostUndo(Autoscript, card)
+         return 'ABORT'
    for transfer in range(num(action.group(1))):
       if targetCard.markers[Spice] > 0: 
          targetCard.markers[Spice] -= 1
@@ -1344,6 +1358,15 @@ def TokensX(Autoscript, announceText, card, targetCard = None, manual = False):
    if not manual: notify('--> {}.'.format(announceString))
    else: return announceString
 
+def DrawX(Autoscript, announceText, card, manual = False, n = 1): # Function for drawing X Cards from the house deck to your hand.
+   action = re.search(r'Draw([0-9]+)Card', Autoscript)
+   draw = num(action.group(1))
+   multiplier = per(Autoscript, card, n, manual)
+   drawMany(me.piles['House Deck'], draw * multiplier, silent)
+   announceString = "{} draw {} cards to their hand".format(announceText, action.group(1))
+   if not manual: notify('--> {}.'.format(announceString))
+   else: return announceString
+
 def ModifyStatus(Autoscript, announceText, card = None, targetCard = None, manual = False):
    action = re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', Autoscript)
    if action.group(1) == 'Engage' and engage(targetCard, silent = True, force = 'Engage') != 'ABORT': pass
@@ -1368,34 +1391,50 @@ def autoscriptCostUndo(Autoscript, card):
    if num(actionCost.group(2)) > 0: me.Favor += num(actionCost.group(2))
    
 def per(Autoscript, card = None, n = 1, manual = False): # This function goes through the autoscript and looks for the words "per<Something>". Then figures out what the card multiplies its effect with, and returns the appropriate multiplier.
-   per = re.search(r'per([A-Z][A-Za-z0-9]*)[-]?', Autoscript) # We're searching for the word per, and grabbing all after that, until the first dash "-" as the variable.
+   per = re.search(r'(per|upto)([A-Z][A-Za-z0-9]*)[-]?', Autoscript) # We're searching for the word per, and grabbing all after that, until the first dash "-" as the variable.
    if per: # If the search was successful...
-      if per.group(1) == 'Intrigue': multiplier = num(card.Intrigue) 
-      elif per.group(1) == 'Arbitration': multiplier = num(card.Arbitration) 
-      elif per.group(1) == 'Battle': multiplier = num(card.Battle) 
-      elif per.group(1) == 'Dueling': multiplier = num(card.Dueling) 
-      elif per.group(1) == 'Weirding': multiplier = num(card.Weirding) 
-      elif per.group(1) == 'Prescience': multiplier = num(card.Prescience) 
-      elif per.group(1) == 'Resistance': multiplier = num(card.Resistance) 
-      elif per.group(1) == 'Command': multiplier = num(card.Command) 
-      elif per.group(1) == 'DeploymentCost': multiplier = num(card.Command) 
-      elif per.group(1) == 'SpiceProducer':
+      if per.group(2) == 'Intrigue': multiplier = num(card.Intrigue) 
+      elif per.group(2) == 'Arbitration': multiplier = num(card.Arbitration) 
+      elif per.group(2) == 'Battle': multiplier = num(card.Battle) 
+      elif per.group(2) == 'Dueling': multiplier = num(card.Dueling) 
+      elif per.group(2) == 'Weirding': multiplier = num(card.Weirding) 
+      elif per.group(2) == 'Prescience': multiplier = num(card.Prescience) 
+      elif per.group(2) == 'Resistance': multiplier = num(card.Resistance) 
+      elif per.group(2) == 'Command': multiplier = num(card.Command) 
+      elif per.group(2) == 'DeploymentCost': multiplier = num(card.properties['Deployment Cost']) 
+      elif per.group(2) == 'SpiceProducer':
          spiceProducers = [c for c in table
                            if re.search('Desert', c.Subtype)
                            or re.search('Spice Harvester', c.name)
                            or re.search('Carryall', c.name)]
          multiplier = len(spiceProducers) * chkPlayer(Autoscript, card.controller, False) # We send False to the manual variable, because we don't want it to give 1 solaris when nobody has any production
-      elif per.group(1) == 'DuneFief':
+      elif per.group(2) == 'DuneFief':
          duneFs = [c for c in table if re.search('Dune Fief', c.Subtype)]
          multiplier = len(duneFs) * chkPlayer(Autoscript, card.controller, False)
-      elif per.group(1) == 'CROE': multiplier = shared.CROE
-      elif re.search(r'CROE(plus|minus)([0-6])', per.group(1)):
-         CROEregex = re.search(r'CROE(plus|minus)([0-6])', per.group(1))
+      elif per.group(2) == 'SpiceFactory':
+         multiplier = 0
+         for player in players: # We're looking at which player has the most of these three cards, and using them as multiplier.
+            spiceFactories = [c for c in table
+                              if (re.search('Harvester Pad', c.name)
+                                 or re.search('Spice Harvester', c.name)
+                                 or re.search('Carryall', c.name))
+                              and c.controller == player]
+            if len(spiceFactories) > multiplier: multiplier = len(spiceFactories)
+      elif per.group(2) == 'CROE': multiplier = shared.CROE
+      elif re.search(r'CROE(plus|minus)([0-6])', per.group(2)):
+         CROEregex = re.search(r'CROE(plus|minus)([0-6])', per.group(2))
          if CROEregex.group(1) == 'plus': multiplier = CROEsnapshot + num(CROEregex.group(1))
          else: multiplier = shared.CROE - num(CROEregex.group(2))
       else: multiplier = num(n) * chkPlayer(Autoscript, card.controller, manual) # All non-special-rules per<somcething> requests use this formula.
                                                                             # Usually there is an n sent to this function (eg, number of favour purchased) with which to multiply the end result with
                                                                             # and some cards may only work when a rival owns or does something.
+      if per.group(1) == 'upto': # If we're using an "upto" autoscript instead of per, the player can choose any number up to the max we found.
+         choiceText = re.search(r':([A-Z][A-Za-z]+)[0-9]+([A-Z][A-Za-z]+)', Autoscript)
+         choice = multiplier + 1
+         while choice > multiplier:
+            choice = askInteger("{} how many {}?\n(Max {})".format(choiceText.group(1), choiceText.group(2), multiplier), multiplier)
+            if not choice: multiplier = 0
+            else: multiplier = choice
    else: multiplier = 1 # If the search was not successful, then return a mutliplier of 1.
    return multiplier
 
