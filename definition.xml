@@ -76,7 +76,7 @@
 			<cardaction menu="Inspect Card" default="false" execute="inspectCard" />
 		</hand>
 		<group name="House Deck" visibility="none" ordered="false" width="63" height="88" icon="r11" collapsed="false">
-			<groupaction menu="Draw" default="true" shortcut="Ctrl+S" execute="draw" />
+			<groupaction menu="Draw" default="true" shortcut="Ctrl+D" execute="draw" />
 			<groupaction menu="Draw Many" default="false" shortcut="Ctrl+Shift+S" execute="drawMany" />
 			<groupaction menu="Discard X Cards" default="false" shortcut="Ctrl+Shift+D" execute="mill" />
 			<groupaction menu="Shuffle" default="false" shortcut="Ctrl+A" execute="shuffle" />
