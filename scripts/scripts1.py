@@ -1184,6 +1184,7 @@ def useAbility(card, x = 0, y = 0):
       elif re.search(r'(Assign|Remove)([0-9]+)', activeAutoscript): announceText = TokensX(activeAutoscript, announceText, card, targetC, True)
       elif re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', activeAutoscript): announceText = ModifyStatus(activeAutoscript, announceText, card, targetC, True)
       elif re.search(r'Draw([0-9]+)', activeAutoscript): announceText = DrawX(activeAutoscript, announceText, card, True)
+      elif re.search(r'UseCustomAbility', activeAutoscript): announceText = UseCustomAbility(announceText, card)
       else: timesNothingDone += 1
    if announceText == 'ABORT': return
    if timesNothingDone == len(selectedAutoscripts): notify("{}".format(announceText.rstrip(' to')))
@@ -1380,7 +1381,10 @@ def ModifyStatus(Autoscript, announceText, card = None, targetCard = None, manua
    announceString = "{} {} {}".format(announceText, action.group(1), targetCard)
    if not manual: notify('--> {}.'.format(announceString))
    else: return announceString
-   
+
+def UseCustomAbility(announceText, card):
+   return "{} use the card's custom ability (Unimplemented! {} will have to take the necessary actions manually)".format(announceText,me)
+
 def autoscriptCostUndo(Autoscript, card):
    whisper("--> Undoing action...")
    actionCost = re.match(r"C([ES0]F?([1-9]?))", Autoscript)
