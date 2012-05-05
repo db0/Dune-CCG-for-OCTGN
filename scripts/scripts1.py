@@ -634,6 +634,7 @@ def subdue(card, x = 0, y = 0):
                notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
                me.Bid = initialBid
                setGlobalVariable("petitionedCard", card._id)
+            chkPetitionAutoscripts(card)
             if ABORT: setGlobalVariable("petitionedCard", chkVar)
             setGlobalVariable("defeatedPlayers", str(defeatedPL))
    
@@ -1122,39 +1123,42 @@ def useAbility(card, x = 0, y = 0):
       while abilChoice >= len(Autoscripts):
          abilChoice = askInteger('{}'.format(abilConcat), 0) # We use the ability concatenation we crafted before to give the player a choice of the abilities on the card.
          if abilChoice == None: return # If the player closed the window, abort.
-      activeAutoscript = Autoscripts[abilChoice] # If a valid choice is given, choose the autoscript at the list index the player chose.
-   else: activeAutoscript = Autoscripts[0]
-   ### Checking if the card effect requires a target first
-   targetC = findTarget(activeAutoscript)
-   if re.search(r'Targeted', activeAutoscript) and not targetC: return
-   #notify('Target: {}'.format(targetC)) # debug
-   ### Checking the activation cost and preparing a relevant string for the announcement
-   actionCost = re.match(r"C([ES0])F?([0-9]?):", activeAutoscript)
-   if actionCost.group(1) == 'E':
-      if card.orientation == Rot90: 
-         whisper("You must engage to take this action. Please disengage the card first and try again")
-         return
-      else: 
-         engage(card, silent = True)
-         costText = '{} engages {}'.format(card.controller, card)
-   elif actionCost.group(1) == 'S': 
-      costText = '{} subdues {} to'.format(card.controller, card.name)
-      random = rnd(10,1000) # Small wait to grab the name.
-      card.isFaceUp = False
-   else: costText = '{} activates {}'.format(card.controller, card)
-   if actionCost.group(2): 
-      me.Favor -= num(actionCost.group(2))
-      costText += ' and discards {} favor'.format(actionCost.group(2))
-   costText += ' to'
-   #notify('CosText: {}'.format(costText)) #Debug
-   ### Calling the relevant function depending on if we're increasing our own counters, the hoard's or putting card markers.
-   if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText, card, manual = True, targetCard = targetC)
-   elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText, card)
-   elif re.search(r'Prod([0-9]+)', activeAutoscript): ProdX(activeAutoscript, costText, card)
-   elif re.search(r'Transfer([0-9]+)', activeAutoscript): TransferX(activeAutoscript, costText, card, targetC)
-   elif re.search(r'(Assign|Remove)([0-9]+)', activeAutoscript): TokensX(activeAutoscript, costText, card, targetC)
-   elif re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', activeAutoscript): ModifyStatus(activeAutoscript, costText, card, targetC)
-   else: engage(card, alreadyDone = True)
+      selectedAutoscripts = Autoscripts[abilChoice].split('&&') # If a valid choice is given, choose the autoscript at the list index the player chose.
+   else: selectedAutoscripts = Autoscripts[0].split('&&')
+   timesNothingDone = 0 # A variable that keeps track if we've done any of the autoscripts defined. If none have been coded, we just engage the card.
+   for activeAutoscript in selectedAutoscripts:
+      ### Checking if the card effect requires a target first
+      targetC = findTarget(activeAutoscript)
+      if re.search(r'Targeted', activeAutoscript) and not targetC: return
+      ### Checking the activation cost and preparing a relevant string for the announcement
+      actionCost = re.match(r"C([ES0])F?([0-9]?):", activeAutoscript)
+      if actionCost: # If there's no match, it means we've already been through the cost part once.
+         if actionCost.group(1) == 'E':
+            if card.orientation == Rot90: 
+               whisper("You must engage to take this action. Please disengage the card first and try again")
+               return
+            else: 
+               engage(card, silent = True)
+               costText = '{} engages {}'.format(card.controller, card)
+         elif actionCost.group(1) == 'S': 
+            costText = '{} subdues {}'.format(card.controller, card.name)
+            random = rnd(10,1000) # Small wait to grab the name.
+            card.isFaceUp = False
+         else: costText = '{} activates {}'.format(card.controller, card)
+         if actionCost.group(2): 
+            me.Favor -= num(actionCost.group(2))
+            costText += ' and discards {} favor'.format(actionCost.group(2))
+         costText += ' to'
+      ### Calling the relevant function depending on if we're increasing our own counters, the hoard's or putting card markers.
+      if re.search(r'Gain([0-9]+)', activeAutoscript): GainX(activeAutoscript, costText, card, manual = True, targetCard = targetC)
+      elif re.search(r'Hoard([0-9]+)', activeAutoscript): HoardX(activeAutoscript, costText, card)
+      elif re.search(r'Prod([0-9]+)', activeAutoscript): ProdX(activeAutoscript, costText, card)
+      elif re.search(r'Transfer([0-9]+)', activeAutoscript): 
+         if TransferX(activeAutoscript, costText, card, targetC) == 'ABORT': return
+      elif re.search(r'(Assign|Remove)([0-9]+)', activeAutoscript): TokensX(activeAutoscript, costText, card, targetC)
+      elif re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', activeAutoscript): ModifyStatus(activeAutoscript, costText, card, targetC)
+      else: timesNothingDone += 1
+   if timesNothingDone == len(selectedAutoscripts): engage(card, alreadyDone = True)
 
 def findTarget(Autoscript):
    targetC = None
@@ -1191,7 +1195,7 @@ def findTarget(Autoscript):
                   invalidNamedTargets.append(chkTarget)
                   validTargets.remove(chkTarget)
          for targetLookup in table: # Now that we have our list of restrictions, we go through each targeted card on the table to check if it matches.
-            if targetLookup.targetedBy and targetLookup.targetedBy == me: # The card needs to be targeted by the player.
+            if targetLookup.targetedBy and targetLookup.targetedBy == me and chkPlayer(Autoscript, targetLookup.controller, False): # The card needs to be targeted by the player. If the card needs to belong to a specific player (me or rival) this also is taken into account.
                if not targetLookup.isFaceUp: # If we've targeted a subdued card, we turn it temporarily face-up to grab its properties.
                   targetLookup.isFaceUp = True
                   wasSubdued = True
@@ -1262,6 +1266,15 @@ def TransferX(Autoscript, costText, card, targetCard = None):
    breakadd = 1
    if not targetCard: targetCard = card # If there's been to target card given, assume the target is the card itself.
    action = re.search(r'Transfer([0-9]+)Spice-to(Owner|Hoard|Discard)', Autoscript)
+   if targetCard.markers[Spice] < num(action.group(1)): 
+      if re.search(r'isCost', Autoscript):
+         whisper("You must have at least {} Spice on the card to take this action".format(action.group(1)))
+         returnResult = 'ABORT' #If the card requires this transfer as part of a cost, we want to abort any other autoscripts that would follow.
+      else: 
+         whisper("There was nothing to transfer.")
+         returnResult = 'OK'
+      autoscriptCostUndo(Autoscript, card)
+      return returnResult
    for transfer in range(num(action.group(1))):
       if targetCard.markers[Spice] > 0: 
          targetCard.markers[Spice] -= 1
@@ -1269,7 +1282,7 @@ def TransferX(Autoscript, costText, card, targetCard = None):
             card.owner.Spice += 1
             destination = "{}'s hoard.".format(card.owner)
          elif action.group(2) == 'Hoard': 
-            shared.Spice += 1
+            shared.counters['Guild Hoard'].value += 1
             destination = "the Guild Hoard."
          elif action.group(2) == 'Discard': destination = "the Discard Pile." # If the tokens are discarded, do nothing
       else: 
@@ -1278,8 +1291,7 @@ def TransferX(Autoscript, costText, card, targetCard = None):
    if action.group(2) == 'Hoard': 
       shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
       destination += 'The new total is {} and the CROE is set at {}.'.format(shared.counters['Guild Hoard'].value, shared.CROE)
-   if transfer: notify("{} transfer {} spice from {} to {}".format(costText, transfer + breakadd, targetCard, destination))
-   else: autoscriptCostUndo(Autoscript, card)
+   notify("{} transfer {} spice from {} to {}".format(costText, transfer + breakadd, targetCard, destination))
    
 def TokensX(Autoscript, costText, card, targetCard = None):
    if not targetCard: targetCard = card # If there's been to target card given, assume the target is the card itself.
@@ -1310,7 +1322,7 @@ def ModifyStatus(Autoscript, costText, card = None, targetCard = None):
    notify('{} {} {}.'.format(costText, action.group(1), targetCard))
    
 def autoscriptCostUndo(Autoscript, card):
-   whisper("There was nothing to transfer. Undoing action...")
+   whisper("--> Undoing action...")
    actionCost = re.match(r"C([ES0])", Autoscript)
    if actionCost.group(1) == 'E': 
       random = rnd(10,1000) # Need to wait a bit or card is left engaged but program thinks it's not o.O
@@ -1318,7 +1330,7 @@ def autoscriptCostUndo(Autoscript, card):
    if actionCost.group(1) == 'S': card.isFaceUp = True
    
 def per(Autoscript, card = None, n = 1, manual = False): # This function goes through the autoscript and looks for the words "per<Something>". Then figures out what the card multiplies its effect with, and returns the appropriate multiplier.
-   per = re.search(r'per([A-Za-z]+)[-]?', Autoscript) # We're searching for the word per, and grabbing all after that, until the first dash "-" as the variable.
+   per = re.search(r'per([A-Z][A-Za-z]*)[-]?', Autoscript) # We're searching for the word per, and grabbing all after that, until the first dash "-" as the variable.
    if per: # If the search was successful...
       if per.group(1) == 'Intrigue': multiplier = num(card.Intrigue) 
       elif per.group(1) == 'Arbitration': multiplier = num(card.Arbitration) 
@@ -1333,23 +1345,30 @@ def per(Autoscript, card = None, n = 1, manual = False): # This function goes th
                            if re.search('Desert', c.Subtype)
                            or re.search('Spice Harvester', c.name)
                            or re.search('Carryall', c.name)]
-         multiplier = len(spiceProducers) * onlyRival(Autoscript, card.owner, False) # We send False to the manual variable, because we don't want it to give 1 solaris when nobody has any production
+         multiplier = len(spiceProducers) * chkPlayer(Autoscript, card.controller, False) # We send False to the manual variable, because we don't want it to give 1 solaris when nobody has any production
       elif per.group(1) == 'DuneFief':
          duneFs = [c for c in table if re.search('Dune Fief', c.Subtype)]
-         multiplier = len(duneFs) * onlyRival(Autoscript, card.owner, False)
+         multiplier = len(duneFs) * chkPlayer(Autoscript, card.controller, False)
       elif per.group(1) == 'CROE': multiplier = shared.CROE
-      else: multiplier = num(n) * onlyRival(Autoscript, card.owner, manual) # All non-special-rules per<somcething> requests use this formula.
+      elif re.search(r'CROE', per.group(1)):
+         CROEregex = re.search(r'CROE(plus|minus)([0-6])', per.group(1))
+         if CROEregex.group(1) == 'plus': multiplier = shared.CROE + num(CROEregex.group(1))
+         else: multiplier = shared.CROE - num(CROEregex.group(1))
+      else: multiplier = num(n) * chkPlayer(Autoscript, card.controller, manual) # All non-special-rules per<somcething> requests use this formula.
                                                                             # Usually there is an n sent to this function (eg, number of favour purchased) with which to multiply the end result with
                                                                             # and some cards may only work when a rival owns or does something.
    else: multiplier = 1 # If the search was not successful, then return a mutliplier of 1.
    return multiplier
 
-def onlyRival(Autoscript, owner, manual):
+def chkPlayer(Autoscript, governor, manual):
 # Function returns 1 if the card is not only for rivals, or if it is for rivals and the card being activated it not ours.
 # This is then multiplied by the multiplier, which means that if the card activated only works for Rival's cards, our cards will have a 0 gain.
 # This will probably make no sense when I read it in 10 years...
    byRival = re.search(r'byRival', Autoscript)
-   if not byRival or (byRival and owner != me) or manual: return 1 #manual means that the actions was called by a player double clicking on the card. In which case we always do it.
+   byMe = re.search(r'byMe', Autoscript)
+   if manual: return 1 #manual means that the actions was called by a player double clicking on the card. In which case we always do it.
+   elif not byRival or (byRival and governor != me): return 1 
+   elif not byMe or (byMe and governor == me): return 1
    else: return 0
    
 def autoscriptOtherPlayers(lookup, n = 1):
@@ -1367,6 +1386,9 @@ def chkDeployAutoscripts(card): # This function is called whenever a card is dep
    if re.search(r'Equipment', card.Subtype): autoscriptOtherPlayers('DeployedEquipment')
    if re.search(r'Holding', card.Type): autoscriptOtherPlayers('DeployedHolding')
    if re.search(r'WhileDeployed', card.AutoScript): whileDeployedEffects(card)
+
+def chkPetitionAutoscripts(card): # This function is called whenever a card is petition to check if any other cards on the table will trigger from it
+   if re.search(r'Holding', card.Type): autoscriptOtherPlayers('PetitionedHolding')
 
 def chkRemoveAutoscripts(card): # This function is called whenever a card is subdued or otherwise leaves active play, to check if any effects on it need to be reversed.
    if re.search(r'WhileDeployed', card.AutoScript): whileDeployedEffects(card, 'Remove')
