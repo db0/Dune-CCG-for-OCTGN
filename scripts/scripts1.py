@@ -124,7 +124,7 @@ def chkOut(globalvar): # A function which safely grabs a global variable by maki
    return globalVar
 
 def chooseWell(limit, choiceText, default = None):
-   if default == None: default = limit - 1# If the player has not provided a default value for askInteger, just assume it's the max.
+   if default == None: default = 0# If the player has not provided a default value for askInteger, just assume it's the max.
    choice = limit # limit is the number of choices we have
    if limit > 1: # But since we use 0 as a valid choice, then we can't actually select the limit as a number
       while choice >= limit:
@@ -1173,7 +1173,12 @@ def useAbility(card, x = 0, y = 0):
       ### Warning the player in case we need to
       if chkWarn(activeAutoscript) == 'ABORT': return
       ### Checking the activation cost and preparing a relevant string for the announcement
-      actionCost = re.match(r"C([ES0])F?([0-9]?):", activeAutoscript)
+      actionCost = re.match(r"C([ES0])(F)?(X)?([0-9]*):", activeAutoscript) 
+      # This is the cost of the card. It always starts with 'C' which is standsa for "Cost"
+      # After C, follows 'E', 'S' or '0', which stand for "Engage", "Subdue" or "No Card Modification" cost respectively.
+      # The follows the Favor cost, if any. If it exists, it must start with 'F'
+      # After the F can follow a number, which will be automatically taken out of the player's counter.
+      # If an X exists then the number is optional. The X will ask the player for an amount of favour to discard, up to the number. No number means unlimited.
       if actionCost: # If there's no match, it means we've already been through the cost part once.
          if actionCost.group(1) == 'E':
             if engage(card, silent = True, force = 'Engage') == 'ABORT': return
@@ -1183,13 +1188,24 @@ def useAbility(card, x = 0, y = 0):
             random = rnd(10,1000) # Small wait to grab the name.
             card.isFaceUp = False
          else: announceText = '{} activates {}'.format(card.controller, card)
-         if actionCost.group(2): 
-            me.Favor -= num(actionCost.group(2))
-            announceText += ' and discards {} favor'.format(actionCost.group(2))
+         X = 0 # Variable for custom cost. Is set to 0 if the card does not require it.
+         if actionCost.group(2):
+            if actionCost.group(3) == 'X':
+               if actionCost.group(4): 
+                  limitX = num(actionCost.group(4))
+                  X = askInteger("How much favor do you want to discard?\n\n(Max {})".format(limitX), limitX)
+                  if X > limitX: X = limitX
+               else: X = askInteger("How much favor do you want to discard?", 1)
+               if not X: return
+               me.Favor -= X
+               announceText += ' and discards {} favor'.format(X)
+            else:
+               me.Favor -= num(actionCost.group(4))
+               announceText += ' and discards {} favor'.format(actionCost.group(2))
          announceText += ' to'
       elif not announceText.endswith(' to') and not announceText.endswith(' and'): announceText += ' and'
       ### Calling the relevant function depending on if we're increasing our own counters, the hoard's or putting card markers.
-      if re.search(r'Gain([0-9]+)', activeAutoscript): announceText = GainX(activeAutoscript, announceText, card, targetC, True)
+      if re.search(r'Gain([0-9]+)', activeAutoscript): announceText = GainX(activeAutoscript, announceText, card, targetC, True, n = X)
       elif re.search(r'Hoard([0-9]+)', activeAutoscript): announceText = HoardX(activeAutoscript, announceText, card, True)
       elif re.search(r'Prod([0-9]+)', activeAutoscript): announceText = ProdX(activeAutoscript, announceText, card, True)
       elif re.search(r'Transfer([0-9]+)', activeAutoscript): announceText = TransferX(activeAutoscript, announceText, card, targetC, True)
@@ -1276,6 +1292,9 @@ def findTarget(Autoscript):
          if len(validNamedTargets) > 0: targetsText += "\nSpecific Valid Targets: {}.".format(validNamedTargets)
          if len(invalidTargets) > 0: targetsText += "\nInvalid Target types: {}.".format(invalidTargets)
          if len(invalidNamedTargets) > 0: targetsText += "\nSpecific Invalid Targets: {}.".format(invalidNamedTargets)
+         if not chkPlayer(Autoscript, targetLookup.controller, False): 
+            allegiance = re.search(r'by(Rival|Mw)', Autoscript)
+            targetsText += "\nValid Target Allegiance: {}.".format(allegiance.group(1))
          whisper("You need to target a valid card before using this action{}".format(targetsText))
          return targetC
    else: return targetC
@@ -1452,15 +1471,18 @@ def autoscriptCostUndo(Autoscript, card):
 def per(Autoscript, card = None, count = 0, targetCard = None, manual = False): # This function goes through the autoscript and looks for the words "per<Something>". Then figures out what the card multiplies its effect with, and returns the appropriate multiplier.
    per = re.search(r'\b(per|upto)(Assigned|Target|Parent|Generated|Deployed|Petitioned|Transferred|Bought)?([{A-Z][A-Za-z0-9,_ {}]*)[-]?', Autoscript) # We're searching for the word per, and grabbing all after that, until the first dash "-" as the variable.
    if per: # If the  search was successful...
-      if per.group(3) == 'Intrigue': multiplier = num(card.Intrigue) * chkPlayer(Autoscript, card.controller, manual)
-      elif per.group(3) == 'Arbitration': multiplier = num(card.Arbitration) * chkPlayer(Autoscript, card.controller, manual)
-      elif per.group(3) == 'Battle': multiplier = num(card.Battle) * chkPlayer(Autoscript, card.controller, manual) 
-      elif per.group(3) == 'Dueling': multiplier = num(card.Dueling) * chkPlayer(Autoscript, card.controller, manual) 
-      elif per.group(3) == 'Weirding': multiplier = num(card.Weirding) * chkPlayer(Autoscript, card.controller, manual) 
-      elif per.group(3) == 'Prescience': multiplier = num(card.Prescience) * chkPlayer(Autoscript, card.controller, manual) 
-      elif per.group(3) == 'Resistance': multiplier = num(card.Resistance) * chkPlayer(Autoscript, card.controller, manual) 
-      elif per.group(3) == 'Command': multiplier = num(card.Command) * chkPlayer(Autoscript, card.controller, manual) 
-      elif per.group(3) == 'DeploymentCost': multiplier = num(card.properties['Deployment Cost']) * chkPlayer(Autoscript, card.controller, manual) 
+      if per.group(2) and per.group(2) == 'Target': useC = targetCard # If the effect is targeted, we need to use the target's attributes
+      else: useC = card # If not, use our own.
+      if per.group(3) == 'X': multiplier = count
+      elif per.group(3) == 'Intrigue': multiplier = num(useC.Intrigue) * chkPlayer(Autoscript, useC.controller, False)
+      elif per.group(3) == 'Arbitration': multiplier = num(useC.Arbitration) * chkPlayer(Autoscript, useC.controller, False)
+      elif per.group(3) == 'Battle': multiplier = num(useC.Battle) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'Dueling': multiplier = num(useC.Dueling) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'Weirding': multiplier = num(useC.Weirding) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'Prescience': multiplier = num(useC.Prescience) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'Resistance': multiplier = num(useC.Resistance) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'Command': multiplier = num(useC.Command) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'DeploymentCost': multiplier = num(useC.properties['Deployment Cost']) * chkPlayer(Autoscript, useC.controller, False) 
       elif per.group(3) == 'CROE': multiplier = shared.CROE
       elif re.search(r'CROE(plus|minus)([0-6])', per.group(3)):
          CROEregex = re.search(r'CROE(plus|minus)([0-6])', per.group(3))
@@ -1486,10 +1508,11 @@ def per(Autoscript, card = None, count = 0, targetCard = None, manual = False): 
          #multiplier *= chkPlayer(Autoscript, card.controller, manual)
       if per.group(1) == 'upto': # If we're using an "upto" autoscript instead of per, the player can choose any number up to the max we found.
          choiceText = re.search(r':([A-Z][A-Za-z]+)[0-9]+([A-Z][A-Za-z]+)', Autoscript)
-         choice = chooseWell(multiplier + 1, "{} how many {}?\n(Max {})".format(choiceText.group(1), choiceText.group(2), multiplier), multiplier)
          choice = multiplier + 1
-         if not choice: multiplier = 0
-         else: multiplier = choice
+         while choice > multiplier:
+            choice = askInteger("{} how many {}?\n(Max {})".format(choiceText.group(1), choiceText.group(2), multiplier), multiplier)
+            if not choice: multiplier = 0
+            elif choice <= multiplier: multiplier = choice
    else: multiplier = 1 # If the search was not successful, then return a mutliplier of 1.
    return multiplier
 
@@ -1547,8 +1570,8 @@ def customScript(card):
 # This function has specific autoscripts tailored to specific cards which have fairly unique effects.
    custom = re.search(r'{Custom:([A-Za-z ]+)', card.Autoscript)
    if custom.group(1) == 'Carthag Engineering' or custom.group(1) == 'Arrakeen Water Facilities': 
-      if re.search('Carthag', custom.group(1)): targetC = findTarget('Targeted-Onlyon{Carthag}')
-      else: targetC = findTarget('Targeted-Onlyon{Arrakeen, Capital of Arrakis}')
+      if re.search('Carthag', custom.group(1)): targetC = findTarget('Targeted-on{Carthag}')
+      else: targetC = findTarget('Targeted-on{Arrakeen, Capital of Arrakis}')
       if not targetC: return
       if engage(card, silent = True, force = 'Engage') == 'ABORT': return
       elif targetC.controller == me:
