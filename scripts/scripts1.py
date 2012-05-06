@@ -1173,7 +1173,7 @@ def useAbility(card, x = 0, y = 0):
       ### Warning the player in case we need to
       if chkWarn(activeAutoscript) == 'ABORT': return
       ### Checking the activation cost and preparing a relevant string for the announcement
-      actionCost = re.match(r"C([ES0])(F)?(X)?([0-9]*):", activeAutoscript) 
+      actionCost = re.match(r"CP?([ES0])(F)?(X)?([0-9]*):", activeAutoscript) 
       # This is the cost of the card. It always starts with 'C' which is standsa for "Cost"
       # After C, follows 'E', 'S' or '0', which stand for "Engage", "Subdue" or "No Card Modification" cost respectively.
       # The follows the Favor cost, if any. If it exists, it must start with 'F'
@@ -1207,7 +1207,7 @@ def useAbility(card, x = 0, y = 0):
       ### Calling the relevant function depending on if we're increasing our own counters, the hoard's or putting card markers.
       if re.search(r'Gain([0-9]+)', activeAutoscript): announceText = GainX(activeAutoscript, announceText, card, targetC, True, n = X)
       elif re.search(r'Hoard([0-9]+)', activeAutoscript): announceText = HoardX(activeAutoscript, announceText, card, True)
-      elif re.search(r'Prod([0-9]+)', activeAutoscript): announceText = ProdX(activeAutoscript, announceText, card, True)
+      elif re.search(r'(Prod|Spawn)([0-9]+)', activeAutoscript): announceText = ProdX(activeAutoscript, announceText, card, True)
       elif re.search(r'Transfer([0-9]+)', activeAutoscript): announceText = TransferX(activeAutoscript, announceText, card, targetC, True)
       elif re.search(r'(Assign|Remove)([0-9]+)', activeAutoscript): announceText = TokensX(activeAutoscript, announceText, card, targetC, True)
       elif re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', activeAutoscript): announceText = ModifyStatus(activeAutoscript, announceText, card, targetC, True)
@@ -1332,12 +1332,12 @@ def HoardX(Autoscript, announceText, card, manual = False):
    else: return announceString
 
 def ProdX(Autoscript, announceText, card, manual = False):
-   action = re.search(r'\bProd([0-9]+)Spice', Autoscript)
-   if not confirm('Do you want to produce spice on {}?\n\nPressing "No" will send it directly to the Guild Hoard instead'.format(card.name)):
-      return HoardX('Hoard{}Spice'.format(action.group(1)), announceText, card) # If we want to produce the spice to the hoard, we're going to use the HoardX() function, but we need to sent it a modified Autoscript.
-   card.markers[Spice] += num(action.group(1))
-   autoscriptOtherPlayers('GeneratedSpice',num(action.group(1)))
-   announceString = "{} produce {} spice assigned to it".format(announceText,action.group(1))
+   action = re.search(r'\b(Prod|Spawn)([0-9]+)Spice', Autoscript)
+   if action.group(1) == 'Prod' and not confirm('Do you want to produce spice on {}?\n\nPressing "No" will send it directly to the Guild Hoard instead'.format(card.name)):
+      return HoardX('Hoard{}Spice'.format(action.group(2)), announceText, card) # If we want to produce the spice to the hoard, we're going to use the HoardX() function, but we need to sent it a modified Autoscript.
+   card.markers[Spice] += num(action.group(2))
+   autoscriptOtherPlayers('GeneratedSpice',num(action.group(2)))
+   announceString = "{} produce {} spice assigned to it".format(announceText,action.group(2))
    if not manual: notify('--> {}.'.format(announceString))
    else: return announceString
 
