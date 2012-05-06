@@ -122,7 +122,18 @@ def chkOut(globalvar): # A function which safely grabs a global variable by maki
    globalVar = getGlobalVariable(globalvar)
    setGlobalVariable(globalvar, 'CHECKOUT')
    return globalVar
-      
+
+def chooseWell(limit, choiceText, default = None):
+   if default == None: default = 0# If the player has not provided a default value for askInteger, just assume it's the max.
+   choice = limit # limit is the number of choices we have
+   if limit > 1: # But since we use 0 as a valid choice, then we can't actually select the limit as a number
+      while choice >= limit:
+         choice = askInteger("{}".format(choiceText), default)
+         if not choice: return False
+         if choice > limit: whisper("You must choose between 0 and {}".format(limit - 1))
+   else: choice = 0 # If our limit is 1, it means there's only one choice, 0.
+   return choice
+   
 #---------------------------------------------------------------------------
 # Card Placement functions
 #---------------------------------------------------------------------------
@@ -604,7 +615,7 @@ def subdue(card, x = 0, y = 0,  silent = False, force = False):
                     else: notify("{} deploys another {} event - {} with {} deferment tokens.".format(me, subtype, card, card.markers[Deferment_Token]))
         elif searchUniques(card, name, 'deploy') == 'NOK': return # Check if the card is unique and in the table. If so, abort this function.
         elif searchNatives(subtype) == 'NOK': return # Check if the card is a native persona and if there's any dune fiefs in our control. If so, abort this function after a confirm.
-        elif card.markers[Deferment_Token] == 0 and cost > 0:
+        elif card.markers[Deferment_Token] == 0:
             if confirm("You cannot normally deploy cards with 0 deferment tokens. Bypass?"):
                notify("{} deploys {} which had 0 deferment tokens.".format(me, card))   
                card.isFaceUp = True
@@ -757,7 +768,7 @@ def CHOAMbuy(group, x = 0, y = 0): # This function allows the player to purchase
           else: 
              me.Solaris -=fullcost # Player pays here.
              me.Spice += spiceNR # Then they get their spice.
-             autoscriptOtherPlayers('SpiceTransferred',spiceNR) # We trigger other player's autoscripts
+             autoscriptOtherPlayers('TransferredSpice',spiceNR) # We trigger other player's autoscripts
              shared.counters['Guild Hoard'].value -= spiceNR # Then the spice is taken away from the hoard.
              shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value) # Then the CROE is reset.
              notify("{} has bought {} Spice for {}. The Guild Hoard now has {} Spice left and the CROE is set at {}".format(me, spiceNR, fullcost, shared.counters['Guild Hoard'].value, shared.CROE))
@@ -787,7 +798,7 @@ def CHOAMsell(group, x = 0, y = 0): # Very similar as CHOAMbuy, but player sells
              fullcost = completeSpiceCost(-spiceNR)
              me.Solaris +=fullcost
              me.Spice -= spiceNR
-             autoscriptOtherPlayers('SpiceTransferred',spiceNR) # We trigger other player's autoscripts
+             autoscriptOtherPlayers('TransferredSpice',spiceNR) # We trigger other player's autoscripts
              shared.counters['Guild Hoard'].value += spiceNR
              shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
              notify("{} has sold {} Spice for {}. The Guild Hoard now has {} Spice left and the CROE is set at {}".format(me, spiceNR, fullcost, shared.counters['Guild Hoard'].value, shared.CROE))
@@ -857,7 +868,7 @@ def buyFavor(group, x = 0, y = 0): # Very similar to CHOAMbuy, but player buys F
           else: 
              me.Solaris -=fullcost
              me.Favor += favorNR
-             autoscriptOtherPlayers('FavorBought',favorNR) # We trigger other player's autoscripts
+             autoscriptOtherPlayers('BoughtFavor',favorNR) # We trigger other player's autoscripts
              notify("{} has bought {} favor. They now have {} favor".format(me, favorNR, me.Favor))
              favorBought = 1
        else:
@@ -1123,10 +1134,10 @@ def useAbility(card, x = 0, y = 0):
    if card.markers[Assembly] == 1 or not card.isFaceUp: # If card is face down or assembly, assume they wanted to deploy it.
       subdue(card)
       return
-   elif not Automation or card.Autoscript == "" or re.search(r'WhileDeployed', card.Autoscript): 
+   elif not Automation or card.AutoScript == "" or re.search(r'WhileDeployed', card.AutoScript): 
       engage(card) # If card is face up but has no autoscripts, or automation is disabled, or it just has a "WhileDeployed" effect, just engage/disengage it.
       return
-   elif re.search(r'{Custom:', card.Autoscript): 
+   elif re.search(r'{Custom:', card.AutoScript): 
       customScript(card) # Some cards just have a fairly unique effect and there's no use in trying to make them work in the generic framework.
       return
    ### Checking if card has multiple autoscript options and providing choice to player.
@@ -1155,13 +1166,19 @@ def useAbility(card, x = 0, y = 0):
    timesNothingDone = 0 # A variable that keeps track if we've done any of the autoscripts defined. If none have been coded, we just engage the card.
    CROEsnapshot = shared.CROE # Some scripts, like "CHOAM Contract" are based on CROE, so we need to take a snapshot of it, because their costs actions might modify it.
    for activeAutoscript in selectedAutoscripts:
-      ### Checking if the card effect requires a target first
+      ### Checking if any of  card effects requires one or more targets first
+      if re.search(r'Targeted', activeAutoscript) and not findTarget(activeAutoscript): return
+   for activeAutoscript in selectedAutoscripts:
       targetC = findTarget(activeAutoscript)
-      if re.search(r'Targeted', activeAutoscript) and not targetC: return
       ### Warning the player in case we need to
       if chkWarn(activeAutoscript) == 'ABORT': return
       ### Checking the activation cost and preparing a relevant string for the announcement
-      actionCost = re.match(r"C([ES0])F?([0-9]?):", activeAutoscript)
+      actionCost = re.match(r"CP?([ES0])(F)?(X)?([0-9]*):", activeAutoscript) 
+      # This is the cost of the card. It always starts with 'C' which is standsa for "Cost"
+      # After C, follows 'E', 'S' or '0', which stand for "Engage", "Subdue" or "No Card Modification" cost respectively.
+      # The follows the Favor cost, if any. If it exists, it must start with 'F'
+      # After the F can follow a number, which will be automatically taken out of the player's counter.
+      # If an X exists then the number is optional. The X will ask the player for an amount of favour to discard, up to the number. No number means unlimited.
       if actionCost: # If there's no match, it means we've already been through the cost part once.
          if actionCost.group(1) == 'E':
             if engage(card, silent = True, force = 'Engage') == 'ABORT': return
@@ -1171,26 +1188,40 @@ def useAbility(card, x = 0, y = 0):
             random = rnd(10,1000) # Small wait to grab the name.
             card.isFaceUp = False
          else: announceText = '{} activates {}'.format(card.controller, card)
-         if actionCost.group(2): 
-            me.Favor -= num(actionCost.group(2))
-            announceText += ' and discards {} favor'.format(actionCost.group(2))
+         X = 0 # Variable for custom cost. Is set to 0 if the card does not require it.
+         if actionCost.group(2):
+            if actionCost.group(3) == 'X':
+               if actionCost.group(4): 
+                  limitX = num(actionCost.group(4))
+                  X = askInteger("How much favor do you want to discard?\n\n(Max {})".format(limitX), limitX)
+                  if X > limitX: X = limitX
+               else: X = askInteger("How much favor do you want to discard?", 1)
+               if not X: return
+               me.Favor -= X
+               announceText += ' and discards {} favor'.format(X)
+            else:
+               me.Favor -= num(actionCost.group(4))
+               announceText += ' and discards {} favor'.format(actionCost.group(2))
          announceText += ' to'
-      else: announceText += ' and'
+      elif not announceText.endswith(' to') and not announceText.endswith(' and'): announceText += ' and'
       ### Calling the relevant function depending on if we're increasing our own counters, the hoard's or putting card markers.
-      if re.search(r'Gain([0-9]+)', activeAutoscript): announceText = GainX(activeAutoscript, announceText, card, targetC, True)
+      if re.search(r'Gain([0-9]+)', activeAutoscript): announceText = GainX(activeAutoscript, announceText, card, targetC, True, n = X)
       elif re.search(r'Hoard([0-9]+)', activeAutoscript): announceText = HoardX(activeAutoscript, announceText, card, True)
-      elif re.search(r'Prod([0-9]+)', activeAutoscript): announceText = ProdX(activeAutoscript, announceText, card, True)
+      elif re.search(r'(Prod|Spawn)([0-9]+)', activeAutoscript): announceText = ProdX(activeAutoscript, announceText, card, True)
       elif re.search(r'Transfer([0-9]+)', activeAutoscript): announceText = TransferX(activeAutoscript, announceText, card, targetC, True)
       elif re.search(r'(Assign|Remove)([0-9]+)', activeAutoscript): announceText = TokensX(activeAutoscript, announceText, card, targetC, True)
       elif re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', activeAutoscript): announceText = ModifyStatus(activeAutoscript, announceText, card, targetC, True)
-      elif re.search(r'Draw([0-9]+)', activeAutoscript): announceText = DrawX(activeAutoscript, announceText, card, True)
-      elif re.search(r'UseCustomAbility', activeAutoscript): announceText = UseCustomAbility(announceText, card)
+      elif re.search(r'Draw([0-9]+)', activeAutoscript): announceText = DrawX(activeAutoscript, announceText, card, targetC, True)
+      elif re.search(r'(Steal|Pay)([0-9]+)', activeAutoscript): announceText = StealX(activeAutoscript, announceText, card, targetC, True)
+      elif re.search(r'UseCustomAbility', activeAutoscript): announceText = UseCustomAbility(activeAutoscript, announceText, card, targetC)
       else: timesNothingDone += 1
-   if announceText == 'ABORT': return
-   if timesNothingDone == len(selectedAutoscripts): notify("{}".format(announceText.rstrip(' to')))
-   else: 
-      announceText += '.' # End the concatenated sentence.
-      notify("{}".format(announceText))
+      if announceText == 'ABORT': 
+         autoscriptCostUndo(selectedAutoscripts[0], card) # If nothing was done, try to undo. The first item in selectedAutoscripts[] contains the cost.
+         return
+   if announceText.endswith(' to'): # If our text annouce ends with " to", it means that nothing happened. Try to undo and inform player.
+      notify("{} but there was nothing to do.".format(announceText[:-len(' to')]))
+      autoscriptCostUndo(selectedAutoscripts[0], card)
+   else: notify("{}.".format(announceText)) # Finally announce what the player just did by using the concatenated string.
 
 def chkWarn(Autoscript):
    warning = re.search(r'warn([A-Z][A-Za-z0-9 ]+)-?', Autoscript)
@@ -1205,80 +1236,82 @@ def findTarget(Autoscript):
    targetC = None
    if re.search(r'Targeted', Autoscript):
       validTargets = [] # a list that holds any type that a card must be, in order to be a valid target.
+      validNamedTargets = [] # a list that holds any type that a card must be, in order to be a valid target.
       invalidTargets = [] # a list that holds any type that a card must not be to be a valid target.
       invalidNamedTargets = [] # a list that holds the name of any specific card that must not be to be a valid target.
-      whatTarget = re.search(r'on([A-Za-z_{}, ]+)[-]?', Autoscript) # We signify target restrictions keywords by starting a string with "or"
-      if re.search(r'Onlyon', Autoscript):
-         if whatTarget.group(1) == 'Carthag': exactSearch = '2037f0a1-773d-42a9-a498-d0cf54e7a003' # The Carthag holding card GUID
-         elif whatTarget.group(1) == 'Arrakeen': exactSearch = '2037f0a1-773d-42a9-a498-d0cf54e7a002' # The Arrakeen holding card GUID
-         else: exactSearch = 'No Target'
-         #notify("Search is {}. regexGrab is {}".format(exactSearch, whatTarget.group(1))) # Debug
-         for targetLookup in table: 
-            if targetLookup.model == exactSearch: 
-               targetC = targetLookup
-               return targetC
-      else: 
-         if whatTarget: validTargets = whatTarget.group(1).split('_or_') # If we have a list of valid targets, split them into a list, separated by the string "_or_". Usually this results in a list of 1 item.
-         for chkTarget in validTargets: # Now we go through each list item and see if it has more than one condition (Eg, non-desert fief)
-            if re.search(r'_and_', chkTarget):  # If there's a string "_and_" between our restriction keywords, then this keyword has mutliple conditions
-               multiConditionTargets = chkTarget.split('_and_') # We put all the mutliple conditions in a new list, separating each element.
-               for chkCondition in multiConditionTargets: 
-                  invalidCondition = re.search(r'(no[nt]){?([A-Za-z, ]+)}?', chkCondition) # Do a search to see if in the multicondition targets there's one with "non" in front
-                  if invalidCondition and invalidCondition.group(1) == 'non': invalidTargets.append(invalidCondition.group(2)) # If there is, move it without the "non" into the invalidTargets list.
-                  elif invalidCondition and invalidCondition.group(1) == 'not': invalidNamedTargets.append(invalidCondition.group(2))
-                  else: validTargets.append(chkCondition) # Else just move the individual condition to the end if validTargets list
-               validTargets.remove(chkTarget) # Finally, remove the multicondition keyword from the valid list. Its individual elements should now be on this list or the invalid targets one.
-            else:   
-               if re.match(r'non', chkTarget): # If the keyword has "non" in front, it means it's something we need to avoid, so we move it to a different list.
-                  invalidTargets.append(chkTarget)
-                  validTargets.remove(chkTarget)
-               if re.match(r'not', chkTarget): # Same as above but keywords with "not" in front as specific card names.
-                  invalidNamedTargets.append(chkTarget)
-                  validTargets.remove(chkTarget)
-         for targetLookup in table: # Now that we have our list of restrictions, we go through each targeted card on the table to check if it matches.
-            if targetLookup.targetedBy and targetLookup.targetedBy == me and chkPlayer(Autoscript, targetLookup.controller, False): # The card needs to be targeted by the player. If the card needs to belong to a specific player (me or rival) this also is taken into account.
-               if not targetLookup.isFaceUp: # If we've targeted a subdued card, we turn it temporarily face-up to grab its properties.
-                  targetLookup.isFaceUp = True
-                  wasSubdued = True
-               else: wasSubdued = False
-               if len(validTargets) == 0: targetC = targetLookup # If we have no target restrictions, any targeted  card will do.
-               else:
-                  for validtargetCHK in validTargets: # look if the card we're going through matches our valid target checks
-                     if re.search(r'{}'.format(validtargetCHK), targetLookup.Type) or re.search(r'{}'.format(validtargetCHK), targetLookup.Subtype) or re.search(r'{}'.format(validtargetCHK), targetLookup.Decktype):
-                        targetC = targetLookup
-               if len(invalidTargets) > 0: # If we have no target restrictions, any selected card will do as long as it's a valid target.
-                  for invalidtargetCHK in invalidTargets:
-                     if re.search(r'{}'.format(invalidtargetCHK), targetLookup.Type) or re.search(r'{}'.format(invalidtargetCHK), targetLookup.Subtype) or re.search(r'{}'.format(invalidtargetCHK), targetLookup.Decktype):
-                        targetC = None
-               if len(invalidNamedTargets) > 0: # If we have no target restrictions, any selected card will do as long as it's a valid target.
-                  for invalidtargetCHK in invalidNamedTargets:
-                     if invalidtargetCHK == targetLookup.name:
-                        targetC = None
-               if wasSubdued: targetLookup.isFaceUp = False
-               if targetC: return targetC
+      whatTarget = re.search(r'\bon([A-Za-z_{}, ]+)[-]?', Autoscript) # We signify target restrictions keywords by starting a string with "or"
+      if whatTarget: validTargets = whatTarget.group(1).split('_or_') # If we have a list of valid targets, split them into a list, separated by the string "_or_". Usually this results in a list of 1 item.
+      for chkTarget in validTargets: # Now we go through each list item and see if it has more than one condition (Eg, non-desert fief)
+         if re.search(r'_and_', chkTarget):  # If there's a string "_and_" between our restriction keywords, then this keyword has mutliple conditions
+            multiConditionTargets = chkTarget.split('_and_') # We put all the mutliple conditions in a new list, separating each element.
+            for chkCondition in multiConditionTargets: 
+               invalidCondition = re.search(r'(no[nt]){?([A-Za-z, ]+)}?', chkCondition) # Do a search to see if in the multicondition targets there's one with "non" in front
+               if invalidCondition and invalidCondition.group(1) == 'non': invalidTargets.append(invalidCondition.group(2)) # If there is, move it without the "non" into the invalidTargets list.
+               elif invalidCondition and invalidCondition.group(1) == 'not': invalidNamedTargets.append(invalidCondition.group(2))
+               else: validTargets.append(chkCondition) # Else just move the individual condition to the end if validTargets list
+            validTargets.remove(chkTarget) # Finally, remove the multicondition keyword from the valid list. Its individual elements should now be on this list or the invalid targets one.
+         else:
+            regexCondition = re.search(r'(no[nt]){?([A-Za-z, ]+)}?', chkTarget)
+            if regexCondition and regexCondition.group(1) == 'non': # If the keyword has "non" in front, it means it's something we need to avoid, so we move it to a different list.
+               invalidTargets.append(regexCondition.group(2))
+               validTargets.remove(chkTarget)
+            if regexCondition and regexCondition.group(1) == 'not': # Same as above but keywords with "not" in front as specific card names.
+               invalidNamedTargets.append(regexCondition.group(2))
+               validTargets.remove(chkTarget)
+            regexCondition = re.search(r'{([A-Za-z, ]+)}', chkTarget)
+            if regexCondition: # Same as above but keywords in {curly brackets} are exact names in front as specific card names.
+               validNamedTargets.append(regexCondition.group(1))
+               validTargets.remove(chkTarget)
+      for targetLookup in table: # Now that we have our list of restrictions, we go through each targeted card on the table to check if it matches.
+         if targetLookup.targetedBy and targetLookup.targetedBy == me and chkPlayer(Autoscript, targetLookup.controller, False): # The card needs to be targeted by the player. If the card needs to belong to a specific player (me or rival) this also is taken into account.
+            if not targetLookup.isFaceUp: # If we've targeted a subdued card, we turn it temporarily face-up to grab its properties.
+               targetLookup.isFaceUp = True
+               wasSubdued = True
+            else: wasSubdued = False
+            if len(validTargets) == 0 and len(validNamedTargets) == 0: targetC = targetLookup # If we have no target restrictions, any targeted  card will do.
+            else:
+               for validtargetCHK in validTargets: # look if the card we're going through matches our valid target checks
+                  if re.search(r'{}'.format(validtargetCHK), targetLookup.Type) or re.search(r'{}'.format(validtargetCHK), targetLookup.Subtype) or re.search(r'{}'.format(validtargetCHK), targetLookup.Decktype):
+                     targetC = targetLookup
+               for validtargetCHK in validNamedTargets: # look if the card we're going through matches our valid target checks
+                  if validtargetCHK == targetLookup.name:
+                     targetC = targetLookup
+            if len(invalidTargets) > 0: # If we have no target restrictions, any selected card will do as long as it's a valid target.
+               for invalidtargetCHK in invalidTargets:
+                  if re.search(r'{}'.format(invalidtargetCHK), targetLookup.Type) or re.search(r'{}'.format(invalidtargetCHK), targetLookup.Subtype) or re.search(r'{}'.format(invalidtargetCHK), targetLookup.Decktype):
+                     targetC = None
+            if len(invalidNamedTargets) > 0: # If we have no target restrictions, any selected card will do as long as it's a valid target.
+               for invalidtargetCHK in invalidNamedTargets:
+                  if invalidtargetCHK == targetLookup.name:
+                     targetC = None
+            if wasSubdued: targetLookup.isFaceUp = False
+            if targetC: return targetC
       if targetC == None: 
          targetsText = ''
          if len(validTargets) > 0: targetsText += "\nValid Target types: {}.".format(validTargets)
+         if len(validNamedTargets) > 0: targetsText += "\nSpecific Valid Targets: {}.".format(validNamedTargets)
          if len(invalidTargets) > 0: targetsText += "\nInvalid Target types: {}.".format(invalidTargets)
          if len(invalidNamedTargets) > 0: targetsText += "\nSpecific Invalid Targets: {}.".format(invalidNamedTargets)
-         if re.search(r'Onlyon', Autoscript): whisper("{} does not seem to be deployed on the table. Deploy the card before running this action again.".format(whatTarget.group(1)))
-         else: whisper("You need to target a valid card before using this action{}".format(targetsText))
+         if not chkPlayer(Autoscript, targetLookup.controller, False): 
+            allegiance = re.search(r'by(Rival|Mw)', Autoscript)
+            targetsText += "\nValid Target Allegiance: {}.".format(allegiance.group(1))
+         whisper("You need to target a valid card before using this action{}".format(targetsText))
          return targetC
    else: return targetC
 
-def GainX(Autoscript, announceText, card, targetCard = None, manual = False, n = 1):
+def GainX(Autoscript, announceText, card, targetCard = None, manual = False, n = 0):
 # n is used when other scripts are calling this variable, to automatically provide the generated result to the counters of another player owning a specific card.
 # For example if one player owns a card that produces one Solaris per Spice produced in a desert, and another player produces 3 spice with a Spice Blow event...
-# ...then the other script will call this one, giving an n of 3. If no n is passed, the multiplier will be 1, which will do nothing.
+# ...then the other script will call this one, giving an n of 3.
    gain = 0
    extraText = ''
-   action = re.search(r'Gain([0-9]+)(Solaris|Spice|Favor)', Autoscript) # First see if we're gaining Solaris, Spice or Favour and how much.
+   action = re.search(r'\bGain([0-9]+)(Solaris|Spice|Favor)', Autoscript) # First see if we're gaining Solaris, Spice or Favour and how much.
    gain += num(action.group(1))
    duneXtra = re.search(r'Dune([0-9])Xtra', Autoscript) # Some cards give you extra Solaris if you control Dune.
    if duneXtra and DuneFiefs(True) == 1: # If the autoscript includes extra cost for controlling Dune, and we contol Dune...
       extraText = ' ({} + {} for controlling Dune)'.format(action.group(1),duneXtra.group(1))
       gain += num(duneXtra.group(1))
-   multiplier = per(Autoscript, card, n, manual) # We check if the card provides a gain based on something else, such as favour bought, or number of dune fiefs controlled by rivals.
+   multiplier = per(Autoscript, card, n, targetCard, manual) # We check if the card provides a gain based on something else, such as favour bought, or number of dune fiefs controlled by rivals.
    if action.group(2) == 'Solaris': card.owner.Solaris += gain * multiplier
    elif action.group(2) == 'Spice': card.owner.Spice += gain * multiplier
    elif action.group(2) == 'Favor': card.owner.Favor += gain * multiplier
@@ -1286,40 +1319,38 @@ def GainX(Autoscript, announceText, card, targetCard = None, manual = False, n =
       whisper("Gain what?! (Bad autoscript)")
       return 'ABORT'
    announceString = "{} gain {} {}{}".format(announceText, gain * multiplier, action.group(2),extraText)
-   if not manual: notify('--> {}.'.format(announceString))
+   if not manual and multiplier > 0: notify('--> {}.'.format(announceString))
    else: return announceString
       
 def HoardX(Autoscript, announceText, card, manual = False):
-   action = re.search(r'Hoard([0-9]+)Spice', Autoscript)
+   action = re.search(r'\bHoard([0-9]+)Spice', Autoscript)
    multiplier = per(Autoscript, card)
    shared.counters['Guild Hoard'].value += num(action.group(1)) * multiplier
    shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)   
    announceString = "{} add {} Spice to the Guild Hoard (Total:{}.CROE:{})".format(announceText, num(action.group(1)) * multiplier, shared.counters['Guild Hoard'].value, shared.CROE)
-   if not manual: notify('--> {}.'.format(announceString))
+   if not manual and multiplier > 0: notify('--> {}.'.format(announceString))
    else: return announceString
 
 def ProdX(Autoscript, announceText, card, manual = False):
-   action = re.search(r'Prod([0-9]+)Spice', Autoscript)
-   if not confirm('Do you want to produce spice on {}?\n\nPressing "No" will send it directly to the Guild Hoard instead'.format(card.name)):
-      return HoardX('Hoard{}Spice'.format(action.group(1)), announceText, card) # If we want to produce the spice to the hoard, we're going to use the HoardX() function, but we need to sent it a modified Autoscript.
-   card.markers[Spice] += num(action.group(1))
-   autoscriptOtherPlayers('SpiceGenerated',num(action.group(1)))
-   announceString = "{} produce {} spice assigned to it".format(announceText,action.group(1))
+   action = re.search(r'\b(Prod|Spawn)([0-9]+)Spice', Autoscript)
+   if action.group(1) == 'Prod' and not confirm('Do you want to produce spice on {}?\n\nPressing "No" will send it directly to the Guild Hoard instead'.format(card.name)):
+      return HoardX('Hoard{}Spice'.format(action.group(2)), announceText, card) # If we want to produce the spice to the hoard, we're going to use the HoardX() function, but we need to sent it a modified Autoscript.
+   card.markers[Spice] += num(action.group(2))
+   autoscriptOtherPlayers('GeneratedSpice',num(action.group(2)))
+   announceString = "{} produce {} spice assigned to it".format(announceText,action.group(2))
    if not manual: notify('--> {}.'.format(announceString))
    else: return announceString
 
 def TransferX(Autoscript, announceText, card, targetCard = None, manual = False):
    breakadd = 1
    if not targetCard: targetCard = card # If there's been to target card given, assume the target is the card itself.
-   action = re.search(r'Transfer([0-9]+)Spice-to(Owner|Hoard|Discard)', Autoscript)
+   action = re.search(r'\bTransfer([0-9]+)Spice-to(Owner|Hoard|Discard)', Autoscript)
    if targetCard.markers[Spice] < num(action.group(1)): 
       if re.search(r'isCost', Autoscript):
          whisper("You must have at least {} Spice on the card to take this action".format(action.group(1)))
-         autoscriptCostUndo(Autoscript, card)
          return 'ABORT'
       elif targetCard.markers[Spice] == 0: 
          whisper("There was nothing to transfer.")
-         autoscriptCostUndo(Autoscript, card)
          return 'ABORT'
    for transfer in range(num(action.group(1))):
       if targetCard.markers[Spice] > 0: 
@@ -1343,7 +1374,7 @@ def TransferX(Autoscript, announceText, card, targetCard = None, manual = False)
    
 def TokensX(Autoscript, announceText, card, targetCard = None, manual = False):
    if not targetCard: targetCard = card # If there's been to target card given, assume the target is the card itself.
-   action = re.search(r'(Assign|Remove)([0-9]+)(Deferment|Spice|Program)', Autoscript)
+   action = re.search(r'\b(Assign|Remove)([0-9]+)(Deferment|Spice|Program)', Autoscript)
    if action.group(3) == 'Deferment' : token = Deferment_Token
    elif action.group(3) == 'Spice' : token = Spice
    elif action.group(3) == 'Program' : token = Program
@@ -1354,91 +1385,134 @@ def TokensX(Autoscript, announceText, card, targetCard = None, manual = False):
    if action.group(1) == 'Assign': modtokens = num(action.group(2)) * multiplier
    else: modtokens = -num(action.group(2)) * multiplier
    targetCard.markers[token] += modtokens
-   autoscriptOtherPlayers('{}Generated'.format(action.group(3)),modtokens)
+   autoscriptOtherPlayers('Generated{}'.format(action.group(3)),modtokens)
    announceString = "{} {} {} {} tokens to {}".format(announceText, action.group(1), abs(modtokens), action.group(3), targetCard)
-   if not manual: notify('--> {}.'.format(announceString))
+   if not manual and multiplier > 0: notify('--> {}.'.format(announceString))
    else: return announceString
 
-def DrawX(Autoscript, announceText, card, manual = False, n = 1): # Function for drawing X Cards from the house deck to your hand.
-   action = re.search(r'Draw([0-9]+)Card', Autoscript)
+def DrawX(Autoscript, announceText, card, targetCard = None, manual = False, n = 0): # Function for drawing X Cards from the house deck to your hand.
+   action = re.search(r'\bDraw([0-9]+)Card', Autoscript)
    draw = num(action.group(1))
-   multiplier = per(Autoscript, card, n, manual)
+   multiplier = per(Autoscript, card, n, targetCard, manual)
    drawMany(me.piles['House Deck'], draw * multiplier, silent)
-   announceString = "{} draw {} cards to their hand".format(announceText, action.group(1))
-   if not manual: notify('--> {}.'.format(announceString))
+   announceString = "{} draw {} cards to their hand".format(announceText, draw * multiplier)
+   if not manual and multiplier > 0: notify('--> {}.'.format(announceString))
    else: return announceString
 
 def ModifyStatus(Autoscript, announceText, card = None, targetCard = None, manual = False):
-   action = re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', Autoscript)
+   action = re.search(r'\b(Engage|Disengage|Subdue|Deploy|Discard)Target', Autoscript)
    if action.group(1) == 'Engage' and engage(targetCard, silent = True, force = 'Engage') != 'ABORT': pass
    elif action.group(1) == 'Disengage'and engage(targetCard, silent = True, force = 'Disengage') != 'ABORT': pass
    elif action.group(1) == 'Subdue' and subdue(targetCard, silent = True, force = 'Subdue') != 'ABORT': pass
    elif action.group(1) == 'Deploy' and subdue(targetCard, silent = True, force = 'Deploy') != 'ABORT': pass
    elif action.group(1) == 'Discard': whisper(":::Note::: No automatic discard action is taken. Please ask the owner of the card to do take this action themselves.") # We do not discard automatically because it's easy to make a mistake that will be difficult to undo this way.
-   else: 
-      autoscriptCostUndo(Autoscript, card)
-      return 'ABORT'
+   else: return 'ABORT'
    announceString = "{} {} {}".format(announceText, action.group(1), targetCard)
    if not manual: notify('--> {}.'.format(announceString))
    else: return announceString
 
-def UseCustomAbility(announceText, card):
-   return "{} use the card's custom ability (Unimplemented! {} will have to take the necessary actions manually)".format(announceText,me)
+def StealX(Autoscript, announceText, card, targetCard = None, manual = False, n = 0):
+   action = re.search(r'\b(Steal|Pay)([0-9]+)(Solaris|Spice|Favor)', Autoscript)
+   if targetCard and re.search(r'toGovernor', Autoscript): targetPL = targetCard.controller
+   else:
+      playerChoice = 'Please select target player\n\n'
+      for idxPL in range(len(players)):
+         playerChoice += "{}: {}\n".format(idxPL, players[idxPL])
+      idxPL = chooseWell(len(players), playerChoice, 0)
+      if idxPL == None: return 'ABORT'
+      targetPL = players[idxPL]
+   if targetPL == me: return announceText # If the player is us, there's nothing to do anyway
+   multiplier = per(Autoscript, card, n, targetCard, manual)
+   if action.group(1) == 'Pay': 
+      multiplier *= -1 # If the action to pay someone, then we reverse the numbers.
+      extraText = 'to'
+   else: extraText = 'from'
+   count = num(action.group(2))
+   if action.group(3) == 'Solaris': 
+      me.Solaris += count * multiplier
+      targetPL.Solaris -= count * multiplier
+   elif action.group(3) == 'Spice': 
+      me.Spice += count * multiplier
+      targetPL.Spice -= count * multiplier
+   elif action.group(3) == 'Favor': 
+      me.Favor += count * multiplier
+      targetPL.Favor -= count * multiplier
+   announceString = "{} {} {} {} {} {}".format(announceText, action.group(1), abs(count * multiplier), action.group(3), extraText, targetPL)
+   if not manual and multiplier > 0: notify('--> {}.'.format(announceString))
+   else: return announceString
+
+def UseCustomAbility(Autoscript, announceText, card, targetCard = None):
+   action = re.search(r'\bUseCustomAbility{([A-Za-z0-9 ,]+)}', Autoscript)
+   if not action: return 'ABORT' # Bad string on card property's AutoScript.
+   if action.group(1) == 'The Shield Wall, Great Barrier Range':
+      SpiceProduce = re.search(r'(Prod|Hoard)([0-9]+)Spice', targetCard.AutoScript)
+      if not SpiceProduce: cost = 1
+      else: cost = num(SpiceProduce.group(2))
+      if payCost(cost, silent) == 'OK':
+         announceText = '{} engaged {} and paid {} in order to disengage {}.'.format(me, card, SpiceProduce.group(2), targetCard)
+         announceText = ModifyStatus('DisengageTarget', announceText, card, targetCard, True)
+         if announceText == 'ABORT': me.Solaris += cost
+         return announceText
+      else: 
+         notify("Couldn't pay the cost for {}'s ability".format(card))
+         autoscriptCostUndo(Autoscript, card)
+   else: # Is the custom script is unimplemented, abort.
+      return "{} use the card's custom ability (Unimplemented! {} will have to take the necessary actions manually)".format(announceText,me)
 
 def autoscriptCostUndo(Autoscript, card):
    whisper("--> Undoing action...")
-   actionCost = re.match(r"C([ES0]F?([1-9]?))", Autoscript)
+   actionCost = re.match(r"\bC([ES0])F?([1-9]?)", Autoscript)
    if actionCost.group(1) == 'E': 
-      random = rnd(10,1000) # Need to wait a bit or card is left engaged but program thinks it's not o.O
+      random = rnd(10,5000) # Need to wait a bit or card is left engaged but program thinks it's not o.O
       card.orientation = Rot0
    if actionCost.group(1) == 'S': card.isFaceUp = True
    if num(actionCost.group(2)) > 0: me.Favor += num(actionCost.group(2))
    
-def per(Autoscript, card = None, n = 1, manual = False): # This function goes through the autoscript and looks for the words "per<Something>". Then figures out what the card multiplies its effect with, and returns the appropriate multiplier.
-   per = re.search(r'(per|upto)([A-Z][A-Za-z0-9]*)[-]?', Autoscript) # We're searching for the word per, and grabbing all after that, until the first dash "-" as the variable.
-   if per: # If the search was successful...
-      if per.group(2) == 'Intrigue': multiplier = num(card.Intrigue) 
-      elif per.group(2) == 'Arbitration': multiplier = num(card.Arbitration) 
-      elif per.group(2) == 'Battle': multiplier = num(card.Battle) 
-      elif per.group(2) == 'Dueling': multiplier = num(card.Dueling) 
-      elif per.group(2) == 'Weirding': multiplier = num(card.Weirding) 
-      elif per.group(2) == 'Prescience': multiplier = num(card.Prescience) 
-      elif per.group(2) == 'Resistance': multiplier = num(card.Resistance) 
-      elif per.group(2) == 'Command': multiplier = num(card.Command) 
-      elif per.group(2) == 'DeploymentCost': multiplier = num(card.properties['Deployment Cost']) 
-      elif per.group(2) == 'SpiceProducer':
-         spiceProducers = [c for c in table
-                           if re.search('Desert', c.Subtype)
-                           or re.search('Spice Harvester', c.name)
-                           or re.search('Carryall', c.name)]
-         multiplier = len(spiceProducers) * chkPlayer(Autoscript, card.controller, False) # We send False to the manual variable, because we don't want it to give 1 solaris when nobody has any production
-      elif per.group(2) == 'DuneFief':
-         duneFs = [c for c in table if re.search('Dune Fief', c.Subtype)]
-         multiplier = len(duneFs) * chkPlayer(Autoscript, card.controller, False)
-      elif per.group(2) == 'SpiceFactory':
-         multiplier = 0
-         for player in players: # We're looking at which player has the most of these three cards, and using them as multiplier.
-            spiceFactories = [c for c in table
-                              if (re.search('Harvester Pad', c.name)
-                                 or re.search('Spice Harvester', c.name)
-                                 or re.search('Carryall', c.name))
-                              and c.controller == player]
-            if len(spiceFactories) > multiplier: multiplier = len(spiceFactories)
-      elif per.group(2) == 'CROE': multiplier = shared.CROE
-      elif re.search(r'CROE(plus|minus)([0-6])', per.group(2)):
-         CROEregex = re.search(r'CROE(plus|minus)([0-6])', per.group(2))
+def per(Autoscript, card = None, count = 0, targetCard = None, manual = False): # This function goes through the autoscript and looks for the words "per<Something>". Then figures out what the card multiplies its effect with, and returns the appropriate multiplier.
+   per = re.search(r'\b(per|upto)(Assigned|Target|Parent|Generated|Deployed|Petitioned|Transferred|Bought)?([{A-Z][A-Za-z0-9,_ {}]*)[-]?', Autoscript) # We're searching for the word per, and grabbing all after that, until the first dash "-" as the variable.
+   if per: # If the  search was successful...
+      if per.group(2) and per.group(2) == 'Target': useC = targetCard # If the effect is targeted, we need to use the target's attributes
+      else: useC = card # If not, use our own.
+      if per.group(3) == 'X': multiplier = count
+      elif per.group(3) == 'Intrigue': multiplier = num(useC.Intrigue) * chkPlayer(Autoscript, useC.controller, False)
+      elif per.group(3) == 'Arbitration': multiplier = num(useC.Arbitration) * chkPlayer(Autoscript, useC.controller, False)
+      elif per.group(3) == 'Battle': multiplier = num(useC.Battle) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'Dueling': multiplier = num(useC.Dueling) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'Weirding': multiplier = num(useC.Weirding) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'Prescience': multiplier = num(useC.Prescience) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'Resistance': multiplier = num(useC.Resistance) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'Command': multiplier = num(useC.Command) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'DeploymentCost': multiplier = num(useC.properties['Deployment Cost']) * chkPlayer(Autoscript, useC.controller, False) 
+      elif per.group(3) == 'CROE': multiplier = shared.CROE
+      elif re.search(r'CROE(plus|minus)([0-6])', per.group(3)):
+         CROEregex = re.search(r'CROE(plus|minus)([0-6])', per.group(3))
          if CROEregex.group(1) == 'plus': multiplier = CROEsnapshot + num(CROEregex.group(1))
          else: multiplier = shared.CROE - num(CROEregex.group(2))
-      else: multiplier = num(n) * chkPlayer(Autoscript, card.controller, manual) # All non-special-rules per<somcething> requests use this formula.
-                                                                            # Usually there is an n sent to this function (eg, number of favour purchased) with which to multiply the end result with
-                                                                            # and some cards may only work when a rival owns or does something.
+      elif count: multiplier = num(count) * chkPlayer(Autoscript, card.controller, manual) # All non-special-rules per<somcething> requests use this formula.
+                                                                                           # Usually there is a count sent to this function (eg, number of favour purchased) with which to multiply the end result with
+                                                                                           # and some cards may only work when a rival owns or does something.
+      elif per.group(2): return 1 * chkPlayer(Autoscript, card.controller, manual) # To be able to grab those not yet implemented, or run manually.
+      else:
+         if re.search(r'Targeted', Autoscript): return 1 # Temporary fix for that give according to the attached cards. So that they can still work manually until I implement that.
+         perItems = per.group(3).split('_or_')
+         multiplier = 0
+         #confirm("per group: {}".format(per.groups())) # debug
+         #confirm("per items: {}".format(perItems)) # debug
+         for perItem in perItems:
+            namedItem = re.search(r'{([A-Z][A-Za-z0-9, ]*)}', perItem)
+            typeItem = re.search(r'[^{]?([A-Z][A-Za-z0-9 ]*)', perItem)
+            if namedItem: # This per triggers for specific named cards
+               multiplier += len([c for c in table if c.name == namedItem.group(1)]) * chkPlayer(Autoscript, c.controller, False)
+            else: 
+               multiplier += len([c for c in table if c.Type == typeItem.group(1) or re.search('{}'.format(typeItem.group(1)), c.Subtype)]) * chkPlayer(Autoscript, c.controller, False)
+         #multiplier *= chkPlayer(Autoscript, card.controller, manual)
       if per.group(1) == 'upto': # If we're using an "upto" autoscript instead of per, the player can choose any number up to the max we found.
          choiceText = re.search(r':([A-Z][A-Za-z]+)[0-9]+([A-Z][A-Za-z]+)', Autoscript)
          choice = multiplier + 1
          while choice > multiplier:
             choice = askInteger("{} how many {}?\n(Max {})".format(choiceText.group(1), choiceText.group(2), multiplier), multiplier)
             if not choice: multiplier = 0
-            else: multiplier = choice
+            elif choice <= multiplier: multiplier = choice
    else: multiplier = 1 # If the search was not successful, then return a mutliplier of 1.
    return multiplier
 
@@ -1449,9 +1523,10 @@ def chkPlayer(Autoscript, governor, manual):
    byRival = re.search(r'byRival', Autoscript)
    byMe = re.search(r'byMe', Autoscript)
    if manual: return 1 #manual means that the actions was called by a player double clicking on the card. In which case we always do it.
-   elif not byRival or (byRival and governor != me): return 1 
-   elif not byMe or (byMe and governor == me): return 1
-   else: return 0
+   elif not byRival and not byMe: return 1 # If the card has no restrictions on being us or a rival.
+   elif byRival and governor != me: return 1 # If the card needs to be played by a rival.
+   elif byMe and governor == me: return 1 # If the card needs to be played by us.
+   else: return 0 # If all the above fail, it means that we're not supposed to be triggering, so we'll return 0 which will make the multiplier 0.
    
 def autoscriptOtherPlayers(lookup, count = 1):
 # This function is called from other functions in order to go through the table and see if other players have any cards which would be activated by it.
@@ -1460,7 +1535,7 @@ def autoscriptOtherPlayers(lookup, count = 1):
    for card in table:
       if not card.isFaceUp: continue # Don't take into accounts cards that are subdued but we've peeked at them.
       costText = '{} activates {} to'.format(card.controller, card) 
-      if re.search(r'{}'.format(lookup), card.AutoScript): # Search if in the script of the card, the string that was sent to us exists. The sent string is decided by the function calling us, so for example the ProdX() function knows it only needs to send the 'SpiceGenerated' string.
+      if re.search(r'{}'.format(lookup), card.AutoScript): # Search if in the script of the card, the string that was sent to us exists. The sent string is decided by the function calling us, so for example the ProdX() function knows it only needs to send the 'GeneratedSpice' string.
          GainX(card.AutoScript, costText, card, n = count) # If it exists, then call the GainX() function, because cards that automatically do something when other players do something else, always give the player something directly.
 
 def chkDeployAutoscripts(card): # This function is called whenever a card is deployed to check if any other cards on the table will trigger from it
@@ -1477,26 +1552,26 @@ def chkRemoveAutoscripts(card): # This function is called whenever a card is sub
    
 def whileDeployedEffects(card, action='Deploy'): # This script defines effects that happen and stick around only while a card is deployed.
    global handsize, assemblysize
-   effect = re.search(r'WhileDeployed:Gain([0-9]+)(AssemblyLimit|HandSize)', card.Autoscript)
-   if action == 'Deploy': 
-      effectNR = num(effect.group(1))
-   else: effectNR = -num(effect.group(1))
-   if effect.group(2) == 'AssemblyLimit': 
-      if card.controller == me: assemblysize += effectNR
-      affectedText = 'Assembly Limit'
-   if effect.group(2) == 'HandSize': 
-      if card.controller == me: handsize += effectNR
-      affectedText = 'Hand Size'
-   # If we're not the controller of the card, this means that we're deploying/removing another player's card with an autoscript, so we don't want their effect to affect us.
-   if card.controller == me: notify("--> {} has modified their {} by {}".format(me, affectedText, addPos(effectNR)))
-   else: notify("--> {} has been {}'d by {}. {} needs to manually modify their {} by {}".format(card, action, me, card.controller, affectedText, addPos(effectNR)))
+   effect = re.search(r'WhileDeployed:(Gain|Accrue)([0-9]+)(AssemblyLimit|HandSize|XtraDeferment)', card.Autoscript)
+   effectNR = num(effect.group(2))
+   if effect.group(1) == 'Gain':
+      if action == 'Remove': effectNR *= -1 # When removing card from play (subduing or discarding), we reverse the effects.
+      if effect.group(3) == 'AssemblyLimit': 
+         if card.controller == me: assemblysize += effectNR
+         affectedText = 'Assembly Limit'
+      if effect.group(3) == 'HandSize': 
+         if card.controller == me: handsize += effectNR
+         affectedText = 'Hand Size'
+      # If we're not the controller of the card, this means that we're deploying/removing another player's card with an autoscript, so we don't want their effect to affect us.
+      if card.controller == me: notify("--> {} has modified their {} by {}".format(me, affectedText, addPos(effectNR)))
+      else: notify("--> {} has been {}'d by {}. {} needs to manually modify their {} by {}".format(card, action, me, card.controller, affectedText, addPos(effectNR)))
 
 def customScript(card):
 # This function has specific autoscripts tailored to specific cards which have fairly unique effects.
    custom = re.search(r'{Custom:([A-Za-z ]+)', card.Autoscript)
    if custom.group(1) == 'Carthag Engineering' or custom.group(1) == 'Arrakeen Water Facilities': 
-      if re.search('Carthag', custom.group(1)): targetC = findTarget('Targeted-OnlyonCarthag')
-      else: targetC = findTarget('Targeted-OnlyonArrakeen')
+      if re.search('Carthag', custom.group(1)): targetC = findTarget('Targeted-on{Carthag}')
+      else: targetC = findTarget('Targeted-on{Arrakeen, Capital of Arrakis}')
       if not targetC: return
       if engage(card, silent = True, force = 'Engage') == 'ABORT': return
       elif targetC.controller == me:
