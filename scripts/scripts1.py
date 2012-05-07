@@ -1131,8 +1131,11 @@ def mill(group):
 def useAbility(card, x = 0, y = 0):
    global CROEsnapshot
    mute()
-   if card.markers[Assembly] == 1 or not card.isFaceUp: # If card is face down or assembly, assume they wanted to deploy it.
+   if card.markers[Assembly] == 1 and not card.isFaceUp: # If card is face down or assembly, assume they wanted to deploy it.
       subdue(card)
+      return
+   elif card.markers[Assembly] == 1: # If card is face down and assembly, assume they wanted to bid on it
+      placeBid(card)
       return
    elif not Automation or card.AutoScript == "": 
       engage(card) # If card is face up but has no autoscripts, or automation is disabled just engage/disengage it.
@@ -1216,14 +1219,14 @@ def useAbility(card, x = 0, y = 0):
                announceText += ' and discards {} favor'.format(X)
             else:
                me.Favor -= num(actionCost.group(4))
-               announceText += ' and discards {} favor'.format(actionCost.group(2))
+               announceText += ' and discards {} favor'.format(actionCost.group(4))
          announceText += ' to'
       elif not announceText.endswith(' to') and not announceText.endswith(' and'): announceText += ' and'
       ### Calling the relevant function depending on if we're increasing our own counters, the hoard's or putting card markers.
       if re.search(r'Gain([0-9]+)', activeAutoscript): announceText = GainX(activeAutoscript, announceText, card, targetC, True, n = X)
       elif re.search(r'Hoard([0-9]+)', activeAutoscript): announceText = HoardX(activeAutoscript, announceText, card, True)
       elif re.search(r'(Prod|Spawn)([0-9]+)', activeAutoscript): announceText = ProdX(activeAutoscript, announceText, card, True)
-      elif re.search(r'Transfer([0-9]+)', activeAutoscript): announceText = TransferX(activeAutoscript, announceText, card, targetC, True, n = X)
+      elif re.search(r'Transfer([0-9]+)', activeAutoscript): announceText = TransferX(activeAutoscript, announceText, card, targetC, True)
       elif re.search(r'(Assign|Remove)([0-9]+)', activeAutoscript): announceText = TokensX(activeAutoscript, announceText, card, targetC, True, n = X)
       elif re.search(r'(Engage|Disengage|Subdue|Deploy|Discard)Target', activeAutoscript): announceText = ModifyStatus(activeAutoscript, announceText, card, targetC, True)
       elif re.search(r'Draw([0-9]+)', activeAutoscript): announceText = DrawX(activeAutoscript, announceText, card, targetC, True)
@@ -1245,6 +1248,8 @@ def chkWarn(Autoscript):
          if not confirm("This action requires that you discard some cards. Have you done this already?"):
             whisper("--> Aborting action. Please discard the necessary amount of cards and run this action again")
             return 'ABORT'
+      if warning.group(1) == 'Workaround':
+         notify(":::Note:::{} is using a workaround autoscript".format(me))
    return 'OK'
             
 def findTarget(Autoscript):
@@ -1282,7 +1287,7 @@ def findTarget(Autoscript):
                validTargets.remove(chkTarget)
                continue
             regexCondition = re.search(r'{([A-Za-z, ]+)}', chkTarget)
-            if regexCondition and regexCondition.group(1) not in validNamedTarget: # Same as above but keywords in {curly brackets} are exact names in front as specific card names.
+            if regexCondition and regexCondition.group(1) not in validNamedTargets: # Same as above but keywords in {curly brackets} are exact names in front as specific card names.
                validNamedTargets.append(regexCondition.group(1))
                validTargets.remove(chkTarget)
       for targetLookup in table: # Now that we have our list of restrictions, we go through each targeted card on the table to check if it matches.
@@ -1344,7 +1349,10 @@ def GainX(Autoscript, announceText, card, targetCard = None, manual = False, n =
       return 'ABORT'
    announceString = "{} gain {} {}{}".format(announceText, gain * multiplier, action.group(2),extraText)
    if not manual and multiplier > 0: notify('--> {}.'.format(announceString))
-   else: return announceString
+   else: 
+      if manual and re.match(r"C0", Autoscript) and re.search(r'\b(per|upto)(Assigned|Target|Parent|Generated|Deployed|Petitioned|Transferred|Bought)', Autoscript):
+         announceString += " (Manual Activation!)" # For when the player manually activates cards which should trigger automatically
+      return announceString
       
 def HoardX(Autoscript, announceText, card, manual = False):
    action = re.search(r'\bHoard([0-9]+)Spice', Autoscript)
@@ -1548,7 +1556,8 @@ def per(Autoscript, card = None, count = 0, targetCard = None, manual = False): 
                if perItem not in cardProperties: perCHK = False # The perCHK starts as True. We only need one missing item to turn it to False, since they all have to exist.
             for perItem in perItemExclusion:
                if perItem in cardProperties: perCHK = False # Pretty much the opposite of the above.
-            if perCHK: multiplier += 1 # If the perCHK remains 1 after the above loop, means that the card matches all our requirements.
+            if perCHK: multiplier += 1 * chkPlayer(Autoscript, c.controller, False) # If the perCHK remains 1 after the above loop, means that the card matches all our requirements.
+                                                                                    # We also multiply it with chkPlayer() which will return 0 if the player is not of the correct allegiance (i.e. Rival, or Me)
       if per.group(1) == 'upto': # If we're using an "upto" autoscript instead of per, the player can choose any number up to the max we found.
          choiceText = re.search(r':([A-Z][A-Za-z]+)[0-9]+([A-Z][A-Za-z]+)', Autoscript)
          choice = multiplier + 1
@@ -1611,7 +1620,7 @@ def whileDeployedEffects(card, action='Deploy'): # This script defines effects t
 
 def customScript(card):
 # This function has specific autoscripts tailored to specific cards which have fairly unique effects.
-   custom = re.search(r'{Custom:([A-Za-z ]+)', card.Autoscript)
+   custom = re.search(r'{Custom:([A-Za-z ]+)}', card.AutoScript)
    if custom.group(1) == 'Carthag Engineering' or custom.group(1) == 'Arrakeen Water Facilities': 
       if re.search('Carthag', custom.group(1)): targetC = findTarget('Targeted-on{Carthag}')
       else: targetC = findTarget('Targeted-on{Arrakeen, Capital of Arrakis}')
@@ -1627,7 +1636,7 @@ def customScript(card):
       else:
          choice = 2
          while choice > 1:
-            choice = askInteger("{} is the governor of {}. What ability do you want to use?\n\n0: Take 3 Solaris from {} (Player must accept and be able to pay)\n1: Gain 3 Favor".format(targetC.controller, targetC.name, targetC.controller), 0)
+            choice = askInteger("{} is the governor of {}. What ability do you want to use?\n\n0: Take 3 Solaris from {} (Player must accept and be able to pay)\n1: Gain 3 Favor (Only if the governor can/will not pay Solaris)".format(targetC.controller, targetC.name, targetC.controller), 0)
             if choice == None: return # If the player closed the window, abort.
             elif choice == 0 and targetC.controller.Solaris < 3: 
                whisper("{} does not have enough Solaris. You can only gain 3 favor".format(targetC.controller))
@@ -1636,4 +1645,27 @@ def customScript(card):
             notify ("{}, taking it from {}".format(GainX('Gain3Solaris', '{} engages {} to'.format(me, card), card, manual = True), targetC.controller))
             targetC.controller.Solaris -= 3
          else: GainX('Gain3Favor', '{} engages {} to'.format(me, card), card)
+   elif custom.group(1) == 'Ducal Tithes':
+      homeworldCHK = False
+      for c in table:
+         if c.controller == me and (re.search('Homeworld', c.Subtype) or c.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001') and re.search('Dune Fief', c.Subtype):
+            homeworldCHK = True # We check all the cards on the table to see if the player controls a Dune Fief Homeworld.
+      if not homeworldCHK:
+         whisper("You need a Dune Fief as a Homeworld to use this card")
+         return
+      total = 0 # How much money in total we're making.
+      announceText = ''
+      for player in players:
+         if player == me: continue # We don't tithe ourselves.
+         tithe = len([c for c in table
+                     if c.controller == player
+                     and c.isFaceUp
+                     and re.search('Dune Fief', c.Subtype)
+                     and not re.search('Homeworld', c.Subtype)])
+         if tithe > player.Solaris: tithe = player.Solaris # If the tithe is more than that player can pay, we just get as much as they have.
+         me.Solaris += tithe
+         player.Solaris -= tithe
+         announceText += '{} from {}, '.format(tithe,player)
+         total += tithe
+      notify('{} Engages {} to demand tribute from all players. They receive {} Solaris in total:{}.'.format(me, card, total,announceText[:-2]))  # We removed the trailing ', '
    else: engage(card)
