@@ -1520,14 +1520,19 @@ def per(Autoscript, card = None, count = 0, targetCard = None, manual = False): 
       else:
          if re.search(r'Targeted', Autoscript): return 1 # Temporary fix for that give according to the attached cards. So that they can still work manually until I implement that.
          perItems = per.group(3).split('_or_')     
-         perItemPool = [] # A list with all the properties we'll need to match on each card on the table.
+         perItemMatch = [] # A list with all the properties we'll need to match on each card on the table.
+         perItemExclusion = [] # A list with all the properties we'll need to match on each card on the table.
          cardProperties = [] #we're making a big list with all the properties of the card we need to match
          multiplier = 0
          for perItem in perItems:
             subItems = perItem.split('_and_')
             for subItem in subItems:
                regexCondition = re.search(r'{?([A-Z][A-Za-z0-9, ]*)}?', subItem)
-               perItemPool.append(regexCondition.group(1))
+               if re.search(r'no[nt]', subItem): # If this is an exclusion item, we put it on the exclusion list.
+                  perItemExclusion.append(regexCondition.group(1))
+               else:
+                  perItemMatch.append(regexCondition.group(1))
+         #notify('Matches: {}\nExclusions: {}'.format(perItemMatch, perItemExclusion)) # Debug
          for c in table: # Go through each card on the table and gather its properties, then see if they match.
             del cardProperties[:] # Cleaning the previous entries
             cardProperties.append(c.name)
@@ -1539,8 +1544,10 @@ def per(Autoscript, card = None, count = 0, targetCard = None, manual = False): 
                if strippedCS: cardProperties.append(strippedCS) # If there's anything left after the stip (i.e. it's not an empty string anymrore) add it to the list.
             cardProperties.append(c.Decktype)
             perCHK = True
-            for perItem in perItemPool: # Now we check if the card properties include all the properties we need
+            for perItem in perItemMatch: # Now we check if the card properties include all the properties we need
                if perItem not in cardProperties: perCHK = False # The perCHK starts as True. We only need one missing item to turn it to False, since they all have to exist.
+            for perItem in perItemExclusion:
+               if perItem in cardProperties: perCHK = False # Pretty much the opposite of the above.
             if perCHK: multiplier += 1 # If the perCHK remains 1 after the above loop, means that the card matches all our requirements.
       if per.group(1) == 'upto': # If we're using an "upto" autoscript instead of per, the player can choose any number up to the max we found.
          choiceText = re.search(r':([A-Z][A-Za-z]+)[0-9]+([A-Z][A-Za-z]+)', Autoscript)
