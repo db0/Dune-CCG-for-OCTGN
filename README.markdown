@@ -20,6 +20,14 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 Changelog
 ---------
 
+### 2.0.2
+
+* Cards with effects per specific kind of card on the table, should now not take into account subdued cards that you've peeked at.
+* Cancelling a petition should will clear all player bids.
+* Double clicking on a subdued card will now try to deploy it, not engage it.
+* You now can't setup unless you've gone to the pre-game setup phase first.
+* Restarting the game should now also clear the holdings and persona placement variables.
+
 ### 2.0.1
 
 Fixed small bug when sending spice produced by deserts straight to the CHOAM.

@@ -56,12 +56,13 @@ DeployedImperiumEvent = 0
 allegiances =[] # List to keep track of the player's allegiances.
 totalevents = 0 # Variable to allow me to move events a bit to avoid hiding on top of exitisting ones.
 totalprogs = 0 # Variable to allow me to move programs a bit to avoid hiding on top of exitisting ones.
-totalholdings = 0
-totalpersonas = 0
+totalholdings = 3
+totalpersonas = -3
 inactiveProgram = { }
 assemblyCards = [ ]
 Automation = True
 CROEsnapshot = 0
+newGame = True # A Variable that prevents the player from using the game setup option unless they've gone to the pre-game setup phase first.
 #---------------------------------------------------------------------------
 # General functions
 #---------------------------------------------------------------------------
@@ -360,7 +361,7 @@ def showCurrentPhase(): # Just say a nice notification about which phase you're 
 def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
 # This phase is not rotated with the nextPhase function as it is a way to basically restart the game.
 # It also serves as a control, so as to avoid a player by mistake using the setup function during play.
-   global PLS, playeraxis, handsize, assemblysize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances, totalevents, inactiveProgram
+   global newGame, PLS, playeraxis, handsize, assemblysize, favorBought, CHOAMDone, DeployedDuneEvent, DeployedImperiumEvent, allegiances, totalevents, inactiveProgram, totalprogs, totalholdings, totalpersonas
    mute()
    PLS = None
    playeraxis = None
@@ -370,19 +371,22 @@ def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
    CHOAMDone = 0
    DeployedDuneEvent = 0
    DeployedImperiumEvent = 0
-   allegiances =['','','',''] # List to keep track of the player's allegiances.
-   shared.Phase = 0
+   del allegiances = [:] # Clear the keeping track of the player's allegiances.
    me.Spice = 0
    me.Solaris = 5
    me.Favor = 10
    me.Initiative = 0
    totalevents = 0
    totalprogs = 0
+   totalholdings = 3
+   totalpersonas = -3
    setGlobalVariable("petitionedCard", "Empty") # Clear the shared variables.
    setGlobalVariable("passedPlayers", "[]")
    setGlobalVariable("defeatedPlayers", "[]")
    inactiveProgram.clear() # Clear the dictionary for reuse.
-   assemblyCards[:] = [] # Empty the list.
+   del assemblyCards[:] # Empty the list.
+   newGame = True
+   shared.Phase = 0
    showCurrentPhase() # Remind the players which phase it is now
 
 def flipCoin(group, x = 0, y = 0):
@@ -644,6 +648,7 @@ def subdue(card, x = 0, y = 0,  silent = False, force = False):
         if card.isFaceUp:
             notify("{} has cancelled their petition.".format(me))
             card.isFaceUp = False
+            for player in players: player.Bid = 0 # Clear all player's bids
             setGlobalVariable("petitionedCard", "Empty")
             setGlobalVariable("passedPlayers", "[]")
         else:
@@ -1007,47 +1012,48 @@ def play(card, x = 0, y = 0):
 def setup(group = me.hand, x= 0, y = 0):
 # This function is usually the first one the player does. It will setup their homeworld on their side of the table. 
 # It will also shuffle their decks, setup their Assembly and Dune and draw 7 cards for them.
+   global newGame, PLS, allegiances, inactiveProgram # Import some necessary variables we're using around the game.
    group = me.hand # Because this action can be run from the table as well now.
-   if shared.Phase == 0: # First check if we're on the pre-setup game phase. 
-                     # As this function will play your whole hand and wipe your counters, we don't want any accidents.
-#      if not confirm("Have bought all the favour and spice you'll need with your bonus solaris? \n\n(Remember you need 1 solaris per program you're going to install.)"): return
-      global PLS, allegiances, inactiveProgram # Import some necessary variables we're using around the game.
-      DuneinHand = 0
-      mute()
-      chooseSide() # The classic place where the players choose their side.
-      me.piles['Imperial Deck'].shuffle() # First let's shuffle our decks now that we have the chance.
-      me.piles['House Deck'].shuffle()
-      for card in group: # For every card in the player's hand... (which should be just their homeworld and possibly some plans)
-         if re.search(r'Homeworld', card.Subtype) and card.Type == 'Holding':  # If it's the homeworld...
-            placeCard(card,'SetupHomeworld')
-            allegiances.append(card.Allegiance) # We make a note of the Allegiance the player is playing this time (used later for automatically losing favour)
-         if re.search(r'Program', card.Subtype) and card.Type == 'Plan':  # If it's a program...
-            if payCost(1) == 'OK': # Pay the cost of the program
-               placeCard(card,'SetupProgram')
-               inactiveProgram[card] = True
-         if card.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001': # If the player has put Dune in their hand as well...
-            placeCard(card,'SetupDune')
-            DuneinHand = 1 # Note down that player brought their own Dune, so that we don't generate a second one.
-      if DuneinHand == 0: # If the player didn't bring their own Dune, generate a new one on their side.
-         Dune = table.create("2037f0a1-773d-42a9-a498-d0cf54e7a001", 0, 0, 1, True) # Create a Dune card in the middle of the table.
-         placeCard(Dune,'SetupDune')
-      noteAllegiances() # Note down the rest allegiances of the player
-      shared.counters['Guild Hoard'].value = 4 + len(players) * 2 # Starting Spice is 4 + (Nr of players * 2)
-      shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
-      startFav = -1
-      startSpice = -1
-      while startSpice < 0 or startSpice >= 5: # keep asking the amount until a valid number is given.
-         startSpice = askInteger("How much spice do you want to buy with your bonus solaris?\n\n({} per Spice)".format(shared.CROE + 1), 0)
-         if payCost(startSpice * (shared.CROE + 1)) == 'ABORT': startSpice = -1
-      me.Spice += startSpice
-      while startFav < 0 or startFav >= 5: 
-         startFav = askInteger("How much favor do you want to buy with your bonus solaris?\n\n(2 per favor)", 0)
-         if payCost(startFav * 2) == 'ABORT': startFav = -1         
-      me.Favor += startFav
-      me.Solaris += 20     
-      refill() # We fill the player's play hand to their hand size (usually 5)
-      notify("{} is playing {}. Their starting Solaris is {} and their Imperial Favour is {}. They have {} Programs".format(me, allegiances[0], me.Solaris, me.Favor, totalprogs))  
-   else: whisper('You can only setup your starting cards during the Pre-Game setup phase') # If this function was called outside the pre-game setup phase
+   if shared.Phase != 0 or not newGame:                                                 # First check if we're on the pre-setup game phase. 
+      whisper('You can only setup your starting cards during the Pre-Game setup phase') # If this function was called outside the pre-game setup phase inform the player
+      return                                                                            # As this function will play your whole hand and wipe your counters, we don't want any accidents.
+   newGame = False
+   DuneinHand = False
+   mute()
+   chooseSide() # The classic place where the players choose their side.
+   me.piles['Imperial Deck'].shuffle() # First let's shuffle our decks now that we have the chance.
+   me.piles['House Deck'].shuffle()
+   for card in group: # For every card in the player's hand... (which should be just their homeworld and possibly some plans)
+      if re.search(r'Homeworld', card.Subtype) and card.Type == 'Holding':  # If it's the homeworld...
+         placeCard(card,'SetupHomeworld')
+         allegiances.append(card.Allegiance) # We make a note of the Allegiance the player is playing this time (used later for automatically losing favour)
+      if re.search(r'Program', card.Subtype) and card.Type == 'Plan':  # If it's a program...
+         if payCost(1) == 'OK': # Pay the cost of the program
+            placeCard(card,'SetupProgram')
+            inactiveProgram[card] = True
+      if card.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001': # If the player has put Dune in their hand as well...
+         placeCard(card,'SetupDune')
+         DuneinHand = True # Note down that player brought their own Dune, so that we don't generate a second one.
+   if not DuneinHand: # If the player didn't bring their own Dune, generate a new one on their side.
+      Dune = table.create("2037f0a1-773d-42a9-a498-d0cf54e7a001", 0, 0, 1, True) # Create a Dune card in the middle of the table.
+      placeCard(Dune,'SetupDune')
+   noteAllegiances() # Note down the rest allegiances of the player
+   shared.counters['Guild Hoard'].value = 4 + len(players) * 2 # Starting Spice is 4 + (Nr of players * 2)
+   shared.CROE = CROEAdjust(shared.counters['Guild Hoard'].value)
+   startFav = -1
+   startSpice = -1
+   while startSpice < 0 or startSpice >= 5: # keep asking the amount until a valid number is given.
+      startSpice = askInteger("How much spice do you want to buy with your bonus solaris?\n\n({} per Spice)".format(shared.CROE + 1), 0)
+      if payCost(startSpice * (shared.CROE + 1)) == 'ABORT': startSpice = -1
+   me.Spice += startSpice
+   while startFav < 0 or startFav >= 5: 
+      startFav = askInteger("How much favor do you want to buy with your bonus solaris?\n\n(2 per favor)", 0)
+      if payCost(startFav * 2) == 'ABORT': startFav = -1         
+   me.Favor += startFav
+   me.Solaris += 20     
+   refill() # We fill the player's play hand to their hand size (usually 5)
+   notify("{} is playing {}. Their starting Solaris is {} and their Imperial Favour is {}. They have {} Programs".format(me, allegiances[0], me.Solaris, me.Favor, totalprogs))  
+   else: 
             
 def setHandSize(group): # A function to modify a player's hand size. This is used during Closing Interval when refilling the player's hand automatically.
    global handsize
@@ -1131,7 +1137,7 @@ def mill(group):
 def useAbility(card, x = 0, y = 0):
    global CROEsnapshot
    mute()
-   if card.markers[Assembly] == 1 and not card.isFaceUp: # If card is face down or assembly, assume they wanted to deploy it.
+   if not card.isFaceUp: # If card is face down assume they wanted to deploy or petition it.
       subdue(card)
       return
    elif card.markers[Assembly] == 1: # If card is face down and assembly, assume they wanted to bid on it
@@ -1559,8 +1565,8 @@ def per(Autoscript, card = None, count = 0, targetCard = None, manual = False): 
                if perItem not in cardProperties: perCHK = False # The perCHK starts as True. We only need one missing item to turn it to False, since they all have to exist.
             for perItem in perItemExclusion:
                if perItem in cardProperties: perCHK = False # Pretty much the opposite of the above.
-            if perCHK: multiplier += 1 * chkPlayer(Autoscript, c.controller, False) # If the perCHK remains 1 after the above loop, means that the card matches all our requirements.
-                                                                                    # We also multiply it with chkPlayer() which will return 0 if the player is not of the correct allegiance (i.e. Rival, or Me)
+            if perCHK and c.isFaceUp: multiplier += 1 * chkPlayer(Autoscript, c.controller, False) # If the perCHK remains 1 after the above loop, means that the card matches all our requirements. We only check faceup cards so that we don't take into acoount peeked subdued ones.
+                                                                                                   # We also multiply it with chkPlayer() which will return 0 if the player is not of the correct allegiance (i.e. Rival, or Me)
       if per.group(1) == 'upto': # If we're using an "upto" autoscript instead of per, the player can choose any number up to the max we found.
          choiceText = re.search(r':([A-Z][A-Za-z]+)[0-9]+([A-Z][A-Za-z]+)', Autoscript)
          choice = multiplier + 1

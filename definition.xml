@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune" id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="3.0.1.5" version="2.0.1" markersize="24">
+<game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Dune" id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" octgnVersion="3.0.1.5" version="2.0.2" markersize="24">
    <globalvariables>
        <globalvariable name="petitionedCard" value="Empty" /> 
        <globalvariable name="passedPlayers" value="[]" /> 
@@ -31,7 +31,6 @@
 		<cardaction menu="Subdue/Deploy" default="false" shortcut="Ctrl+S" execute="subdue" />
 		<groupaction menu="Buy Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+C" execute="CHOAMbuy" />
 		<groupaction menu="Sell Spice (CHOAM Exchange)" default="false" shortcut="Ctrl+Shift+C" execute="CHOAMsell" />
-		<cardaction menu="Engage to produce Spice to the Guild Hoard" default="false" execute="produceSpice" />
 		<groupaction menu="Reset the Guild Bank and/or CROE" default="false" execute="resetBank" />
 		<groupaction menu="Purchase Favor" default="false" shortcut="Ctrl+F" execute="buyFavor" />
 		<groupaction menu="Flip a Coin" default="false" shortcut="Ctrl+F" execute="flipCoin" />
