@@ -19,6 +19,11 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 
 Changelog
 ---------
+
+### 2.0.1
+
+Fixed small bug when sending spice produced by deserts straight to the CHOAM.
+
 ### 2.0.0
 
 Big Changes! Card Automation is here!
