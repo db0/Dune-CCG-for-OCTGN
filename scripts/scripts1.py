@@ -1328,7 +1328,7 @@ def findTarget(Autoscript):
          return targetC
    else: return targetC
 
-def GainX(Autoscript, announceText, card, targetCard = None, manual = False, n = 0):
+def GainX(Autoscript, announceText, card, targetCard = None, manual = True, n = 0):
 # n is used when other scripts are calling this variable, to automatically provide the generated result to the counters of another player owning a specific card.
 # For example if one player owns a card that produces one Solaris per Spice produced in a desert, and another player produces 3 spice with a Spice Blow event...
 # ...then the other script will call this one, giving an n of 3.
@@ -1350,11 +1350,11 @@ def GainX(Autoscript, announceText, card, targetCard = None, manual = False, n =
    announceString = "{} gain {} {}{}".format(announceText, gain * multiplier, action.group(2),extraText)
    if not manual and multiplier > 0: notify('--> {}.'.format(announceString))
    else: 
-      if manual and re.match(r"C0", Autoscript) and re.search(r'\b(per|upto)(Assigned|Target|Parent|Generated|Deployed|Petitioned|Transferred|Bought)', Autoscript):
+      if manual and re.match(r"C0", Autoscript) and re.search(r'\b(per|upto|when)(Assigned|Target|Parent|Generated|Deployed|Petitioned|Transferred|Bought|Engaged)', Autoscript):
          announceString += " (Manual Activation!)" # For when the player manually activates cards which should trigger automatically
       return announceString
       
-def HoardX(Autoscript, announceText, card, manual = False):
+def HoardX(Autoscript, announceText, card, manual = True):
    action = re.search(r'\bHoard([0-9]+)Spice', Autoscript)
    multiplier = per(Autoscript, card)
    shared.counters['Guild Hoard'].value += num(action.group(1)) * multiplier
@@ -1363,17 +1363,17 @@ def HoardX(Autoscript, announceText, card, manual = False):
    if not manual and multiplier > 0: notify('--> {}.'.format(announceString))
    else: return announceString
 
-def ProdX(Autoscript, announceText, card, manual = False):
+def ProdX(Autoscript, announceText, card, manual = True):
    action = re.search(r'\b(Prod|Spawn)([0-9]+)Spice', Autoscript)
    if action.group(1) == 'Prod' and not confirm('Do you want to produce spice on {}?\n\nPressing "No" will send it directly to the Guild Hoard instead'.format(card.name)):
-      return HoardX('Hoard{}Spice'.format(action.group(2)), announceText, card) # If we want to produce the spice to the hoard, we're going to use the HoardX() function, but we need to sent it a modified Autoscript.
+      return HoardX('Hoard{}Spice'.format(action.group(2)), announceText, card, manual) # If we want to produce the spice to the hoard, we're going to use the HoardX() function, but we need to sent it a modified Autoscript.
    card.markers[Spice] += num(action.group(2))
    autoscriptOtherPlayers('GeneratedSpice',num(action.group(2)))
    announceString = "{} produce {} spice assigned to it".format(announceText,action.group(2))
    if not manual: notify('--> {}.'.format(announceString))
    else: return announceString
 
-def TransferX(Autoscript, announceText, card, targetCard = None, manual = False):
+def TransferX(Autoscript, announceText, card, targetCard = None, manual = True):
    breakadd = 1
    if not targetCard: targetCard = card # If there's been to target card given, assume the target is the card itself.
    action = re.search(r'\bTransfer([0-9]+)Spice-to(Owner|Hoard|Discard)', Autoscript)
@@ -1404,10 +1404,13 @@ def TransferX(Autoscript, announceText, card, targetCard = None, manual = False)
    if not manual: notify('--> {}.'.format(announceString))
    else: return announceString
    
-def TokensX(Autoscript, announceText, card, targetCard = None, manual = False, n = 0):
+def TokensX(Autoscript, announceText, card, targetCard = None, manual = True, n = 0):
    if not targetCard: targetCard = card # If there's been to target card given, assume the target is the card itself.
    action = re.search(r'\b(Assign|Remove)([0-9]+)(Deferment|Spice|Program)', Autoscript)
-   if action.group(3) == 'Deferment' : token = Deferment_Token
+   if action.group(3) == 'Deferment' and not card.isFaceUp: 
+      whisper("Deferment tokens can only be added to Subdued cards")
+      return 'ABORT'
+   elif action.group(3) == 'Deferment': token = Deferment_Token
    elif action.group(3) == 'Spice' : token = Spice
    elif action.group(3) == 'Program' : token = Program
    else: 
@@ -1431,7 +1434,7 @@ def DrawX(Autoscript, announceText, card, targetCard = None, manual = False, n =
    if not manual and multiplier > 0: notify('--> {}.'.format(announceString))
    else: return announceString
 
-def ModifyStatus(Autoscript, announceText, card = None, targetCard = None, manual = False):
+def ModifyStatus(Autoscript, announceText, card = None, targetCard = None, manual = True):
    action = re.search(r'\b(Engage|Disengage|Subdue|Deploy|Discard)(Target|Parent)', Autoscript)
    if action.group(1) == 'Engage' and engage(targetCard, silent = True, force = 'Engage') != 'ABORT': pass
    elif action.group(1) == 'Disengage'and engage(targetCard, silent = True, force = 'Disengage') != 'ABORT': pass
@@ -1443,7 +1446,7 @@ def ModifyStatus(Autoscript, announceText, card = None, targetCard = None, manua
    if not manual: notify('--> {}.'.format(announceString))
    else: return announceString
 
-def StealX(Autoscript, announceText, card, targetCard = None, manual = False, n = 0):
+def StealX(Autoscript, announceText, card, targetCard = None, manual = True, n = 0):
    action = re.search(r'\b(Steal|Pay)([0-9]+)(Solaris|Spice|Favor)', Autoscript)
    if targetCard and re.search(r'toGovernor', Autoscript): targetPL = targetCard.controller
    elif targetCard and re.search(r'toOwner', Autoscript): targetPL = targetCard.owner
@@ -1588,7 +1591,7 @@ def autoscriptOtherPlayers(lookup, count = 1):
       if not card.isFaceUp: continue # Don't take into accounts cards that are subdued but we've peeked at them.
       costText = '{} activates {} to'.format(card.controller, card) 
       if re.search(r'{}'.format(lookup), card.AutoScript): # Search if in the script of the card, the string that was sent to us exists. The sent string is decided by the function calling us, so for example the ProdX() function knows it only needs to send the 'GeneratedSpice' string.
-         GainX(card.AutoScript, costText, card, n = count) # If it exists, then call the GainX() function, because cards that automatically do something when other players do something else, always give the player something directly.
+         GainX(card.AutoScript, costText, card, n = count, manual = False) # If it exists, then call the GainX() function, because cards that automatically do something when other players do something else, always give the player something directly.
 
 def chkDeployAutoscripts(card): # This function is called whenever a card is deployed to check if any other cards on the table will trigger from it
    if re.search(r'Mentat', card.Subtype): autoscriptOtherPlayers('DeployedMentat')
@@ -1631,8 +1634,8 @@ def customScript(card):
          while choice > 1:
             choice = askInteger("You are the governor of {}. What ability do you want to use?\n\n0: Gain 3 Solaris\n1: Gain 3 Favor".format(targetC.name), 0)
             if choice == None: return # If the player closed the window, abort.
-         if choice == 0: GainX('Gain3Solaris', '{} engages {} to'.format(me, card), card)
-         else: GainX('Gain3Favor', '{} engages {} to'.format(me, card), card) # We pass a custom autostring for what we want to do and call the GainX() function directly.
+         if choice == 0: notify('{}'.format(GainX('Gain3Solaris', '{} engages {} to'.format(me, card), card, manual = True))) # We put GainX() in the notify, because when called with manual = True, it returns an announce text.
+         else: notify('{}'.format(GainX('Gain3Favor', '{} engages {} to'.format(me, card), card, manual = True))) # We pass a custom autostring for what we want to do and call the GainX() function directly.
       else:
          choice = 2
          while choice > 1:
@@ -1644,7 +1647,7 @@ def customScript(card):
          if choice == 0: 
             notify ("{}, taking it from {}".format(GainX('Gain3Solaris', '{} engages {} to'.format(me, card), card, manual = True), targetC.controller))
             targetC.controller.Solaris -= 3
-         else: GainX('Gain3Favor', '{} engages {} to'.format(me, card), card)
+         else: notify('{}'.format(GainX('Gain3Favor', '{} engages {} to'.format(me, card), card, manual = True)))
    elif custom.group(1) == 'Ducal Tithes':
       homeworldCHK = False
       for c in table:
