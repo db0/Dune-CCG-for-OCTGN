@@ -19,6 +19,27 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 
 Changelog
 ---------
+### 2.0.0
+
+Big Changes! Card Automation is here!
+
+**Important:** For this version, you'll require to update all your sets. [Use the provided patch](https://github.com/downloads/db0/Dune-CCG-for-OCTGN/Patch-to-2.0.x.o8p).
+
+Basically, now most of the holdings, as well as some personas and resources have automated abilities, which means you double-click them and they perform their printed ability.
+For most cards, this is something simple, like "Gain 2 Solaris" or something, but the scripts also support multiple-choice abilities, and even abilities with two or three different effects.
+You can see if a card has been automated by using the Inspect Feature. This will tell you if it's Auto-Scripted or not (as well as show you the script for debugging purposes)
+
+A lot of cards also are automated when they have passive abilities, such as making money when someone deploys some equipment, or when someone buys solaris and so on. You can also call these effect manually by clicking on the card, in case something went wrong.
+
+The autoscripts support also cards that target other cards. To use those, you have to target first, and then use the ability. If you haven't selected a valid target, the script will abort and the game will inform you. If you've selected more than one valid target, the game will select the one who's been put the table earlier.
+Targeting can also recognise if the target needs to be controlled by you or a rival.
+
+Support also exists for cards with variable effects depending on the cards on the table. So for example a card that gives you 1 solaris per Desert, Harvester or Carryall, will take all these into account.
+
+Abilities which trigger depending on assigned cards are not implemented correctly yet. They may seemingly work in some function, but you may have to complete things manually.
+
+At the moment, plans & events don't have any automation, but might do this later if there's any interest or need.
+
 ### 1.1.8
 
 * Added the [Orthodox Herbetarian](http://www.kullwahad.com/?p=264) fonts for the menu.
