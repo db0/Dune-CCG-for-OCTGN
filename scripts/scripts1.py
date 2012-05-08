@@ -371,7 +371,7 @@ def goToSetup(group, x = 0, y = 0):  # Go back to the Pre-Game Setup phase.
    CHOAMDone = 0
    DeployedDuneEvent = 0
    DeployedImperiumEvent = 0
-   del allegiances = [:] # Clear the keeping track of the player's allegiances.
+   del allegiances[:] # Clear the keeping track of the player's allegiances.
    me.Spice = 0
    me.Solaris = 5
    me.Favor = 10
@@ -1053,7 +1053,6 @@ def setup(group = me.hand, x= 0, y = 0):
    me.Solaris += 20     
    refill() # We fill the player's play hand to their hand size (usually 5)
    notify("{} is playing {}. Their starting Solaris is {} and their Imperial Favour is {}. They have {} Programs".format(me, allegiances[0], me.Solaris, me.Favor, totalprogs))  
-   else: 
             
 def setHandSize(group): # A function to modify a player's hand size. This is used during Closing Interval when refilling the player's hand automatically.
    global handsize
