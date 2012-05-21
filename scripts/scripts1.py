@@ -53,11 +53,11 @@ favorBought = 0
 CHOAMDone = 0
 DeployedDuneEvent = 0
 DeployedImperiumEvent = 0
-allegiances =[] # List to keep track of the player's allegiances.
+allegiances = [] # List to keep track of the player's allegiances.
 totalevents = 0 # Variable to allow me to move events a bit to avoid hiding on top of exitisting ones.
 totalprogs = 0 # Variable to allow me to move programs a bit to avoid hiding on top of exitisting ones.
-totalholdings = 3
-totalpersonas = -3
+totalholdings = 2
+totalpersonas = -2
 inactiveProgram = { }
 assemblyCards = [ ]
 Automation = True
@@ -66,6 +66,10 @@ newGame = True # A Variable that prevents the player from using the game setup o
 #---------------------------------------------------------------------------
 # General functions
 #---------------------------------------------------------------------------
+
+def execDebug(group,x=0,y=0):
+   #notify("Your allegiances are: {}".format(allegiances))
+   notify("Your Assembly Cards are: {}".format(assemblyCards))
 
 def num (s): 
 # This function reads the value of a card and returns an integer. For some reason integer values of cards are not processed correctly
@@ -183,11 +187,11 @@ def placeCard(card,type = None):
          card.moveToTable(homeDistance(card) + PLS * totalevents * 35, cheight(card)* -2 * PLS + PLS * totalevents * -35) 
          card.isFaceUp = False
       if type =='DeployHolding':
-         card.moveToTable(homeDistance(card) - cardDistance(card), -cheight(card) * PLS + totalholdings * cheight(card)) # We move them just in front and to the side of the player's homeworld
+         card.moveToTable(homeDistance(card) - 2 * cardDistance(card), -cheight(card) * PLS + totalholdings * cheight(card)) # We move them just in front and to the side of the player's homeworld
          totalholdings += 1
          if totalholdings == 5: totalholdings = -4
       if type =='DeployPersona':
-         card.moveToTable(homeDistance(card) - 2 * cardDistance(card), totalpersonas * cheight(card)) # We move them just ahead of the player's homeworld, as some distance.
+         card.moveToTable(homeDistance(card) - 3.5 * cardDistance(card), totalpersonas * cheight(card)) # We move them just ahead of the player's homeworld, as some distance.
          totalpersonas += 1
          if totalpersonas == 5: totalpersonas = -5
       if type =='DeployResource':
@@ -225,8 +229,8 @@ def homeDistance(card):
 # This makes the code more readable and allows me to tweak these values from one place
    if table.isTwoSided(): return (PLS * cheight(card) * 3) # players on an inverted table are placed half a card away from their edge.
    else:
-      if playeraxis == Xaxis:
-         return (PLS * cwidth(card) * 11) # players on the X axis, are placed 10 times a card's width towards their side (left or right)
+      if playeraxis == Xaxis: # using cheight here, in order to take into account the size of the card when it's engaged.
+         return (PLS * cwidth(card) * 13) # players on the X axis, are placed 10 times a card's width towards their side (left or right)
       elif playeraxis == Yaxis:
          return (PLS * cheight(card) * 4 - yaxisMove(card)) # players on the Y axis, are placed 4 times a card's height towards their side (top or bottom)
 
@@ -238,7 +242,7 @@ def cardDistance(card):
 #   Thus by adding this in a moveToTable's y integer, the card being placed will be moved towards your side by one multiple of card height
 #   While if you remove it from the y integer, the card being placed will be moved towards the centre of the table by one multiple of card height.
    if playeraxis == Xaxis:
-      return (PLS * cwidth(card))
+      return (PLS * cheight(card))
    elif playeraxis == Yaxis:
       return (PLS * cheight(card))
 
@@ -293,7 +297,8 @@ def noteAllegiances(): # This function checks every card in the Imperial Deck an
    for card in me.piles['Imperial Deck']: 
       # Ugly hack follows. We need to move each card in the discard pile and then back into the deck because OCTGN won't let us peek at cards in facedown decks.
       card.moveTo(me.piles['Imperial Discard']) # Put the card in the discard pile in order to make its properties visible to us.
-      if len(players) > 1: random = rnd(1,100) # Fix for multiplayer only. Makes Singleplayer setup very slow otherwise.
+   if len(players) > 1: random = rnd(1,100) # Fix for multiplayer only. Makes Singleplayer setup very slow otherwise.
+   for card in me.piles['Imperial Discard']: # We need to start a new loop as if we do a rnd after each card, it gets too slow.
       if card.model == '2037f0a1-773d-42a9-a498-d0cf54e7a001':  # If the player moved dune put Dune by mistake to their Deck, move it to their hand to be placed automatically.
          card.moveTo(me.piles['Imperial Discard'])
          whisper("Dune found in your Imperial Deck. Discarding. Please remove Dune from your Imperial Deck during deck construction!")
@@ -496,13 +501,14 @@ def placeBid(group, x = 0, y = 0):
          notify("{} has re-enterred the bidding contest".format(me))
          passedPL.remove(me._id)
    if not ABORT:
-      mybid = askInteger("What is your bid?\n\n[Currently highest bid is {} Solaris.]\n[Card Deployment Cost is {}].\n(Putting 0 will cancel the bid)".format(highestbid, card.properties['Deployment Cost']), 0)
+      mybid = askInteger("What is your bid?\n\n[Currently highest bid is {} Solaris.]\n[Card Deployment Cost is {}].\n(Putting 0 will pass for the bid)".format(highestbid, card.properties['Deployment Cost']), 0)
       while 0 < mybid <= highestbid and highestbid > 0: 
-         mybid = askInteger("You must bid higher then the current bid of {}. Please bid again.\n\n(0 will cancel the bid)".format(highestbid), 0)
+         mybid = askInteger("You must bid higher then the current bid of {}. Please bid again.\n\n(0 will pass for the bid)".format(highestbid), 0)
          if mybid > me.Solaris: 
             if not confirm("You have bid more than your available Solaris in your bank. You're not normally allowed to do this, even if you would reduce it with favor.\n\nBypass?"): mybid = highestbid
             else: overdraft = True
-      if mybid == 0 or mybid == None: 
+      if mybid == None: notify("{} was about to bid but thought better of it.".format(me))
+      elif mybid == 0:
          notify("{} has passed for this petition".format(me))
          passedPL.append(me._id)
          me.Bid = 0
@@ -747,7 +753,8 @@ def switchAssembly(card, x = 0, y = 0):
    else:
       notify("{} takes {} out of the Imperial Assembly.".format(me, card))
       card.markers[Assembly] = 0
-      assemblyCards.remove(card)
+      for asscard in assemblyCards:
+         if asscard == card: assemblyCards.remove(card) # Making sure we remove stale entries as well.
 
 def CHOAMbuy(group, x = 0, y = 0): # This function allows the player to purchase spice through checks and balances to avoid mistakes.
     global CHOAMDone # Import the variable which informs us if the player has done another CHOAM exchange this turn
@@ -1326,7 +1333,7 @@ def findTarget(Autoscript):
          if len(invalidTargets) > 0: targetsText += "\nInvalid Target types: {}.".format(invalidTargets)
          if len(invalidNamedTargets) > 0: targetsText += "\nSpecific Invalid Targets: {}.".format(invalidNamedTargets)
          if not chkPlayer(Autoscript, targetLookup.controller, False): 
-            allegiance = re.search(r'by(Rival|Mw)', Autoscript)
+            allegiance = re.search(r'by(Rival|Me)', Autoscript)
             requiredAllegiances.append(allegiance.group(1))
          if len(requiredAllegiances) > 0: targetsText += "\nValid Target Allegiance: {}.".format(requiredAllegiances)
          whisper("You need to target a valid card before using this action{}".format(targetsText))
@@ -1612,7 +1619,7 @@ def chkRemoveAutoscripts(card): # This function is called whenever a card is sub
    
 def whileDeployedEffects(card, action='Deploy'): # This script defines effects that happen and stick around only while a card is deployed.
    global handsize, assemblysize
-   effect = re.search(r'WhileDeployed:(Gain|Accrue)([0-9]+)(AssemblyLimit|HandSize|XtraDeferment)', card.Autoscript)
+   effect = re.search(r'WhileDeployed:(Gain|Accrue)([0-9]+)(AssemblyLimit|HandSize|XtraDeferment)', card.AutoScript)
    effectNR = num(effect.group(2))
    if effect.group(1) == 'Gain':
       if action == 'Remove': effectNR *= -1 # When removing card from play (subduing or discarding), we reverse the effects.
