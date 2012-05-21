@@ -20,6 +20,12 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 Changelog
 ---------
 
+### 2.0.3
+
+* Fixed cards remaining stale in the assembly if one removes their marker manually.
+* Players on the X axis now shouldn't have their card so squashed together.
+* Fixed long delay during deck checking in setup.
+
 ### 2.0.2
 
 * Cards with effects per specific kind of card on the table, should now not take into account subdued cards that you've peeked at.

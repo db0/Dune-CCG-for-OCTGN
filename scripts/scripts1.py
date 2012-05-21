@@ -17,9 +17,9 @@
 Solaris = ("Solaris", "b30701c1-d925-45fc-afe4-6c341a103f32")
 Spice = ("Spice", "491cf29f-224c-4d8b-8e2d-58467686be88")
 Favor = ("Favor", "6ed72fed-4a63-4f38-95bb-424cbbcdd427")
-Deferment_Token = ("Deferment_Token", "f8f34145-60a8-4d2c-92e9-25824982944e")
+Deferment_Token = ("Deferment Token", "f8f34145-60a8-4d2c-92e9-25824982944e")
 Assembly = ("Imperial Assembly", "a5634dc5-ffd0-4428-95b5-13c6bb3ff00d")
-Program = ("Program Token", "e66b8122-e98a-48bb-a9ba-991fde33d01c")
+Program = ("Program Token", "517890dd-338e-425c-b2f1-187a551a74a7")
 
 phases = [
     '{} is currently in the Pre-game Setup Phase'.format(me),
