@@ -676,13 +676,16 @@ def subdue(card, x = 0, y = 0,  silent = False, force = False):
                initialBid = -1
                while initialBid < cost:
                   initialBid = askInteger("What will your initial bid be? (Min {}). 0 will cancel the petition.".format(cost), cost)
-                  if (initialBid == 0 and cost != 0) or initialBid == None: ABORT = True # If the player puts zero for the bid, or closes the window, abort.
+                  if (initialBid == 0 and cost != 0) or initialBid == None: 
+                     ABORT = True # If the player puts zero for the bid, or closes the window, abort.
+                     break
                   elif initialBid > me.Solaris and not confirm("You cannot bid more Solaris than you have in your bank.\n\nBypass?"): initialBid = -1
-               card.isFaceUp = True
-               notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
-               me.Bid = initialBid
-               setGlobalVariable("petitionedCard", card._id)
-            chkPetitionAutoscripts(card)
+               if not ABORT:
+                  card.isFaceUp = True
+                  notify("{} initiates a petition for {} with an initial bid of {}".format(me, card, initialBid))
+                  me.Bid = initialBid
+                  setGlobalVariable("petitionedCard", card._id)
+                  chkPetitionAutoscripts(card)
             if ABORT: setGlobalVariable("petitionedCard", chkVar)
             setGlobalVariable("defeatedPlayers", str(defeatedPL))
    
@@ -1353,9 +1356,9 @@ def GainX(Autoscript, announceText, card, targetCard = None, manual = True, n = 
       extraText = ' ({} + {} for controlling Dune)'.format(action.group(1),duneXtra.group(1))
       gain += num(duneXtra.group(1))
    multiplier = per(Autoscript, card, n, targetCard, manual) # We check if the card provides a gain based on something else, such as favour bought, or number of dune fiefs controlled by rivals.
-   if action.group(2) == 'Solaris': card.owner.Solaris += gain * multiplier
-   elif action.group(2) == 'Spice': card.owner.Spice += gain * multiplier
-   elif action.group(2) == 'Favor': card.owner.Favor += gain * multiplier
+   if action.group(2) == 'Solaris': card.controller.Solaris += gain * multiplier
+   elif action.group(2) == 'Spice': card.controller.Spice += gain * multiplier
+   elif action.group(2) == 'Favor': card.controller.Favor += gain * multiplier
    else: 
       whisper("Gain what?! (Bad autoscript)")
       return 'ABORT'

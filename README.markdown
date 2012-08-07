@@ -20,6 +20,12 @@ Sample screenshot of 1.1.2 (Another 3-Player game in progress
 Changelog
 ---------
 
+### 2.0.4
+
+* Gaining Solaris autotimatically from cards now gives it to the controller (in case of captured cards)
+* Fixed not being able to cancel petitions you start yourself
+* (Hopefully) fixed a bug where the game wouldn't recognise face down cards (?!)
+
 ### 2.0.3
 
 * Fixed cards remaining stale in the assembly if one removes their marker manually.
