@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<set xmlns:noNamespaceSchemaLocation="CardSet.xsd" name="Markers" id="5636f68b-4d23-4a6a-96f9-78243e0649b2" gameId="c196d3b0-bb5e-4d08-b49b-20dbce40443f"  version="2.0.1" gameVersion="2.0.0">
+	<markers>
+		<marker id="b30701c1-d925-45fc-afe4-6c341a103f32" name="Solaris" />
+		<marker id="491cf29f-224c-4d8b-8e2d-58467686be88" name="Spice" />
+		<marker id="6ed72fed-4a63-4f38-95bb-424cbbcdd427" name="Favor" />
+		<marker id="f8f34145-60a8-4d2c-92e9-25824982944e" name="Deferment" />
+		<marker id="a5634dc5-ffd0-4428-95b5-13c6bb3ff00d" name="Imperial Assembly" />
+		<marker id="517890dd-338e-425c-b2f1-187a551a74a7" name="Program" />
+	</markers>
+</set>
