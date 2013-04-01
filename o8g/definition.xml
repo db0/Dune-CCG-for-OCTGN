@@ -6,8 +6,8 @@
       octgnVersion="3.0.1.5" 
       version="2.0.4" 
       markersize="24"
-      tags="multiplayer dune sci-fi long CCG"
-      description="A card game set in Frank Herbert's Dune.&#xd;&#xd;&#xd;Players are the heads of Minor Houses (sponsored by one of the familiar factions, e.g. Atreides) attempting to become a Great House and join the Landsraad. This game really shines when played with more than 2 players."
+      tags="multiplayer dune sci-fi long CCG complex"
+      description="A complex card game set in Frank Herbert's Dune universe.&#xd;&#xd;&#xd;Players are the heads of Minor Houses (sponsored by one of the familiar factions, e.g. Atreides) attempting to become a Great House via intrigue, politics or combat, and join the Landsraad.&#xd;&#xd;This game really shines when played with more than 2 players."
       setsurl="http://octgn.gamersjudgement.com/viewtopic.php?f=42&amp;t=236"
       gameurl="https://github.com/db0/Dune-CCG-for-OCTGN"
       authors="Db0"
@@ -19,6 +19,8 @@
        <font src="Fonts/OrthodoxHerbertarian.ttf" size="11" target="context"/>
        <font src="Fonts/DuneMovie.ttf" size="12" target="chat"/> 
    </fonts>   
+   <proxygen definitionsrc="Proxy/proxydef.xml">
+   </proxygen>   
    <globalvariables>
        <globalvariable name="petitionedCard" value="Empty" /> 
        <globalvariable name="passedPlayers" value="[]" /> 
