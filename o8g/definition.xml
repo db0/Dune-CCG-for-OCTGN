@@ -4,10 +4,10 @@
       name="Dune" 
       id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" 
       octgnVersion="3.0.1.5" 
-      version="2.0.4" 
+      version="2.0.4.1" 
       markersize="24"
       tags="multiplayer dune sci-fi long CCG complex"
-      description="A complex card game set in Frank Herbert's Dune universe.&#xd;&#xd;&#xd;Players are the heads of Minor Houses (sponsored by one of the familiar factions, e.g. Atreides) attempting to become a Great House via intrigue, politics or combat, and join the Landsraad.&#xd;&#xd;This game really shines when played with more than 2 players."
+      description="A complex card game set in Frank Herbert's Dune universe.&#xd;&#xd;&#xd;Players are the heads of Minor Houses (sponsored by one of the familiar factions, e.g. Atreides) attempting to become a Great House via intrigue, politics or combat, and join the Landsraad.&#xd;&#xd;This game really shines when played with more than 2 players.&#xd;&#xd;Automation rank: B&#xd;(This game definition contains some useful card automatizations to speed up play and avoid mistakes)"
       setsurl="http://octgn.gamersjudgement.com/viewtopic.php?f=42&amp;t=236"
       gameurl="https://github.com/db0/Dune-CCG-for-OCTGN"
       authors="Db0"
@@ -84,6 +84,7 @@
 		<groupactions menu="Game...">
 			<groupaction menu="Set up" default="False" shortcut="Ctrl+Shift+S" execute="setup" />
 			<groupaction menu="Switch Automation ON/OFF" default="False" execute="switchAutomation" />  
+			<groupaction menu="Download Sets Card Images." shortcut="Ctrl+G" default="False" execute="download_o8c" />
 			<groupaction menu="Debug" default="False" execute="execDebug" />  
 		</groupactions>
 	</table>
