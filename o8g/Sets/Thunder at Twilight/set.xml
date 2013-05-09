@@ -1,0 +1,3191 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<set xmlns:noNamespaceSchemaLocation="CardSet.xsd" name="Thunder at Twilight" id="63581dd8-7dc7-4982-b2aa-ac2da7471ef3" gameId="c196d3b0-bb5e-4d08-b49b-20dbce40443f" gameVersion="2.0.0" version="2.0.2">
+	<cards>
+		<card id="5d140d30-a36c-442d-98f3-dbc9b332b779" name="Duchy of Arrakis">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Homeworld. Dune Fief." />
+			<property name="Operation" value="Engage to produce 4 solaris in your treasury or engage to discard X favor to assign or discard X deferment tokens to or from a target non-Homeworld Dune Fief. Do not subdue Duchy of Arrakis when deploying Dune." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="5" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="0" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Gain4Solaris||CEFX:Assign1Deferment-perX-Targeted-onDune Fief_and_nonHomeworld||CEFX:Remove1Deferment-perX-Targeted-onDune Fief_and_nonHomeworld" />
+		</card>
+		<card id="1a1a6c7c-d761-47b6-bb6e-2100ecfb8bcc" name="Salsa Secundus">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Homeworld. Fief." />
+			<property name="Operation" value="Engage to produce 4 solaris in your treasury. Declaration Tactic: Engage to deploy Corrino Troop from your hand free of cost." />
+			<property name="Command" value="3" />
+			<property name="Resistance" value="6" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="1" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Gain4Solaris||CE:UseCustomAbility{Salsa Secundus}" />
+		</card>
+		<card id="f482b60a-708c-4994-bd77-ae7fa832ad7e" name="Dune Regency, Seat of the Oppressor">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Homeworld. Dune Fief." />
+			<property name="Operation" value="Engage to produce 4 solaris in your treasury or engage to engage/disengage a target non-homeworld Dune city. Do not subdue Dune Regency when deploying Dune." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="5" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="0" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Gain4Solaris||CE:EngageTarget-Targeted-onCity_and_nonHomeworld||CE:DisengageTarget-Targeted-onCity_and_nonHomeworld" />
+		</card>
+		<card id="6e650cf7-3b64-4ff5-b27d-f530b61dffc5" name="Duke Leto Atreides">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Noble. Duke." />
+			<property name="Operation" value="Initiative Tactic (declaration). Pay X solaris to increase or decrease your declared favor by X. X may not exceed Leto's command." />
+			<property name="Command" value="3" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="4" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="d6ff08f9-0730-40fe-a9dd-97c5cdf00764" name="Gurney Halleck, Troubador-Warrior">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Officer." />
+			<property name="Operation" value="You need not pay the deployment cost to assign ventures to Gurney." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="2" />
+			<property name="Battle" value="3" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="5a7ee8d7-e361-4d4f-8915-d5327cfaa00e" name="Lady Jessica, Concubine of Duke Leto">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Adept. Concubine." />
+			<property name="Operation" value="Declaration Tactic (duration effect). Engage to reduce the force generated by a target rite participant by X. X equals Jessica's weirding rank." />
+			<property name="Command" value="0" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="1" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="3" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="da84e6f4-722e-4c40-834d-fb7c74cdbc37" name="Paul Atreides, Son of Duke Leto">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Noble. Heir." />
+			<property name="Operation" value="Engage to assign X deferment tokens to a target subdued event. X equals Paul's prescience rank." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="3" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="1" />
+			<property name="Prescience" value="1" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Assign1Deferment-perPrescience-Targeted-onEvent" />
+		</card>
+		<card id="ddad7da6-6237-4479-b899-54c3149b905f" name="Thufir Hawat, Master of Assassins">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Mentat." />
+			<property name="Operation" value="Thufir may counter for any rite for which he possesses the corresponding talent." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="1" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="4" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="044b1132-b553-442d-970e-ceab8728155e" name="Evangelina, Breeding Mistress">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Bene Gesserit Sisterhood" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Adept. Consort." />
+			<property name="Operation" value="Declaration Tactic: If declared the target of a rite, engage Evangelina to engage any eligible persona to Counter. Eligible personas must posses the appropriate ability to Counter during that type of rite but they may be governed by a rival player." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="2" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="2" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="9989b8a8-7103-4389-ace2-4e3455f4a035" name="Commander Aramsham">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Officer. Sardaukar." />
+			<property name="Operation" value="Battle Tactic (declaration): When participating in a battle rite, Aramsham's resistance may be reduced by X to increase his battle rank by X. X may not exceed Aramsham's resistance. If his resistance is reduced to 0, vanquish Aramsham upon resolving the rite." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="3" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="C0:UseCustomAbility{Commander Aramsham}" />
+		</card>
+		<card id="e446f01d-b5c9-4110-b37b-e68b02d93180" name="Dr. Kynes, Judge of the Change">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Native." />
+			<property name="Operation" value="Declaration Tactic (Duration effect): Engage to reduce the resistance of a target Dune holding by X. X equals Kyne's arbitration rank." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="1" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="3" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="f1a9eed6-bec4-44a2-bcda-db2886ab305a" name="Emperor Shaddam IV">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Noble. Emperor." />
+			<property name="Operation" value="When you are the victor of a petition initiated by a rival, reduce the final deployment cost by 2 solaris." />
+			<property name="Command" value="3" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="5" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="C0:UseCustomAbility{Emperor Shaddam IV}" />
+		</card>
+		<card id="a96b9563-ec06-483a-a224-547ed522cfd0" name="Gaius Helen Mohiam">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Reverend Mother." />
+			<property name="Operation" value="Declaration Tactic:(Voice Effect) Engage to apply X force to a target ally or aide. If the applied force equals or exceeds the target's resistance, engage the target ally or subdue the target aide. X equals Mohiam's Weirding rank." />
+			<property name="Command" value="0" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="3" />
+			<property name="Prescience" value="1" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="de1285c9-d418-4402-9a25-aa1730a0c35d" name="Kardif, Colonel - Bashar">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Officer. Sardaukar." />
+			<property name="Operation" value="Declaration Tactic: Engage to include Kardif as an additional participant in any battle rite. If Kardif is vanquished, discard 1+X favor. X equals the number of participating troops assigned to Kardif." />
+			<property name="Command" value="3" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="4" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="10c4e4ba-22b6-4c5a-af90-fec28fc5690f" name="Duncan Idaho">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Fremen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Swordmaster." />
+			<property name="Operation" value="Duncan gains Atreides allegiance if any player governs an Atreides noble. When assigned a Crysknife, Duncan gains +1 command and +1 battle rank." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="3" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="04d33243-921b-481d-b94f-7a264a940d75" name="Jarmush, Security Officer">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Spacing Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Officer. Spy." />
+			<property name="Operation" value="Jarmush may Counter during dueling and battle rites." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="3" />
+			<property name="Battle" value="1" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="3682589d-ad56-4a22-961e-dcaaeddd8b3b" name="Baron Vladimir Harkonnen">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Noble. Baron." />
+			<property name="Operation" value="Declaration Tactic: (duration effect) Engage to redirect all force assigned to the Baron to another persona you govern." />
+			<property name="Command" value="3" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="2" />
+			<property name="Arbitration" value="3" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="c881675a-dfff-4c7c-8b47-48610ce61ed9" name="Dr. Yueh, The Traitor">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Physician. Suk." />
+			<property name="Operation" value="Engage and subdue to apply X force to a target ally. X equals Yueh's intrigue rank. If applied force equals or exceeds the target's resistance, subdue the target." />
+			<property name="Command" value="0" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="2" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="1" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="e1a4178e-5acd-4e28-ad2f-e710943ffeb5" name="Glossu Rabban, Regent of Arrakis">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Noble. Count." />
+			<property name="Operation" value="Engage and discard 2 favor to disengage a target fief you govern." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="3" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="2" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CEF2:DisengageTarget-Targeted-onDune Fief-byMe" />
+		</card>
+		<card id="ead81558-bfcf-425b-9170-ea022abc111f" name="Piter de Vries, Twisted Mentat">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Mentat. Assassin." />
+			<property name="Operation" value="Rites led by Piter do not count against your House Interval Limit." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="1" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="4" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="8b742143-18e0-413d-a78b-b1ed833b3ea7" name="Umman Kudu, Captain of the Guard">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Officer. Guard." />
+			<property name="Operation" value="Umman may Counter during dueling and intrigue rites." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="2" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="1" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="52002863-77b9-4396-9009-f0d350f79fbd" name="Dharva Glynn, Miner's Guild Counsel">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Spice Miners Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Mentat. Native." />
+			<property name="Operation" value="Declaration tactic (Duration effect). Engage to increase the resistance and talent rank of a target Miner participant by +1 during an Intrigue or Arbitration rite." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="3" />
+			<property name="Arbitration" value="2" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="0b3c3bf6-40b9-4f0c-b5a6-f8c737c888c1" name="Jareh Benquait">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="Dune Smugglers" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Native." />
+			<property name="Operation" value="When Jareh initiates and leads a battle rite, the defending player must engage the target as a participant if the target is currently disengaged." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="2" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="0030378f-a497-4462-a577-4c00f152f859" name="Styros, Expert Saboteur">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Water Sellers Union" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Ally. Vassal. Officer. Native." />
+			<property name="Operation" value="Battle and Intrigue rites initiated and led by Styros may be considered either Landsraad or CHOAM rites, regardless of the type of rite initiated. You must declare what the rite will be considered when making your attack declaration." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="2" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="4c098854-dde4-467f-b11d-3e1fbf68659a" name="Broken Land">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Fief. Desert." />
+			<property name="Operation" value="Engage to produce 1 spice, assigning it to The Broken Land." />
+			<property name="Command" value="0" />
+			<property name="Resistance" value="5" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="0" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Spawn1Spice" />
+		</card>
+		<card id="e2d51abe-7729-4993-a609-73252e7894c6" name="Splintered Rock">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Fief. Outpost." />
+			<property name="Operation" value="Engage to produce 2 solaris. Battle Tactic (engagement). Assigned troops may be engaged to participate in battle rites targeting desert fiefs you govern." />
+			<property name="Command" value="3" />
+			<property name="Resistance" value="4" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Gain2Solaris" />
+		</card>
+		<card id="fdb23b34-b8a3-4f02-bce1-e4113ef368e1" name="Tsimpo, Garrison Town">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Fief. City." />
+			<property name="Operation" value="Engage to produce 2 solaris in your treasury. Battle Tactic (Declaration/Duration effect): Engage to add +2 to the resistance of a target Dune Fief you govern." />
+			<property name="Command" value="3" />
+			<property name="Resistance" value="4" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="1" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Gain2Solaris||CE:UseCustomAbility{Tsimpo, Garrison Town}" />
+		</card>
+		<card id="e3fca4b1-633c-4cc0-88cc-99f22be8f499" name="Ducal Tithes">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Charter. Dune Tithe." />
+			<property name="Operation" value="If your Homeworld is a Dune Fief, engage to make each of your rivals pay you X solaris. For each player, X equals the number of non-Homeworld Dune fiefs that player governs, or the number of solaris in that player's treasury, whichever is fewer." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="4" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="0" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="{Custom:Ducal Tithes}" />
+		</card>
+		<card id="33fd0e41-7eef-453a-91c2-20d6c00dcd26" name="Breeding Program">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="The Bene Gesserit Sisterhood" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Charter. Partnership." />
+			<property name="Operation" value="Engage to produce 1 solari in your treasury per Sisterhood ally you govern." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="5" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="0" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Gain1Solaris-perAlly_and_allegiance{The Bene Gesserit Sisterhood}" />
+		</card>
+		<card id="616bb269-ebb5-4662-8ee3-93175f9184b9" name="Emperor's Proxy">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Charter. Partnership." />
+			<property name="Operation" value="When petitioning to deploy cards having allegiance to your sponsor, you may reduce the final deployment cost by 2 for every favor you discard." />
+			<property name="Command" value="3" />
+			<property name="Resistance" value="5" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="0" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="C0FX:UseCustomAbility{Emperor's Proxy}" />
+		</card>
+		<card id="973847b9-37fa-4e7b-876a-d9f56a2cc779" name="Skirmishing Spoils">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="The Fremen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Charter. Partnership." />
+			<property name="Operation" value="Reduce the deployment cost of all equipment you assign to Fremen personas or personnel by 1 Solaris each." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="6" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="1" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="C0:Gain1Solaris-perDeployedEquipment-onallegiance{The Fremen}-byMe" />
+		</card>
+		<card id="50ea476f-12dd-4845-a1b9-0f0edbebac80" name="Directorship Kickbacks">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="The Spacing Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Charter. Directorship." />
+			<property name="Operation" value="Engage to produce X solaris in your treasury. X equals the number of directorships you govern, excluding Directorship Kickbacks." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="4" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="0" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Gain1Solaris-perDirectorship_and_not{Directorship Kickbacks}" />
+		</card>
+		<card id="4ee43f2a-9fae-4c3f-b6fb-967a006993d0" name="Baronial Tithes">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Charter. Directorship." />
+			<property name="Operation" value="Engage and subdue a Harkonnen Ally you govern to disengage a fief you govern." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="5" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="0" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="C0:EngageTarget-Targeted-onAlly_and_allegiance{House Harkonnen}&amp;&amp;SubdueTarget-Targeted-onAlly_and_allegiance{House Harkonnen}&amp;&amp;DisengageTarget-Targeted-onFief" />
+		</card>
+		<card id="a5de3d6f-e5d5-45a1-abbe-8afcab5b9458" name="Silo Trust Management">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="The Spice Miners Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Charter. Directorship." />
+			<property name="Operation" value="Engage to produce 2 solaris in your treasury." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="4" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="0" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Gain2Solaris" />
+		</card>
+		<card id="759ea958-fc92-447f-8954-e80c2d7cb8cd" name="Black Market Enterprise">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="Dune Smugglers" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Charter. Partnership." />
+			<property name="Operation" value="Engage to produce 2 solaris in your treasury." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="4" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="0" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Gain2Solaris" />
+		</card>
+		<card id="e1d0517a-5163-4ee2-bb38-dcd8efb0389b" name="Dew Harvesting">
+			<property name="Type" value="Holding" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="The Water Sellers Union" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Charter. Directorship." />
+			<property name="Operation" value="Engage to produce 2 solaris in your treasury." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="4" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="0" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CE:Gain2Solaris" />
+		</card>
+		<card id="525c76ee-1c15-430c-b40e-eb2616b97619" name="Ducal Signet Ring">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Decree. Enhancement. Symbol." />
+			<property name="Operation" value="Assign to a target Atreides noble. The target gains +2 command. Declaration Tactic. Engage the assigned target to disengage an Atreides persona or holding." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CPE:DisengageTarget-Targeted-onPersona_and_allegiance{House Atreides}_or_Holding_and_allegiance{House Atreides}" />
+		</card>
+		<card id="1a863bb6-c253-4335-80b3-cfde8b11e89a" name="High College, Imperial Suk Certificate">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Decree. Enhancement. Title." />
+			<property name="Operation" value="Assign to a target physician or Suk. The target gains Suk subtype. If the target is vanquished during a rite, you gain X favor. X equals the target's command." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="2fe10035-f84c-40b9-9e08-dcf1fee370c3" name="Lisan Al-Gaib, Voice of the Outer Worlds">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="The Fremen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Decree. Enhancement. Title." />
+			<property name="Operation" value="Assign to a noble heir. Declaration tactic: Engage to immediately end a rite in which any native persona or Dune fief you govern is declared a participant. The rite still counts against the attacker's House interval limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="e841343a-a4cb-4640-ab74-0926cbd74551" name="Instrument of the Guild">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Spacing Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Decree. Enhancement. Dictum." />
+			<property name="Operation" value="Limit 1. Assign to a target persona. Engage the assigned persona to add or discard 1 deferment token to or from a deployed nexus event. If the assigned persona possesses the prescience talent, they may add or discard tokens from subdued nexus events as well." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="c2a636b6-8f2e-489f-823d-5be06e6945fa" name="Regent-Siridar, Planetary Governor">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Decree. Enhancement. Title." />
+			<property name="Operation" value="Assign to a target noble you govern. Each time you engage a Dune Fief to produce solaris or spice, you may discard 2 favor to increase the number of spice produced by 1 or the number of solaris produced by 3." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="C0F2:Gain3Solaris||C0F2:Prod1Spice-Targeted-onDune Fief" />
+		</card>
+		<card id="46e10d51-d834-44cf-b50d-36fde6098ac0" name="CHOAM Company Flag">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Spice Miners Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Decree. Enhancement. Dictum." />
+			<property name="Operation" value="Assign to a target Dune fief you govern. If the target is vanquished during a battle rite, the attacking player must discard 1 favor per attack participant as a consequence of the rite." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="a8eb6d8c-01fa-4c28-a158-bb5dce8563cb" name="Beyond the Faufreluches">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="Dune Smugglers" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Decree. Enhancement. Dictum." />
+			<property name="Operation" value="Assign to your homeworld. If your favor is 0, or lower, assign X tokens to this decree when you are required to reduce or discard favor. X equals the number of favor you are required to discard or reduce. Declaration Tactic: Subdue and discard X assigned tokens to increase your favor by X." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="{Custom:Beyond the Faufreluches}" />
+		</card>
+		<card id="082501c6-6c63-4c0f-a318-935844cc5359" name="Water Magnate">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="The Water Sellers Union" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Decree. Enhancement. Title." />
+			<property name="Operation" value="Assign to a target ally. Engage the assigned ally to produce X solaris in your treasury. X equals the assigned persona's command." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="CPE:Gain1Solaris-perCommand" />
+		</card>
+		<card id="88ec6f2e-a815-4de9-b4a4-b31aa21aeca9" name="Schooled Adept">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="Weirding 1" />
+			<property name="Subtype" value="Decree. Enhancement. Title." />
+			<property name="Operation" value="Assign to a target adept. Declaration Tactic: Discard X favor to engage the target to immediately initiate an assigned weirding venture. X equals the deployment cost of the venture." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="3d5a3930-00a6-4a1e-8a1a-e44d1db1ac4c" name="Tame Arrakis">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you vanquish a Dune fief during a battle rite. Venture. Produce X spice in your hoard. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="07a8b477-5870-4669-b043-d1d8e0c39063" name="Insert Watchers">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="The Bene Gesserit Sisterhood" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you subdue or discard an event governed by a rival. Venture. Produce 4X solaris in your treasury. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="175e82a5-4e55-4516-930a-f31b82cc38da" name="Usurp CHOAM Directorship">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you vanquish a directorship during an arbitration rite. Venture: Produce X spice in your hoard. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="56b1b2ab-abe1-42e7-9384-8eca47d63603" name="Shelter the Lisan Al-Gaib">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="The Fremen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time a defender you govern Counters and survives the rite. Venture: Produce 4X solaris in your treasury. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="b80bbf83-169f-40b8-9c84-3d0206ae4ad8" name="Spice Stockpiling">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="The Spacing Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you decrease the value of the CROE by increasing the number of spice in the Guild Hoard. Venture: Increase your favor by 2X. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="8c8a629f-a228-4e41-936b-0106b64d62ee" name="Fall of a Great Rival">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign one program token each time you vanquish one or more allies having adversarial allegiance during an intrigue rite. Venture: Produce X spice in your treasury. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="8ea5374e-8508-4723-bbd6-720f32093d28" name="Surpass Mining Quota">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="The Spice Miners Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you engage a desert you govern to produce spice in the Guild Hoard. Venture. Produce 4X solaris in your treasury. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="22e15aa3-341b-415c-9815-60fe0a589fc3" name="Remain Invisible, Operate in the Shadows">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="Dune Smugglers" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you earn last initiative rank as a result of playing one or more initiative tactics. Venture: Produce 4X solaris in your treasury. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="d25c6fc3-c35a-40ab-869c-92536eb87f48" name="Immobilize Urban Centre">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="The Water Sellers Union" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you vanquish a city or homeworld during a battle rite. Venture: Increase your favor by 2X. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="ff551bd6-426b-443c-94e2-3ff38d031bbd" name="Abduct Heir">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you capture one or more allies during a rite. Venture: Produce X spice in your hoard. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="6e3d7f2d-b87d-495c-ae04-1e9a83eb89b4" name="Dominate the Assembly">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you are the victor of a petition initiated by a rival. Venture: Increase your favor by 2X. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="74002fe7-2572-4601-8bad-e94870082c52" name="Initiative Coup">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you earn first initiative rank as the result of playing one or more initiative tactics. Venture: Produce 4X solaris in your treasury. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="bf9e533f-b042-45b3-9782-79cdc9b42341" name="Prevail in Kanly">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you vanquish one or more allies during a dueling rite. Venture. Produce X spice in your hoard. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="fd698ec6-11c5-4cc6-a5b8-7adc800a35f1" name="Resurrect Alliance">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you successfully petition to deploy an ally that is currently subdued within a rivals domain. Venture. Increase your favor by 2X. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="8de11740-4e1e-4a63-be1d-7480f88bb2b9" name="Suborn Suk, Break Conditioning">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Program." />
+			<property name="Operation" value="Assign 1 program token each time you assign your sponsor's allegiance to an ally governed by a rival. Venture: Increase your favor by 2X. X equals the number of program tokens assigned." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="Imperial" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="b1e32698-743e-4da6-8833-48864fcf7e0a" name="Corrupt Water Official">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Water Sellers Union" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Officer. Spy." />
+			<property name="Operation" value="Engage to discard X favor, producing 2X Solaris in your treasury. X may not exceed 3." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="1" />
+			<property name="Arbitration" value="1" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="CEFX3:Gain2Solaris-perX" />
+		</card>
+		<card id="0379f2e6-f63b-4711-bcbd-6f3290094cfd" name="Cpt. Trumane">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Officer. Unique." />
+			<property name="Operation" value="Trumane may Counter during dueling and intrigue rites targeting an Atreides persona you govern." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="1" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="1" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="ca273094-d45d-4c67-ac60-64095eeadc13" name="Czigo, Harkonnen Trooper">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Soldier. Unique." />
+			<property name="Operation" value="Subdue to capture a subdued aide, assigning it to Czigo. If the aide becomes deployed, immediately transfer it to its former governor's domain, retaining its status." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="48a93718-9777-4109-8eb7-469d274ac336" name="Fremen Marauder">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Fremen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Warrior. Native." />
+			<property name="Operation" value="When Marauder leads a battle rite, you may capture any 1 projectile resource assigned to an opposing participant vanquished during the rite." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="4cde5621-1e4a-4e5a-9fd2-aebd10289656" name="House Courier">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Pilot. Spy." />
+			<property name="Operation" value="Engage to assign a target venture from your hand to an eligible persona governed by a rival. If the rival initiates the venture, either produce X solaris in your treasury or increase you favor by X. X equals the deployment cost of the venture." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="1" />
+			<property name="Arbitration" value="1" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="ce4050ba-56e0-4405-89d7-2a937d6285a7" name="Imperial Suk, of the Inner Circle">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Physician. Suk." />
+			<property name="Operation" value="Declaration Tactic: Engage and subdue to deploy a target subdued persona in your domain. The target need not be assigned any deferment tokens." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="2" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="CS:DeployTarget-Targeted-onPersona" />
+		</card>
+		<card id="8187ba59-41bc-4d92-a70b-5b19bcbe9b0c" name="Lighter Pilot">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="Dune Smugglers" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Pilot. Native." />
+			<property name="Operation" value="When assigned a craft, Lighter Pilot gains surprise during battle rites." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="140ac107-2e32-4a7f-8af1-b0d68645f9ea" name="Lt. Erta, Junior Levenbrech">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Sardaukar. Spy. Unique." />
+			<property name="Operation" value="Lt. Erta may Counter during intrigue or dueling rites targeting Corrino persona you govern." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="1" />
+			<property name="Intrigue" value="1" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="e841821e-ad67-4965-bcc8-b273f7647a3c" name="Lt. Fedor, Field Commander">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Officer. Unique." />
+			<property name="Operation" value="Fedor may counter during battle rites targeting a Dune fief you govern." />
+			<property name="Command" value="3" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="d98e296d-4544-4b59-a62e-756903329032" name="Lt. Kinet, &quot;Scarface&quot;">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Pilot. Unique." />
+			<property name="Operation" value="Kinet is immune to the effects generated by weirding ventures and Voice effects." />
+			<property name="Command" value="0" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="1" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="bffabc1b-243b-4d2b-93ce-431813d1aca7" name="Marduk, Bashar of the Corps">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Officer. Sardaukar. Unique." />
+			<property name="Operation" value="Marduk is immune to capture and discard effects." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="4e832603-aedf-4e9c-87a7-69b140a7ce00" name="Master of Arms, Guard Commander">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Officer." />
+			<property name="Operation" value="Master of Arms may use either assigned blade or assigned projectile weapons during dueling and battle rites. Battle/Dueling Tactic (declaration). Declare which type of assigned weapons will generate effects during the rite." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="2" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="f1a10fdd-0b78-40c8-92f1-05ca63e06d0d" name="Sister of the Azhar">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Bene Gesserit Sisterhood" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Adept. Spy." />
+			<property name="Operation" value="Engage to disengage a target native persona." />
+			<property name="Command" value="0" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="1" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="2" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="CE:DisengageTarget-Targeted-onPersona_and_Native" />
+		</card>
+		<card id="9685dedc-9c2d-499c-8c22-671260cfa92d" name="Watchdog, Informant">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Spacing Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Delegate. Spy." />
+			<property name="Operation" value="Declaration Tactic: Engage to add +2 to the arbitration rank or resistance of a target charter you govern." />
+			<property name="Command" value="2" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="2" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="4592df91-182a-42cf-9bb6-0cc67347b96e" name="Weather Scanner">
+			<property name="Type" value="Persona" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Spice Miners Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Aide. Officer. Scout." />
+			<property name="Operation" value="When deploying Coriolis Storm events, you may apply the generated Storm force directly to a target Dune fief." />
+			<property name="Command" value="1" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="2" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="ea4ca88b-a0da-4dbf-9842-4450959bf285" name="Advance Base">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Bastion." />
+			<property name="Operation" value="Assign to a target desert. Battle Tactic (declaration). Troops assigned to the target may be declared additional participants during battle rites targeting any desert fiefs." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="e617e37f-783c-481f-bc9c-8a0c958649af" name="Bill of Particulars">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="Arbitration 2" />
+			<property name="Subtype" value="Enhancement. Compact. Document." />
+			<property name="Operation" value="Assign to a target persona. Arbitration rites led by the target may be declared and resolved as Landsraad rites." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="dc4203f0-3d86-46ee-b839-d239e0214390" name="Byzantine Corruption">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Condition." />
+			<property name="Operation" value="Limit 2: Discard 1 favor and assign to a target persona. During the disengage phase, the target's governor must either pay you 2 solaris or discard one favor to disengage the target." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="WhileDeployed:ParentDoesNotDisengage||C0:Pay2Solaris-toOwner&amp;&amp;DisengageParent||C0F1:DisengageParent" />
+		</card>
+		<card id="06f23685-09b1-44c4-a724-93f9307def4b" name="Deep Training, in the Weirding Way">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Skill." />
+			<property name="Operation" value="Limit 1. Assign to a target persona. Target gains +2 weirding rank." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="1715277d-cc83-4915-b3af-04bcfecf3817" name="Division Leader">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Title." />
+			<property name="Operation" value="Limit 1: Assign to a target persona. When participating in rites, the target generates +1 force per assigned division." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="9b9d3d10-de6e-4e07-b38e-4ee38ef790d5" name="Expert Command">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Skill." />
+			<property name="Operation" value="Limit 1. Assign to a target persona. The target gains +2 command." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="950d8663-15cd-4c91-8d14-6f412c2d5903" name="Genetic Factor">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="Prescience 0" />
+			<property name="Subtype" value="Enhancement. Condition." />
+			<property name="Operation" value="Limit 1: Assign to a target persona. Target gains +2 Prescience rank." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="4da85a99-a197-40fc-b679-fd9e8de7283d" name="Guild Bank, Financial Headquarters">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="The Spacing Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Bastion." />
+			<property name="Operation" value="Limit 1. Assign to a target city or homeworld governed by a rival. When engaged to produce solaris, produce X solaris in your treasury. X equals the target's command rank. If assigned to a Dune fief, you may deploy native personas and Dune events." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="C0:Gain1Solaris-perParentCommand-whenParentEngaged-forSolaris" />
+		</card>
+		<card id="117d2272-326c-40a2-b881-07860fe8db5a" name="House Armory">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Bastion." />
+			<property name="Operation" value="Assign to a fief you govern. Blade and projectile weapons may be assigned to House Armory. Engage and pay X solaris to transfer X assigned weapons to any number of eligible targets you govern." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="ae9e886e-67e3-4682-ba43-1499a9e5ef17" name="Landing Field">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Bastion." />
+			<property name="Operation" value="Assign to a target city. Target gains subtype outpost and +1 battle rank. Declaration Tactic: Engage to deploy any personnel from your hand. You must pay the full deployment cost for each, and assign each to an eligible target you govern." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="5e7d8689-642c-41a6-b517-f5195ad3a317" name="Landsraad Spokesman">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="6" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Title." />
+			<property name="Operation" value="Assign to an ally. When initiating a petition for a target having the same allegiance as the ally, reduce the listed deployment cost by X. X equals the ally's command. The listed deployment cost may never be reduced below 0." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="15d442f6-6493-4580-88c1-44b6bc12b64e" name="Melee Training">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="Dueling 1" />
+			<property name="Subtype" value="Enhancement. Skill." />
+			<property name="Operation" value="Limit 1. Assign to a target persona. During battle rites, the target generates +X force. X equals the target's dueling rank." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="59dfccae-3450-46e6-a999-f7040cb5f45e" name="Political Conniving">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Skill." />
+			<property name="Operation" value="Limit 1. Assign to a target persona. During arbitration rites, the target generated +X force. X equals the target's intrigue rank." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="214714a8-80d8-461e-be2a-cb4f20aa8096" name="Sabotage">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="Intrigue 1" />
+			<property name="Subtype" value="Enhancement. Skill." />
+			<property name="Operation" value="Assign to a persona you govern. Engage the assigned persona and pay X solaris to apply X force to a target equipment resource. If applied force exceeds the target's deployment cost, discard the target. X may not exceed the target's intrigue rank." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="bb201072-0e25-489d-b9c0-0064aeb80767" name="Sardaukar Mystique">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Condition." />
+			<property name="Operation" value="Limit 1: Assign to a target Sardaukar persona or Corrino troop. Target gains +2 resistance and is immune to capture effects." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="c940b96a-cc95-4ed6-af05-cd00185683fe" name="School Injunction">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Dictum." />
+			<property name="Operation" value="Assign to a persona. The target may not be assigned any ventures." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="cd7e639a-1ede-40f5-9814-4de65242955c" name="Seat of Governance">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="6" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Bastion." />
+			<property name="Operation" value="Limit 1. Assign to a target homeworld or city. Target gains +1 command, +2 battle rank and +4, resistance." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="50685787-5ee6-4952-9fe2-17f5b35763bc" name="Shadowed Place">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Condition." />
+			<property name="Operation" value="Assign to a target subdued event. The target is immune to effects generated by prescience ventures and tactics." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="19e7e42a-2f0b-4105-85b0-aaeecd7043bc" name="Storm Damage">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Condition." />
+			<property name="Operation" value="Assign to a resource assigned directly or indirectly to a Dune fief. Its governor must either pay 1 solari during the disengage phase or else subdue the resource." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="88a3d2f5-795b-44a4-b4f6-0ea96eda0316" name="Tahaddi Al-Burhan">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Secret." />
+			<property name="Operation" value="Limit 1: Assign to a target persona. If the persona becomes engaged, its governor must discard X favor and discard Tahaddi Al-Burhan. X equals the target's command." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="57ed2653-6289-4072-9a24-d49d72e48505" name="Thopter Piloting">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Enhancement. Skill." />
+			<property name="Operation" value="Limit 1. Assign to a target persona. The persona gains the subtype &amp;quot;Pilot&amp;quot;. If assigned a craft, the persona loses 2 command (to a minimum of 0)." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="436241d3-95dd-4dac-813b-d12acdc79624" name="Witching Power">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="Weirding 3" />
+			<property name="Subtype" value="Enhancement. Skill." />
+			<property name="Operation" value="Assign to a target persona. target may initiate weirding rites targeting personas. A weirding rite must be declared as either a Landsraad or CHOAM rite and is conducted by using weirding rank to calculate force." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="30b43fcb-dd52-4842-8032-b2433e7a3b8c" name="Assassins' Handbook">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Equipment. Device. Book." />
+			<property name="Operation" value="Limit 1: Assign to a target Mentat or assassin persona. You may ignore talent requirements when assigning intrigue ventures to the target. Engage Assassin's Handbook to initiate an intrigue venture assigned to the target persona." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="887a3d73-c269-4709-a5ff-f925cbc155c0" name="Battle-Rigged 'Thopter">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Equipment. Transport. Craft." />
+			<property name="Operation" value="Limit 1. Assign to target pilot not currently assigned a craft. Battle Tactic (engagement). When target is engaged to participate in a battle rite, engage to include Battle-Rigged 'Thopter as a participant" />
+			<property name="Command" value="" />
+			<property name="Resistance" value="5" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="3" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="4e4a86f4-74e1-4ca9-8f30-8c5d8cb09568" name="Cannon Artillery">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="Battle 1" />
+			<property name="Subtype" value="Equipment. Weapon. Projectile." />
+			<property name="Operation" value="Assign to a target troop or fief. Target generates +X force during battle rites. X equals the target's battle rank. Even if applied sufficient force, do not vanquish any opposing participants that are assigned shield resources." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="1eb31664-08e9-41fe-9ee6-e24ce53ad7be" name="Cielago Distrans">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="The Fremen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Equipment. Device." />
+			<property name="Operation" value="Assign to a target persona. Engage to transfer a venture assigned to the target persona to another eligible persona having the same allegiance or no allegiance." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="97b49847-46ff-4f1b-9422-a0d42da5445a" name="Disguising Uniform">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Equipment. Device. Suit." />
+			<property name="Operation" value="Assign to a target persona or personnel you govern. The assigned target loses all current allegiance and is considered to have no allegiance. If vanquished during a rite, the target does not count as a participant with regard to determining the solari or favor reward of the rite." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="10f42435-7e6c-484d-9dfe-600d1cca9837" name="Drag-Line Outfit">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Equipment. Transport." />
+			<property name="Operation" value="Assign to a target Spice Harvester. Target gains +1 resistance. When engaging the Harvester to transfer spice, you may either ignore paying the 1 solari or you may pay 2 solaris to transfer 2 spice." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="C0:Gain1Solaris-warnWorkaround||C0:Transfer1Spice-warnWorkaround-Targeted-onDesert" />
+		</card>
+		<card id="c25cf290-b8f5-4860-889f-abaf9fb17164" name="Fabled Crysknife">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="Dueling 1" />
+			<property name="Subtype" value="Equipment. Weapon. Blade." />
+			<property name="Operation" value="Limit 1: Assign to an ally not already assigned a blade. The ally gains +1 dueling rank. The ally may not be declared the target of rites initiated by Fremen personas." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="668380c2-f3a5-4a8f-b7a0-14340b22c826" name="Lasgun Turret, Mounted Lasgun">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Equipment. Weapon. Projectile." />
+			<property name="Operation" value="Assign to a target fief assigned a bastion or a target pilot assigned a craft. When participating in battle rites, the target generates +3 force." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="d2f30a03-9018-4d36-b9ee-4ac230e8d03c" name="Manual of the Friendly Desert">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Equipment. Device. Book." />
+			<property name="Operation" value="Limit 1: Assign to a persona you govern. Target gains subtype native. Duration Tactic: If you govern a Dune fief, you may subdue Manual of the Friendly Desert to assign one deferment token to the assigned persona." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="9f17a6a4-7145-4951-b6a3-28e2562ee2a9" name="Scout 'Thopter">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Equipment. Transport. Craft." />
+			<property name="Operation" value="Limit 1. Assign to a target pilot not currently assigned a craft. Battle Tactic (declaration): Engage to either add +2 to the force generated by your leader or to give your leader surprise." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="bc3990cb-8f93-485b-850c-092464f28868" name="Troop Crusher, Battle Frigate">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Equipment. Transport. Craft." />
+			<property name="Operation" value="Limit 1. Assign to a target pilot not currently assigned a craft. When leading battle rites the target and all of its assigned troops are immune to force generated by opposing troops." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="4" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="2c42927e-7975-4e9d-849a-7504c46034fb" name="Arrakeen Richece">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Corps. Reserve." />
+			<property name="Operation" value="Assign to a target persona or fief. If assigned to Arrakeen, gain 1 favor per Arrakeen Richece that survives any rite targeting Arrakeen." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="1" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="1" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="c29161aa-a9aa-426a-bdde-aa4fdcfab56d" name="Atreides Brigade">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="5" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Troop. Brigade." />
+			<property name="Operation" value="Assign to a target persona or fief. If assigned to an Atreides persona or fief, Atreides Brigade gains +1 resistance." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="4" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="6891f74f-043e-4d84-ac12-d09f7bba9ba2" name="Demolition Corps">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Corps. Division." />
+			<property name="Operation" value="Assign to a target persona or fief. Battle Tactic (declaration): Subdue to add +2 force generated by the assigned target." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="1" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="48c548d0-efff-44fa-8492-9c88d5d15b23" name="Disguised Sardaukar">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="6" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Troop. Brigade." />
+			<property name="Operation" value="Assign to a target persona or fief. Battle Tactic (engagement): If target participates in a battle rite, engage to include as a participant." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="4" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="4" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="54dfda26-dd12-4348-b27d-028cb6ece095" name="Folk of Graban and Pan">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="None" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Corps. Reserve." />
+			<property name="Operation" value="Assign to a target Dune fief. When participating in a battle rite, the attacker must discard X favor per Folk of Grabban and Pan that are vanquished during the rite. X equals the number of attack participants. Discard Folk of Grabban and Pan when vanquished." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="1" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="0" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="f239feb3-e0fe-4e5c-8e1f-ebdca9dcce8c" name="Fremen Band">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="The Fremen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Troop. Reserve." />
+			<property name="Operation" value="Assign to a target persona or fief. If vanquished during a Battle rite, you must discard Fremen Band." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="3" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="b408aa90-1ae2-4414-a1f2-24e649374e7a" name="Guild Security Division">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Spacing Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Troop. Battalion." />
+			<property name="Operation" value="Assign to a target fief you govern. If Security Division is vanquished during a battle rite, the attacking player must discard 1 favor." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="1" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="3" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="78cc8568-9911-41c8-9f54-21e15393e821" name="Harvesting Outfit">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Spice Miners Guild" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Troop. Division." />
+			<property name="Operation" value="Assign to a target persona or fief. When participating in attacks targeting desert fiefs, you may capture 1 assigned spice per participating Harvesting Outfit if the target desert is vanquished." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="2" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="6bc96139-c137-4397-89ed-e25eabeaed7e" name="Hellhounds, Mercenary Corps">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="House Harkonnen" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Troop. Brigade." />
+			<property name="Operation" value="Assign to a target persona or fief. Battle Tactic (engagement): Pay X solaris to give X Hellhound troops surprise." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="3" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="b0c508ac-db94-4407-b479-d34f7df39c47" name="Honor Guard">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="The Bene Gesserit Sisterhood" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Troop. Guard." />
+			<property name="Operation" value="Assign to a target persona. If the target possesses Sisterhood allegiance, Honor Guard does not count against the target's command limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="2" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="22fac588-7acb-43c9-ab65-865c5f9ac3b4" name="Hydraulic Initiative Corps">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="The Water Sellers Union" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Corps. Division." />
+			<property name="Operation" value="Assign to a target persona or charter. Hydraulic Initiative Corps gains surprise when participating in intrigue rites." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="1" />
+			<property name="Arbitration" value="1" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="3ace062e-3aec-4c2d-8901-c81a3d27ee8d" name="Imperial Agents">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Corps. Cohort." />
+			<property name="Operation" value="Assign to a target persona or charter." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="2" />
+			<property name="Arbitration" value="2" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="4f181e26-76f5-4d23-b8a8-b143d883f715" name="Propaganda Corps">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="House Atreides" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Corps. Division." />
+			<property name="Operation" value="Assign to a target persona or charter. Declaration Tactic. If the assigned persona or charter is declared the target of an arbitration rite, engage to give a target disengaged persona having the arbitration talent the ability to counter." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="2" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="2" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="02a92a55-e315-40f2-9301-d65738716c45" name="Sardaukar Drop-Battalion">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="6" />
+			<property name="Allegiance" value="House Corrino" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Troop. Battalion." />
+			<property name="Operation" value="Assign to a target persona. If the opposing leader is vanquished during a battle rite in which a Drop-Battalion participates, gain 1 favor per surviving Drop-Battalion." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="4" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="478e1918-ebc0-4118-8640-a59a2926c7d6" name="Smuggler Underground">
+			<property name="Type" value="Resource" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="Dune Smugglers" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Personnel. Corps. Cohort." />
+			<property name="Operation" value="Assign to a target persona." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="3" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="0" />
+			<property name="Intrigue" value="2" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="4985546d-94dc-41a3-b2d8-ab7dcf1e847a" name="Assailant's Calling Card">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Intrigue. Engagement." />
+			<property name="Operation" value="Duration Effect: Assign to the opposing leader. If vanquished, you may opt not to subdue the assigned leader and any of its assigned participants, gaining X solaris instead. X equals the leader's deployment cost +1 per additional participant left unsubdued" />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="43e999eb-f036-43d9-b117-83a01269f491" name="Backstabbing">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Duel. Engagement." />
+			<property name="Operation" value="Duration Effect. Assign to your leader. When distributing force, you may divide your force among the opposing participants as you wish, ignoring the normal order of distribution." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="47efd42f-68f7-4d0f-8906-f48515a8dc7a" name="Battle Company">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Battle. Declaration." />
+			<property name="Operation" value="Duration Effect: Assign to a target leader. Group the leader and X assigned participants to count as a single battle participant. Ignore the operations and card types of the assigned participants, observing only the type and operation of the target leader." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="929088b5-47b6-46f5-ac1a-d58e5b022d4f" name="Dishonorable Knifework">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Duel. Declaration." />
+			<property name="Operation" value="Duration Effect: Assign to a target leader. Group the leader and X assigned participants to count as a single duel participant. Ignore the operations and card types of the assigned participants, observing only the type and operation of the target leader." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="068b0ab9-cb4f-41d0-9cf9-b55701ff9c98" name="Distrans Message">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Declaration." />
+			<property name="Operation" value="Transfer up to X ventures assigned to a target persona you govern to other eligible personas you govern." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="8995bc3e-6dff-4089-9344-4984a07f1b48" name="Fog of Battle">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Battle. Engagement." />
+			<property name="Operation" value="Duration Effect. Assign to your leader. When distributing force, you may divide your force among the opposing participants as you wish, ignoring the normal order of distribution." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="2bc8bbae-aaa2-4aa7-90e6-4f4d1a9f24b0" name="Gang Assailants">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Intrigue. Declaration." />
+			<property name="Operation" value="Duration Effect: Assign to a target leader. Group the leader and X assigned participants to count as a single intrigue participant. Ignore the operations and card types of the assigned participants, observing only the type and operation of the target leader." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="8aa762bd-7f04-47ae-a4ba-e85fecfdbb79" name="Grant Quarter">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Battle. Declaration." />
+			<property name="Operation" value="Duration Effect: Assign to your rival's leader. If assigned sufficient force to be vanquished, you may allow the leader and its additional participants to survive, gaining X favor instead. X equals the leader's deployment cost +1 per additional participant." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="73eb7a11-40e8-40a3-9d53-5a69a93b7fc3" name="Gross Soliciting">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Discard. Declaration." />
+			<property name="Operation" value="Duration Effect: Discard X favor to increase or decrease a target player's assembly limit by X. X may not exceed 2." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="26aea017-448a-4820-8643-22d0fd1b3531" name="Incite Hysteria">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Intrigue. Engagement." />
+			<property name="Operation" value="Duration Effect: Assign to your leader. When distributing force, you may divide your force among the opposing participants as you wish, ignoring the normal order of distribution." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="8329c712-2e42-4d33-a95b-d24bdae53f3f" name="Letter of Credit">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Petition. Declaration." />
+			<property name="Operation" value="Duration Effect: Assign to a target noble you govern. You may bid as if you possessed 10 additional solaris in your treasury. If you are the victor and cannot pay the full deployment cost, you must discard the target noble." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="92afafe4-46db-43dd-ab21-2950fa381075" name="Lost in the Desert">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Declaration." />
+			<property name="Operation" value="Subdue a target aide you govern to subdue a target aide governed by a rival." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="e8ff765b-4043-4e08-911a-a5d478fb2b82" name="Overwhelming Affluence">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Initiative. Declaration." />
+			<property name="Operation" value="Pay X solaris to increase or decrease a target player's declared favor by X." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="b4b8717d-82df-40f0-b280-9b983fe1f858" name="Political Combine">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Arbitration. Declaration." />
+			<property name="Operation" value="Duration Effect: Assign to a target leader. Group the leader and X assigned participants to count as a single arbitration participant. Ignore the operations and card types of the assigned participants, observing only the type and operation of the target leader." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="a1fa4c10-7749-4b9c-be52-f0491abc03bf" name="Preordained Sequence">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Initiative. Declaration." />
+			<property name="Operation" value="Limit 1: Discard X favor and assign to a target rival's homeworld. Duration Effect: After all initiative ranks are assigned, change the target's governor's initiative rank to X. Players must draw cards normally to break any ranking ties this effect creates." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="6e9b427b-9529-4213-a5d9-860e0d9e6a29" name="Relinquish Claim">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Arbitration. Engagement." />
+			<property name="Operation" value="Duration Effect: Assign to the opposing leader. If vanquished, you may opt not to subdue the assigned leader and any of its assigned participants, gaining X solaris instead. X equals the leader's deployment cost +1 per additional participant left unsubdued." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="8aac9f66-764a-4d04-ab3a-4d5b56d35b2c" name="Shaitan's Bargain">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Initiative. Declaration." />
+			<property name="Operation" value="Duration effect. Target an ally you govern to increase your declared favor by X. X equals twice the target's deployment cost. If you fail to achieve initiative rank 1, you must discard the target." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="d55b25fe-c31b-4f14-ac76-ee9909776111" name="Smuggling Compact">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Discard. Declaration." />
+			<property name="Operation" value="Duration Effect: Pay 2X solaris to increase or decrease a target player's hand limit by X. X may not exceed 5." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="ec681831-d9ac-44a7-81f7-5be31cdcb794" name="Stake Reputation">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Petition. Declaration." />
+			<property name="Operation" value="Duration Effect. Assign to the target of the Petition, negating all previous bids. Reduce the target's deployment cost to 0. All players now bid using favor. The victor must discard the entire amount of favor bid and, if the Petitioner, must also pay the listed deployment cost in solaris." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="45173f45-a02c-4d14-888c-3bdbd7dbb6dd" name="Supply Routing">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Declaration." />
+			<property name="Operation" value="Deploy a target resource from your hand by paying its deployment cost and assigning it to an eligible target." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="40a9b523-cd98-46a2-9f3e-a51dfb6c155a" name="Transfer Orders">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Declaration." />
+			<property name="Operation" value="Transfer up to X target personnel and/or equipment you govern from an assigned target to a new eligible target you govern. The target cards retain their current status when transferred." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="78e66f8f-03bc-4423-af27-da120223c596" name="Unfulfill'd Plans">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Tactic. Declaration." />
+			<property name="Operation" value="Discard X favor to subdue X ventures or programs assigned to a single target." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="e5dcdd34-75f6-410c-b265-c8852b01b579" name="Blood Feuding">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="2" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Dueling 4" />
+			<property name="Subtype" value="Venture. Duel." />
+			<property name="Operation" value="Initiate a dueling rite. Discard all participants vanquished during the rite. This rite counts against your House Interval Limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="d4b093cf-ce55-47f8-a9f5-b4a9a142b828" name="Challenge by Combat">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Dueling 3" />
+			<property name="Subtype" value="Venture. Duel." />
+			<property name="Operation" value="Initiate a dueling rite naming any fief as the target. This rite is considered a Landsraad rite and counts against your House Interval Limit. Only the defending player may deploy dueling tactics during the rite." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="ca19ebea-7418-403c-b54e-296954559b1f" name="CHOAM Complot">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Intrigue 3" />
+			<property name="Subtype" value="Venture. Intrigue." />
+			<property name="Operation" value="Initiate an intrigue rite naming any charter as the target. This rite is considered a CHOAM rite and counts against your House Interval Limit. Only the defending player may deploy intrigue tactics during the rite." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="171c5347-2fc1-47d0-95a8-1b20e8e552ac" name="Counter Conspiracy">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Venture. Transfer." />
+			<property name="Operation" value="Transfer a target venture assigned to a rival persona to an eligible persona you govern. X equals the deployment cost of the target venture." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="91281057-07ec-4cd4-8842-ed2654a1e6e3" name="Enlist Survivor">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Venture. Petition." />
+			<property name="Operation" value="Initiate a petition to capture a target subdued aide. All players participate as petitioners with the victor capturing the target upon paying the previous governor the final deployment cost. Assign 1 deferment token to the target upon resolution." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="0b4624cf-ffe4-4b51-bf02-e4baea233337" name="Exploit CHOAM Channels">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Arbitration 4" />
+			<property name="Subtype" value="Venture. Arbitration." />
+			<property name="Operation" value="Exchange a target charter you govern with a target charter governed by a rival. Each retains it's current status. Cards assigned to each charter transfer to the other. If the charters have different deployment costs, the player receiving the cheaper charter gains favor equal to the difference." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="2a2e337d-7804-493a-b27d-d6281e0a670c" name="Fencing Operation">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Venture. Petition." />
+			<property name="Operation" value="Engage to initiate a petition for a target equipment resource you govern. All players participate as petitioners with the victor deploying the target in their own domain upon paying you the final deployment cost. This target is deployed in the disengaged position." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="51183d56-ed70-4dc7-8be0-d3e830df62b6" name="Focus Awareness">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Prescience 3" />
+			<property name="Subtype" value="Venture. Prescience." />
+			<property name="Operation" value="Subdue a target nexus event and discard its assigned deferment tokens. X equals the number of  assigned deferment tokens." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="2bdb8754-d956-4864-887d-611a6b7d0fec" name="Grant Furlough">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Venture. Transfer." />
+			<property name="Operation" value="Transfer a target persona you govern to a rival's domain, retaining its current status. The rival must either pay you solaris equal to the target's deployment cost or discard an equal amount of favor. Once transferred, the rival becomes the new governor of the target." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="0baef541-93fd-4707-bccc-00c3e1b330fb" name="Maneuver Pawn">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Weirding 4" />
+			<property name="Subtype" value="Venture. Weirding." />
+			<property name="Operation" value="Engage an eligible persona governed by a rival to initiate a rite against a target governed by any player. You are considered the attacking player during the rite, but you and the persona's governor both collect the full reward if the target of the rite is vanquished. This rite counts against your House interval limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="c2b7af9a-c4ce-42c9-aa88-c07d9920a0e5" name="Medical Tampering">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="1" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Intrigue 1" />
+			<property name="Subtype" value="Venture. Deployment." />
+			<property name="Operation" value="Assign to a Suk you govern. Pay X solaris to discard a target skill enhancement. X equals the target's deployment cost." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="c475dddc-774d-4169-8f6e-74eb3551fd06" name="Open Battle">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Battle 3" />
+			<property name="Subtype" value="Venture. Battle." />
+			<property name="Operation" value="Initiate a battle rite naming any persona having battle talent as the target. This rite is considered a Landsraad rite and counts against your House Interval Limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="2fa8153f-738d-47f6-9404-a40d8b1f662f" name="Political Blackmail">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Arbitration 3" />
+			<property name="Subtype" value="Venture. Arbitration." />
+			<property name="Operation" value="Initiate an arbitration rite naming any persona having arbitration talent as the target. This rite is considered a CHOAM rite and counts against your House Interval Limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="a0ccf134-be7a-444a-8dcd-964bd963d0da" name="Regional Assignment">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Venture. Rite." />
+			<property name="Operation" value="Duration Effect. Initiate a rite. Ignore all effects generated by counter operations and/or tactics for the duration of the rite. This rite counts against your House Interval limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="8b8bfd79-bd8a-4b60-890b-2a1185a4f4e7" name="Sterilization Proceedings">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Battle 4" />
+			<property name="Subtype" value="Venture. Battle." />
+			<property name="Operation" value="Initiate a battle rite. Discard all non-fief participants vanquished during the rite. This rite counts against your House Interval Limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="c75c014e-2c1c-42c7-aec9-f874c7caa9a4" name="Traverse the Alam Al-Mithal">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="0" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Prescience 4" />
+			<property name="Subtype" value="Venture. Prescience." />
+			<property name="Operation" value="Pay X solaris to discard a target event located in any player's domain. If the target is subdued, X equals the number of deferment tokens assigned to the target. If deployed, X equals the target's final deployment cost." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="b302d18e-fe11-4203-add6-e0e033738d57" name="Truthtrance Inquest">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Weirding 3" />
+			<property name="Subtype" value="Venture. Weirding." />
+			<property name="Operation" value="Apply X force to a target ally governed by a rival. X equals the weirding rank of the assigned persona. If the applied force exceeds the target's resistance, turn the target face down and transfer it to the owner's assembly." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="66814df7-ce64-4429-8ae6-37978ca6632f" name="Unleashed Horror">
+			<property name="Type" value="Plan" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="Intrigue 4" />
+			<property name="Subtype" value="Venture. Intrigue." />
+			<property name="Operation" value="Initiate an intrigue rite. Discard all participants vanquished during the rite. This rite counts against your House Interval Limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="290b104e-cc2a-4858-8739-cddc632ffcb7" name="Assertion of Mining Rights">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Event. Nexus." />
+			<property name="Operation" value="Duration Effect: The first arbitration rite a player initiates against each of their rivals does not count against their House Interval Limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="15c0740e-9db4-486f-ab1f-47cc5ffe323d" name="Contract Audits">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="4" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Event." />
+			<property name="Operation" value="Your rivals must either pay you 2 solaris per Dune contract they govern or subdue each contract for which they do not pay." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="e893ab7a-7152-4b4c-9855-1959e1e44a80" name="Mobilization of the Tribes">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Event. Nexus." />
+			<property name="Operation" value="Duration Effect. As a general operation of their House intervals, all players may engage any personnel they govern to transfer them from an assigned target to another, eligible target they govern." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="6764dd95-c869-401a-bc01-f93179e3c44f" name="Program of Extermination">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Event." />
+			<property name="Operation" value="Duration effect: Discard all troops vanquished during battle rites." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="ad3e3454-ff8d-4a50-b06b-0abe7e81e740" name="Revolt of the Dew Gatherers">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Event. Nexus." />
+			<property name="Operation" value="Duration Effect. Players who govern one or more Dune fiefs may buy no more than 3 favor during their House intervals." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="b8614e7e-56f5-4a93-b4d1-e9a265678c92" name="Sack of the Guild Bank">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Event." />
+			<property name="Operation" value="Discard a number of spice from the Guild Hoard equal to the number of players in the game. X equals the CROE. Each player must immediately transfer one spice to the Guild Hoard or discard X favor. Reset the CROE upon completion." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="08777d8e-5fe6-48fd-ba91-bef04f0234b3" name="Thunder At Twilight">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Event. Nexus." />
+			<property name="Operation" value="Duration Effect: The first battle rite a player initiates against each of their rivals does not count against their House Interval Limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="6648372a-07e0-4517-8225-59217e319ba1" name="Benefice of Allegiance">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Imperium Event. Nexus." />
+			<property name="Operation" value="Duration Effect. During the initiative phase, all players may increase their declared favor by an amount equal to the number of sponsor allies they govern." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="752e99ce-0f99-4eed-8380-1a22ad8361fe" name="Culmination of Training">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Imperium Event. Nexus." />
+			<property name="Operation" value="Duration Effect: The first intrigue rite a player initiates against each of their rivals does not count against their House Interval Limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="3b7f7387-34f7-4cbb-80d8-655f6d78a508" name="Hazard Rates, Shipping Rate Increase">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Imperium Event. Nexus." />
+			<property name="Operation" value="Duration Effect: During the deferment phase, do not assign tokens to troops already assigned one or more deferment tokens." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="4037dfaf-2c21-418f-ab84-1d9d5c30a138" name="Mockery of CHOAM">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Imperium Event." />
+			<property name="Operation" value="Duration Effect: Players initiating CHOAM rites who fail to vanquish their declared target must discard X favor. X equals 1 per attack participant or their current total favor, whichever is less." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="0848d729-8780-4668-bef6-3bef2f604256" name="Right of the Faufreluches">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Dune Event. Nexus." />
+			<property name="Operation" value="Duration Effect: The first dueling rite a player initiates against each of their rivals does not count against their House Interval Limit." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="ce9d19fe-5504-4b14-8fc4-42bfe0346578" name="Scavenging Warfare">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="X" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Imperium Event. Nexus." />
+			<property name="Operation" value="Duration Effect: Whenever personas or personnel are captured or discarded, all of their assigned equipment remains assigned, also either being captured or discarded." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+		<card id="0964604d-d442-45bf-9fa4-44b45279dac6" name="Scorn of the Landsraad">
+			<property name="Type" value="Event" />
+			<property name="Deployment Cost" value="3" />
+			<property name="Allegiance" value="" />
+			<property name="Talent Requirement" value="" />
+			<property name="Subtype" value="Imperium Event." />
+			<property name="Operation" value="Duration Effect. Players initiating Landsraad rites who fail to vanquish their declared targets must discard X favor. X equals 1 per attack participant or their current total favor, whichever is less." />
+			<property name="Command" value="" />
+			<property name="Resistance" value="" />
+			<property name="Dueling" value="" />
+			<property name="Battle" value="" />
+			<property name="Intrigue" value="" />
+			<property name="Arbitration" value="" />
+			<property name="Weirding" value="" />
+			<property name="Prescience" value="" />
+			<property name="Decktype" value="House" />
+			<property name="AutoScript" value="" />
+		</card>
+	</cards>
+</set>

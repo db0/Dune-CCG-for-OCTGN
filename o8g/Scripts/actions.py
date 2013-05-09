@@ -139,6 +139,8 @@ def chooseWell(limit, choiceText, default = None):
    else: choice = 0 # If our limit is 1, it means there's only one choice, 0.
    return choice
    
+def download_o8c(group,x=0,y=0):
+   openUrl("http://dbzer0.com/pub/Dune/sets/Dune-Sets-Bundle.o8c")
 #---------------------------------------------------------------------------
 # Card Placement functions
 #---------------------------------------------------------------------------

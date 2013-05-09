@@ -1,24 +1,9 @@
-Dune CCG plugin for OCTGN
-=========================
+Changelog - Dune CCG OCTGN Game Definition
+===============================================
 
-One of the most interesting and complex and deep CCGs ever devised, within the best Sci-Fi universe ever conceived. The Dune CCG is now available in OCTGN. You want more details? Then [look no further](http://boardgamegeek.com/thread/739664/god-created-dune-ccg-to-train-the-faithful-paul).
+### 3.0.0.x
 
-Note: This is just the game engine, you'll also need to download [the sets](http://octgn.gamersjudgement.com/viewtopic.php?f=42&t=236). If you've never played the Dune CCG before, you can find [the rulebook here](http://boardgamegeek.com/file/download/c6bw2c3cu/DuneRulebookv2.1.pdf).
-
-Screenshots
------------
-(Click for larger size)
-
-Sample screenshot of 1.1.2 (A 3-Player game in progress)
-
-[![](http://i.imgur.com/wt1rXl.jpg)](http://i.imgur.com/wt1rX.jpg)
-
-Sample screenshot of 1.1.2 (Another 3-Player game in progress
-
-[![](http://i.imgur.com/9jKNml.jpg)](http://i.imgur.com/9jKNm.jpg)
-
-Changelog
----------
+* Version compatible with OCTGN 3.1.x
 
 ### 2.0.4
 
@@ -219,9 +204,3 @@ Because of the changes below all existing sets at v0.0 are now incompatible with
 * Deploying a face down card (that doesn't have an "Assembly" marker) with less deferment tokens than its deployment cost will ask the player to pay the difference. It will also notify everyone is a player deploys something with 0 deferment tokens
 * The "refresh all" function will remove Assembly markers from face up cards. This way, you can see which cards have just been put in from the assembly this turn.
 
-
-Roadmap
--------
-
-- Need to fix the sets
--- Remove the word 'Event' from card subtypes
