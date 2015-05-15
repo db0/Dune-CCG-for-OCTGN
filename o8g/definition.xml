@@ -4,13 +4,14 @@
       name="Dune" 
       id="c196d3b0-bb5e-4d08-b49b-20dbce40443f" 
       octgnVersion="3.1.0.0" 
-      version="3.0.0.0" 
+      version="3.0.1.0" 
       markersize="24"
       tags="multiplayer dune sci-fi long CCG complex"
       description="A complex card game set in Frank Herbert's Dune universe.&#xd;&#xd;&#xd;Players are the heads of Minor Houses (sponsored by one of the familiar factions, e.g. Atreides) attempting to become a Great House via intrigue, politics or combat, and join the Landsraad.&#xd;&#xd;This game really shines when played with more than 2 players.&#xd;&#xd;Automation rank: B&#xd;(This game definition contains some useful card automatizations to speed up play and avoid mistakes)"
       setsurl="https://github.com/db0/Dune-CCG-for-OCTGN#available-sets"
       gameurl="https://github.com/db0/Dune-CCG-for-OCTGN#dune-ccg-plugin-for-octgn"
       authors="Db0"
+      scriptVersion="3.1.0.1"
       iconurl="https://raw.github.com/db0/Dune-CCG-for-OCTGN/master/sandworm.jpg">
 	<scripts>
 		<script src="Scripts/actions.py" />
